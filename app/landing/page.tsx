@@ -177,35 +177,25 @@ function Hero() {
   );
 }
 
-type Product = {
-  id: string;
-  title: string;
-  handle: string;
-  image: string | null;
-  imageAlt: string;
-};
-
 function StoryIn() {
   const sectionRef = useRef(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [storeDomain, setStoreDomain] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [productsRevealed, setProductsRevealed] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<{
-    product: Product;
-    subtitle: string;
-    img: string;
+  const [products, setProducts] = useState<Array<{
+    id: string;
+    title: string;
+    handle: string;
+    image: string | null;
     imageAlt: string;
-  } | null>(null);
+  }>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch products from Shopify
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
         if (response.ok) {
           const data = await response.json();
           setProducts(data.products || []);
-          setStoreDomain(data.storeDomain || '');
         } else {
           console.error('Failed to fetch products');
         }
@@ -218,13 +208,6 @@ function StoryIn() {
 
     fetchProducts();
   }, []);
-
-  // When products finish loading, reveal cards after a short delay (one-time visible animation)
-  useEffect(() => {
-    if (loading || products.length === 0) return;
-    const t = setTimeout(() => setProductsRevealed(true), 50);
-    return () => clearTimeout(t);
-  }, [loading, products.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -249,16 +232,17 @@ function StoryIn() {
     return () => observer.disconnect();
   }, []);
 
-  // Map products to display format (include product for modal)
+  // Map products to display format
   const items = products.map((product) => {
+    // Extract subtitle from title or use default
     let subtitle = 'A small moment, beautifully delivered';
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
       subtitle = 'A collection of memories';
     } else if (product.title.toLowerCase().includes('7') || product.title.toLowerCase().includes('seven')) {
       subtitle = 'A story told over time';
     }
+    
     return {
-      product,
       title: product.title,
       subtitle,
       img: product.image || '/placeholder-product.png',
@@ -279,8 +263,8 @@ function StoryIn() {
         <div className="absolute inset-0 bg-[#FDF9F5]/10" />
       </div>
 
-      <div className="pointer-events-none absolute bottom-0 right-0 z-10 h-[400px] w-[250px] sm:h-[500px] sm:w-[300px] lg:h-[600px] lg:w-[400px] xl:h-[700px] xl:w-[500px] overflow-hidden opacity-60 lg:opacity-80">
-        <Image src="/plant.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
+      <div className="pointer-events-none absolute bottom-0 right-0 z-10 h-[500px] w-[300px] sm:h-[700px] sm:w-[400px] lg:h-[900px] lg:w-[550px] xl:h-[980px] xl:w-[650px] overflow-hidden rounded-[10px] opacity-50 lg:opacity-100">
+        <Image src="/plant.png" alt="" fill className="object-contain object-right-bottom" sizes="650px" />
       </div>
 
       <div className="relative z-10">
@@ -302,33 +286,25 @@ function StoryIn() {
                   ))}
                 </div>
               ) : items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
                   {items.map((i, idx) => (
-                    <button
-                      type="button"
-                      key={i.product.id}
-                      onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
-                      className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 ${
-                        productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                      }`}
-                      style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
-                    >
-                      <div className="relative mx-auto h-[180px] sm:h-[200px] lg:h-[220px] xl:h-[240px] w-full max-w-[180px] sm:max-w-[200px] lg:max-w-[220px] mb-4">
+                    <div key={idx} className="text-center group animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
+                      <div className="relative mx-auto h-[200px] sm:h-[240px] lg:h-[280px] xl:h-[340px] w-full max-w-[200px] sm:max-w-[220px] lg:max-w-[260px] mb-3">
                         <Image
                           src={i.img}
                           alt={i.imageAlt || i.title}
                           fill
-                          className="object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
-                          sizes="(min-width: 1280px) 220px, (min-width: 1024px) 200px, (min-width: 640px) 180px, 160px"
+                          className="object-contain scale-[1.45] sm:scale-[1.55] lg:scale-[1.65] drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-[1.72] transition-transform duration-500"
+                          sizes="(min-width: 1280px) 260px, (min-width: 1024px) 220px, (min-width: 640px) 200px, 180px"
                         />
                       </div>
                       <h4 className="font-serif text-[18px] sm:text-[19px] lg:text-[20px] text-[#2D2926] font-medium leading-tight">
                         {i.title}
                       </h4>
-                      <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[160px] mx-auto">
+                      <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[18px] text-[#2D2926]/60 leading-relaxed max-w-[160px] mx-auto">
                         {i.subtitle}
                       </p>
-                    </button>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -375,139 +351,7 @@ function StoryIn() {
           </div>
         </div>
       </div>
-
-      {/* Product detail modal */}
-      {selectedProduct && (
-        <ProductModal
-          selected={selectedProduct}
-          storeDomain={storeDomain}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
     </section>
-  );
-}
-
-function ProductModal({
-  selected,
-  storeDomain,
-  onClose,
-}: {
-  selected: { product: Product; subtitle: string; img: string; imageAlt: string };
-  storeDomain: string;
-  onClose: () => void;
-}) {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const product = selected.product;
-  const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
-
-  const handleBuyNow = () => {
-    const trimmed = email.trim();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!trimmed) {
-      setEmailError('Email is required');
-      return;
-    }
-    if (!emailRe.test(trimmed)) {
-      setEmailError('Please enter a valid email address');
-      return;
-    }
-    setEmailError('');
-    if (storeDomain && product.handle) {
-      const url = `https://${storeDomain}/products/${product.handle}`;
-      window.open(url, '_blank');
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-6 sm:p-8">
-          <div className="flex justify-end mb-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors"
-              aria-label="Close"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="relative aspect-[4/3] w-full max-w-[280px] mx-auto rounded-xl overflow-hidden mb-6">
-            <Image
-              src={selected.img}
-              alt={selected.imageAlt}
-              fill
-              className="object-contain"
-              sizes="280px"
-            />
-          </div>
-          <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
-            {product.title}
-          </h3>
-          <p className="text-[#2D2926]/60 text-sm text-center mb-6">{selected.subtitle}</p>
-
-          <div className="space-y-4 mb-6 text-[#2D2926]/80 text-sm">
-            <div>
-              <h4 className="font-semibold text-[#2D2926] mb-1">What you get</h4>
-              <ul className="list-disc list-inside space-y-0.5">
-                <li>{keyCount} unique Moment Code{keyCount > 1 ? 's' : ''} delivered by email</li>
-                <li>Delivery options: Physical + Digital, Split, or Full Digital</li>
-                <li>One code = one private memory (video, voice, or photo)</li>
-                <li>A tree planted for every key</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-[#2D2926] mb-1">How it works</h4>
-              <ol className="list-decimal list-inside space-y-0.5">
-                <li>Buy → you receive your code(s) by email</li>
-                <li>Upload your moment at unikmo.com/unlock (or /upload)</li>
-                <li>Share the code or card with the recipient</li>
-                <li>They unlock and view at unikmo.com/unlock</li>
-              </ol>
-            </div>
-          </div>
-
-          <div className="space-y-2 mb-6">
-            <label htmlFor="product-modal-email" className="block text-sm font-medium text-[#2D2926]">
-              Email <span className="text-red-600">*</span>
-            </label>
-            <input
-              id="product-modal-email"
-              type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
-              placeholder="your@email.com"
-              className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30"
-            />
-            {emailError && <p className="text-red-600 text-xs">{emailError}</p>}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleBuyNow}
-            disabled={!storeDomain}
-            className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Buy now
-          </button>
-          {!storeDomain && (
-            <p className="text-center text-amber-700 text-xs mt-3">Store link not configured. Set Shopify credentials in admin.</p>
-          )}
-        </div>
-      </div>
-    </div>
   );
 }
 

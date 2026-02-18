@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -10,809 +12,501 @@ interface MediaItem {
   createdAt: string;
 }
 
-// Confetti component
-const Confetti = () => {
-  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7', '#a29bfe'];
-  const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    }
-  }, []);
-  
+// Icons matching landing How It Works
+function IconKey() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-      {[...Array(100)].map((_, i) => {
-        const startX = Math.random() * dimensions.width;
-        return (
-          <motion.div
-            key={i}
-            className="absolute w-3 h-3 rounded-sm"
-            style={{
-              left: `${Math.random() * 100}%`,
-              backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-            }}
-            initial={{
-              y: -100,
-              x: startX,
-              rotate: 0,
-              opacity: 1,
-            }}
-            animate={{
-              y: dimensions.height + 100,
-              x: startX + (Math.random() * dimensions.width - dimensions.width / 2),
-              rotate: 360,
-              opacity: [1, 1, 0],
-            }}
-            transition={{
-              duration: Math.random() * 2 + 2,
-              delay: Math.random() * 0.5,
-              ease: 'easeOut',
-            }}
-          />
-        );
-      })}
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 sm:h-6 sm:w-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M14.5 10.5a4.5 4.5 0 1 0-2.2 3.9L14 16h2l1-1h2v-2h-2l-1-1h-2l-1.2-1.2c.45-.15.87-.37 1.2-.66Z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 10.5h.01" strokeLinecap="round" strokeWidth="2" />
+    </svg>
   );
-};
-
-// Sparkles component
-const Sparkles = ({ count = 50 }: { count?: number }) => {
+}
+function IconUpload() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(count)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 bg-yellow-300 rounded-full"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            scale: [0, 1, 0],
-            opacity: [0, 1, 0],
-            y: [0, -50],
-          }}
-          transition={{
-            duration: Math.random() * 2 + 1,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-            ease: 'easeOut',
-          }}
-        />
-      ))}
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 sm:h-6 sm:w-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 3v10" strokeLinecap="round" />
+      <path d="M8.5 6.5 12 3l3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 14v4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-4" strokeLinecap="round" />
+    </svg>
   );
-};
-
-// Fireworks component
-const Fireworks = () => {
+}
+function IconHeart() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(20)].map((_, i) => {
-        const x = 20 + (i % 5) * 20;
-        const y = 20 + Math.floor(i / 5) * 30;
-        const colors = ['#ff6b6b', '#4ecdc4', '#f9ca24', '#6c5ce7', '#a29bfe'];
-        
-        return (
-          <motion.div
-            key={i}
-            className="absolute"
-            style={{
-              left: `${x}%`,
-              top: `${y}%`,
-            }}
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{
-              scale: [0, 3, 0],
-              opacity: [1, 1, 0],
-            }}
-            transition={{
-              duration: 1.5,
-              delay: i * 0.1,
-              repeat: Infinity,
-              repeatDelay: 3,
-            }}
-          >
-            {[...Array(12)].map((_, j) => (
-              <motion.div
-                key={j}
-                className="absolute w-2 h-2 rounded-full"
-                style={{
-                  backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-                }}
-                initial={{ x: 0, y: 0, scale: 0 }}
-                animate={{
-                  x: Math.cos((j * 30 * Math.PI) / 180) * 100,
-                  y: Math.sin((j * 30 * Math.PI) / 180) * 100,
-                  scale: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  delay: i * 0.1,
-                  repeat: Infinity,
-                  repeatDelay: 3,
-                }}
-              />
-            ))}
-          </motion.div>
-        );
-      })}
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 sm:h-6 sm:w-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 20s-7-4.4-9.2-9A5.4 5.4 0 0 1 12 6.2 5.4 5.4 0 0 1 21.2 11c-2.2 4.6-9.2 9-9.2 9Z" strokeLinejoin="round" />
+    </svg>
   );
-};
+}
 
-// Floating hearts component
-const FloatingHearts = () => {
-  const [height, setHeight] = useState(1080);
+function UnlockPageContent() {
+  const searchParams = useSearchParams();
+  const codeParam = searchParams.get('code') || '';
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setHeight(window.innerHeight);
-    }
-  }, []);
+  // --- Upload state ---
+  const [uploadCode, setUploadCode] = useState(codeParam);
+  const [uploadValidating, setUploadValidating] = useState(false);
+  const [uploadValid, setUploadValid] = useState<boolean | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [media, setMedia] = useState<MediaItem | null>(null);
+  const [loadingMedia, setLoadingMedia] = useState(false);
+  const [deletingMedia, setDeletingMedia] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(30)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute text-2xl"
-          style={{
-            left: `${Math.random() * 100}%`,
-            bottom: '-50px',
-          }}
-          animate={{
-            y: [0, -height - 100],
-            x: [0, Math.random() * 100 - 50],
-            rotate: [0, 360],
-            scale: [0.5, 1, 0.5],
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 3 + 3,
-            delay: Math.random() * 2,
-            repeat: Infinity,
-            ease: 'easeOut',
-          }}
-        >
-          ❤️
-        </motion.div>
-      ))}
-    </div>
-  );
-};
-
-export default function UnlockPage() {
-  const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [media, setMedia] = useState<MediaItem[]>([]);
+  // --- Unlock state ---
+  const [unlockCode, setUnlockCode] = useState('');
+  const [unlockLoading, setUnlockLoading] = useState(false);
+  const [unlockError, setUnlockError] = useState<string | null>(null);
+  const [unlockMedia, setUnlockMedia] = useState<MediaItem[]>([]);
   const [unlocked, setUnlocked] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
 
-  const handleUnlock = async () => {
-    if (!code || code.length < 10) {
-      const errorMsg = 'Please enter a valid code';
-      setError(errorMsg);
-      toast.error(errorMsg);
-      return;
+  // Upload: validate code when it changes
+  useEffect(() => {
+    if (uploadCode && uploadCode.length >= 10) {
+      setUploadValidating(true);
+      setUploadError(null);
+      fetch(`/api/media/validate-code?code=${encodeURIComponent(uploadCode.toUpperCase())}`)
+        .then((r) => r.json())
+        .then((data) => {
+          setUploadValid(!!data.valid);
+          if (!data.valid) setUploadError(data.error || 'Invalid code');
+        })
+        .catch(() => {
+          setUploadValid(false);
+          setUploadError('Failed to validate');
+        })
+        .finally(() => setUploadValidating(false));
+    } else {
+      setUploadValid(null);
+      setUploadError(null);
     }
+  }, [uploadCode]);
 
-    setLoading(true);
-    setError(null);
+  // Upload: load media when valid
+  useEffect(() => {
+    if (!uploadValid || !uploadCode || uploadCode.length < 10) return;
+    setLoadingMedia(true);
+    fetch(`/api/media/list?code=${encodeURIComponent(uploadCode.toUpperCase())}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.media && data.media.length > 0) setMedia(data.media[0]);
+        else setMedia(null);
+      })
+      .catch(() => setMedia(null))
+      .finally(() => setLoadingMedia(false));
+  }, [uploadValid, uploadCode]);
 
-    try {
-      const response = await fetch('/api/unlock', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: code.toUpperCase().trim() }),
-      });
+  const getVideoDuration = (file: File): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(video.duration);
+      };
+      video.onerror = () => reject(new Error('Failed to load'));
+      video.src = URL.createObjectURL(file);
+    });
+  };
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMsg = data.error || 'Failed to unlock';
-        setError(errorMsg);
-        toast.error(errorMsg);
+  const uploadFile = useCallback(
+    async (file: File) => {
+      if (!uploadCode || !uploadValid || uploading) return;
+      const fileType = file.type || '';
+      const isVideo = fileType.startsWith('video/');
+      const isAudio = fileType.startsWith('audio/');
+      const isImage = fileType.startsWith('image/');
+      const maxVideo = 350 * 1024 * 1024;
+      const maxAudio = 40 * 1024 * 1024;
+      const maxImage = 40 * 1024 * 1024;
+      if (isVideo && file.size > maxVideo) {
+        toast.error('Video max 350 MB');
         return;
       }
-
-      setMedia(data.media || []);
-      setUnlocked(true);
-      setShowCelebration(true);
-      toast.success('Moment unlocked successfully!');
-
-      // Hide celebration after 12 seconds
-      setTimeout(() => {
-        setShowCelebration(false);
-      }, 12000);
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to unlock moment';
-      setError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !loading) {
-      handleUnlock();
-    }
-  };
-
-  const openMediaViewer = (index: number) => {
-    setSelectedMedia(index);
-  };
-
-  const closeMediaViewer = () => {
-    setSelectedMedia(null);
-  };
-
-  const navigateMedia = (direction: 'prev' | 'next') => {
-    if (selectedMedia === null) return;
-    
-    if (direction === 'prev') {
-      setSelectedMedia(selectedMedia > 0 ? selectedMedia - 1 : media.length - 1);
-    } else {
-      setSelectedMedia(selectedMedia < media.length - 1 ? selectedMedia + 1 : 0);
-    }
-  };
-
-  // Handle keyboard navigation in media viewer
-  useEffect(() => {
-    if (selectedMedia !== null) {
-      const handleKeyPress = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          setSelectedMedia(null);
-        } else if (e.key === 'ArrowLeft') {
-          setSelectedMedia(selectedMedia > 0 ? selectedMedia - 1 : media.length - 1);
-        } else if (e.key === 'ArrowRight') {
-          setSelectedMedia(selectedMedia < media.length - 1 ? selectedMedia + 1 : 0);
+      if ((isAudio || isImage) && file.size > (isAudio ? maxAudio : maxImage)) {
+        toast.error(isAudio ? 'Audio max 40 MB' : 'Photo max 40 MB');
+        return;
+      }
+      if (isVideo) {
+        try {
+          const dur = await getVideoDuration(file);
+          if (dur > 180) {
+            toast.error('Video max 3 minutes');
+            return;
+          }
+        } catch {
+          /* continue */
         }
-      };
-      window.addEventListener('keydown', handleKeyPress);
-      return () => window.removeEventListener('keydown', handleKeyPress);
+      }
+      setUploading(true);
+      setUploadProgress(0);
+      const progressInterval = setInterval(() => setUploadProgress((p) => Math.min(p + 10, 90)), 200);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('code', uploadCode.toUpperCase());
+        const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Upload failed');
+        }
+        const data = await res.json();
+        setMedia({ type: data.media.type, url: data.media.url, createdAt: new Date().toISOString() });
+        toast.success('Uploaded successfully');
+      } catch (err: any) {
+        toast.error(err.message || 'Upload failed');
+      } finally {
+        setUploading(false);
+        setTimeout(() => setUploadProgress(0), 1000);
+      }
+    },
+    [uploadCode, uploadValid, uploading]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      if (uploadValid && !uploading && e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+    },
+    [uploadValid, uploading, uploadFile]
+  );
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files?.[0] || !uploadValid || uploading) return;
+      uploadFile(e.target.files[0]);
+      e.target.value = '';
+    },
+    [uploadValid, uploading, uploadFile]
+  );
+
+  const handleDeleteMedia = async () => {
+    if (!uploadCode || !media || deletingMedia) return;
+    setDeletingMedia(true);
+    try {
+      const res = await fetch('/api/media/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: uploadCode.toUpperCase(), mediaUrl: media.url }),
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      setMedia(null);
+      toast.success('Media deleted');
+    } catch {
+      toast.error('Delete failed');
+    } finally {
+      setDeletingMedia(false);
     }
-  }, [selectedMedia, media.length]);
+  };
+
+  const handleUnlock = async () => {
+    if (!unlockCode || unlockCode.length < 10) {
+      setUnlockError('Please enter a valid code');
+      toast.error('Please enter a valid code');
+      return;
+    }
+    setUnlockLoading(true);
+    setUnlockError(null);
+    try {
+      const res = await fetch('/api/unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: unlockCode.toUpperCase().trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUnlockError(data.error || 'Failed to unlock');
+        toast.error(data.error || 'Failed to unlock');
+        return;
+      }
+      setUnlockMedia(data.media || []);
+      setUnlocked(true);
+      toast.success('Moment unlocked!');
+    } catch {
+      setUnlockError('Failed to unlock');
+      toast.error('Failed to unlock');
+    } finally {
+      setUnlockLoading(false);
+    }
+  };
+
+  const navigateMedia = (dir: 'prev' | 'next') => {
+    if (selectedMedia === null) return;
+    if (dir === 'prev') setSelectedMedia(selectedMedia > 0 ? selectedMedia - 1 : unlockMedia.length - 1);
+    else setSelectedMedia(selectedMedia < unlockMedia.length - 1 ? selectedMedia + 1 : 0);
+  };
+
+  useEffect(() => {
+    if (selectedMedia === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedMedia(null);
+      else if (e.key === 'ArrowLeft') navigateMedia('prev');
+      else if (e.key === 'ArrowRight') navigateMedia('next');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedMedia, unlockMedia.length]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8 relative overflow-hidden">
-      {/* Background animations */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-[#FDF9F5] text-[#2D2926]">
+      <header className="border-b border-[#2D2926]/10 bg-[#FDF9F5]/95 sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="font-serif text-lg tracking-wide text-[#2D2926]/80 hover:text-[#2D2926]">
+            UNIKMO
+          </Link>
+          <Link href="/" className="text-xs sm:text-sm text-[#2D2926]/60 hover:text-[#2D2926]">
+            ← Home
+          </Link>
+        </div>
+      </header>
 
-      {/* Celebration effects */}
-      <AnimatePresence>
-        {showCelebration && (
-          <>
-            <Confetti />
-            <Sparkles count={100} />
-            <Fireworks />
-            <FloatingHearts />
-          </>
-        )}
-      </AnimatePresence>
+      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+        {/* How It Works card - same as landing image */}
+        <div className="rounded-xl sm:rounded-2xl bg-[#FBF7F2]/90 px-4 sm:px-8 py-6 sm:py-8 text-center ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)] mb-10 sm:mb-14">
+          <p className="font-serif text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/70 uppercase tracking-wide">
+            How It Works
+          </p>
+          <div className="mt-5 grid grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
+            {[
+              { title: 'Buy a Moment Key', icon: <IconKey /> },
+              { title: 'Add your video, photo, or message', icon: <IconUpload /> },
+              { title: 'They unlock it anytime', icon: <IconHeart /> },
+            ].map((step) => (
+              <div key={step.title} className="flex flex-col items-center text-[#2D2926]/70">
+                <div className="text-[#2D2926]/55 mb-2">{step.icon}</div>
+                <p className="text-[9px] sm:text-[10px] lg:text-[11px] leading-tight">{step.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="backdrop-blur-xl bg-white/10 rounded-2xl p-8 shadow-2xl border border-white/20"
-        >
-          {!unlocked ? (
-            <>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Unlock Your Moment
-                </h1>
-                <p className="text-gray-300 mb-8">Enter your Moment Code to reveal the special content</p>
-              </motion.div>
+        {/* Upload your moment */}
+        <section className="mb-12 sm:mb-16">
+          <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926] mb-4">Upload your moment</h2>
+          <p className="text-sm text-[#2D2926]/60 mb-6">Enter your Moment Code and add your video, photo, or audio.</p>
+          <div className="rounded-xl bg-white/60 border border-[#2D2926]/10 p-4 sm:p-6 shadow-sm">
+            <label className="block text-sm font-medium text-[#2D2926] mb-2">Moment Code</label>
+            <input
+              type="text"
+              value={uploadCode}
+              onChange={(e) => setUploadCode(e.target.value.toUpperCase())}
+              placeholder="UNIKMO-XXXX-XXXX-XXX"
+              className="w-full px-4 py-3 rounded-lg border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+            />
+            {uploadValidating && <p className="mt-2 text-sm text-[#2D2926]/50">Validating...</p>}
+            {uploadValid === false && !uploadValidating && <p className="mt-2 text-sm text-red-600">{uploadError || 'Invalid code'}</p>}
+            {uploadValid === true && !uploadValidating && (
+              <p className="mt-2 text-sm text-green-700 flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center text-xs">✓</span>
+                Code validated
+              </p>
+            )}
 
-              <div className="space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
+            {uploadValid && (
+              <div className="mt-6">
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${isDragging ? 'border-[#2D2926]/40 bg-[#2D2926]/5' : 'border-[#2D2926]/20 bg-[#2D2926]/[0.02]'} ${uploading ? 'opacity-60 pointer-events-none' : 'cursor-pointer'}`}
                 >
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Moment Code
+                  <input
+                    type="file"
+                    id="unlock-page-upload"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,video/*,audio/*"
+                    disabled={uploading || !uploadValid}
+                  />
+                  <label htmlFor="unlock-page-upload" className="cursor-pointer">
+                    <div className="text-[#2D2926]/50 mb-2">
+                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <p className="font-medium text-[#2D2926]">Drag and drop or click to upload</p>
+                    <p className="text-xs text-[#2D2926]/50 mt-1">Video: max 350 MB, 3 min · Audio/Photo: max 40 MB</p>
                   </label>
-                  <motion.input
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    onKeyPress={handleKeyPress}
-                    placeholder="UNIKMO-XXXX-XXXX-XXX"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg"
-                    disabled={loading}
-                    whileFocus={{ scale: 1.02 }}
-                  />
-                </motion.div>
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleUnlock}
-                  disabled={loading || !code}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-500 hover:to-pink-500 transition-all relative overflow-hidden"
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {loading ? (
-                      <>
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        Unlocking...
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                          />
-                        </svg>
-                        Unlock Moment
-                      </>
-                    )}
-                  </span>
-                </motion.button>
-
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ 
-                type: 'spring',
-                stiffness: 100,
-                damping: 15,
-                duration: 0.8
-              }}
-            >
-              {/* Success Header with Celebration */}
-              <div className="text-center mb-8 relative">
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ 
-                    delay: 0.2, 
-                    type: 'spring', 
-                    stiffness: 200,
-                    damping: 15
-                  }}
-                  className="w-24 h-24 mx-auto mb-4 relative"
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-2xl"
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(34, 197, 94, 0.7)',
-                        '0 0 0 20px rgba(34, 197, 94, 0)',
-                        '0 0 0 0 rgba(34, 197, 94, 0)',
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                    }}
-                  >
-                    <motion.svg
-                      className="w-12 h-12 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ delay: 0.5, duration: 0.5 }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </motion.svg>
-                  </motion.div>
-                </motion.div>
-
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-5xl font-bold mb-4 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent"
-                >
-                  🎉 Moment Unlocked! 🎉
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-gray-300 text-lg"
-                >
-                  Your special content is ready to view
-                </motion.p>
-
-                {/* Animated stars around text */}
-                {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute text-2xl"
-                    style={{
-                      top: '50%',
-                      left: `${20 + i * 12}%`,
-                    }}
-                    animate={{
-                      rotate: [0, 360],
-                      scale: [1, 1.5, 1],
-                      opacity: [0.5, 1, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                    }}
-                  >
-                    ⭐
-                  </motion.div>
-                ))}
-              </div>
-
-              {media.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="text-center py-12 text-gray-400"
-                >
-                  <p>No media has been uploaded for this moment yet.</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
-                  {media.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ 
-                        delay: 0.9 + index * 0.15,
-                        type: 'spring',
-                        stiffness: 100,
-                        damping: 15
-                      }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      className="backdrop-blur-xl bg-white/5 rounded-xl overflow-hidden border border-white/10 shadow-xl cursor-pointer"
-                      onClick={() => openMediaViewer(index)}
-                    >
-                      {item.type === 'image' && (
-                        <motion.img
-                          src={item.url}
-                          alt={`Media ${index + 1}`}
-                          className="w-full h-64 object-cover"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 1 + index * 0.15 }}
-                        />
-                      )}
-                      {item.type === 'video' && (
-                        <motion.div className="relative w-full h-64 bg-black/50 flex items-center justify-center">
-                          <motion.video
-                            src={item.url}
-                            className="w-full h-full object-cover"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1 + index * 0.15 }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <motion.div
-                              className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
-                              whileHover={{ scale: 1.1 }}
-                            >
-                              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                              </svg>
-                            </motion.div>
-                          </div>
-                        </motion.div>
-                      )}
-                      {item.type === 'audio' && (
-                        <motion.div
-                          className="p-8 bg-gradient-to-br from-purple-500/20 to-pink-500/20"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 1 + index * 0.15 }}
-                        >
-                          <div className="flex items-center justify-center mb-4">
-                            <div className="w-20 h-20 bg-purple-500/30 rounded-full flex items-center justify-center">
-                              <svg className="w-10 h-10 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4-3.707a1 1 0 011.617.793zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                          </div>
-                          <audio src={item.url} controls className="w-full" />
-                        </motion.div>
-                      )}
-                      {item.type === 'text' && (
-                        <motion.div
-                          className="p-8 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 min-h-[256px] flex items-center justify-center"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 1 + index * 0.15 }}
-                        >
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <svg className="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                            </div>
-                            <p className="text-blue-300 font-semibold">Text Content</p>
-                            <p className="text-blue-400/70 text-sm mt-2">Click to view</p>
-                          </div>
-                        </motion.div>
-                      )}
-                      {/* Overlay on hover */}
-                      <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                        <motion.div
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          whileHover={{ scale: 1, opacity: 1 }}
-                          className="bg-white/10 backdrop-blur-md rounded-full p-4"
-                        >
-                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                          </svg>
-                        </motion.div>
+                  {uploading && (
+                    <div className="mt-4">
+                      <div className="w-full h-1.5 bg-[#2D2926]/10 rounded-full overflow-hidden">
+                        <motion.div className="h-full bg-[#2D2926]/60 rounded-full" initial={{ width: 0 }} animate={{ width: `${uploadProgress}%` }} transition={{ duration: 0.2 }} />
                       </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
+                      <p className="text-xs text-[#2D2926]/50 mt-2">Uploading… {uploadProgress}%</p>
+                    </div>
+                  )}
+                </div>
 
-      {/* Media Viewer Modal */}
+                {loadingMedia && <p className="text-center text-[#2D2926]/50 py-6">Loading media…</p>}
+                {!loadingMedia && media && (
+                  <div className="mt-6 relative group rounded-xl overflow-hidden border border-[#2D2926]/10">
+                    <button
+                      type="button"
+                      onClick={handleDeleteMedia}
+                      disabled={deletingMedia}
+                      className="absolute top-2 right-2 z-10 w-8 h-8 bg-red-500/90 hover:bg-red-600 rounded-full flex items-center justify-center text-white disabled:opacity-50"
+                    >
+                      {deletingMedia ? (
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      )}
+                    </button>
+                    {media.type === 'image' && <img src={media.url} alt="Uploaded" className="w-full h-56 object-cover" />}
+                    {media.type === 'video' && <video src={media.url} className="w-full h-56 object-cover" controls />}
+                    {media.type === 'audio' && (
+                      <div className="p-6 bg-[#2D2926]/5 flex items-center justify-center">
+                        <audio src={media.url} controls className="w-full max-w-md" />
+                      </div>
+                    )}
+                    <div className="p-3 text-sm text-[#2D2926]/60 capitalize">{media.type}</div>
+                  </div>
+                )}
+                {!loadingMedia && !media && uploadValid && (
+                  <p className="text-center text-[#2D2926]/40 py-6 text-sm">No media yet. Upload above.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Unlock a moment */}
+        <section>
+          <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926] mb-4">Unlock a moment</h2>
+          <p className="text-sm text-[#2D2926]/60 mb-6">Enter a Moment Code to view the private content.</p>
+          <div className="rounded-xl bg-white/60 border border-[#2D2926]/10 p-4 sm:p-6 shadow-sm">
+            {!unlocked ? (
+              <>
+                <label className="block text-sm font-medium text-[#2D2926] mb-2">Moment Code</label>
+                <input
+                  type="text"
+                  value={unlockCode}
+                  onChange={(e) => setUnlockCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+                  placeholder="UNIKMO-XXXX-XXXX-XXX"
+                  className="w-full px-4 py-3 rounded-lg border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+                  disabled={unlockLoading}
+                />
+                {unlockError && <p className="mt-2 text-sm text-red-600">{unlockError}</p>}
+                <button
+                  type="button"
+                  onClick={handleUnlock}
+                  disabled={unlockLoading || !unlockCode}
+                  className="mt-4 w-full py-3 rounded-full bg-[#2D2926] text-white font-medium text-sm uppercase tracking-wide hover:bg-[#1E1B18] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {unlockLoading ? 'Unlocking…' : 'Unlock Moment'}
+                </button>
+              </>
+            ) : (
+              <div>
+                <p className="text-green-700 font-medium mb-4 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center text-green-700 text-xs">✓</span>
+                  Moment unlocked
+                </p>
+                {unlockMedia.length === 0 ? (
+                  <p className="text-[#2D2926]/60">No media for this moment yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {unlockMedia.map((item, index) => (
+                      <button
+                        type="button"
+                        key={index}
+                        onClick={() => setSelectedMedia(index)}
+                        className="rounded-xl overflow-hidden border border-[#2D2926]/10 hover:border-[#2D2926]/30 transition-colors text-left"
+                      >
+                        {item.type === 'image' && <img src={item.url} alt="" className="w-full h-48 object-cover" />}
+                        {item.type === 'video' && (
+                          <div className="relative w-full h-48 bg-black/10">
+                            <video src={item.url} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center text-[#2D2926]">▶</span>
+                            </div>
+                          </div>
+                        )}
+                        {item.type === 'audio' && (
+                          <div className="p-6 bg-[#2D2926]/5 flex items-center justify-center h-48">
+                            <audio src={item.url} controls className="w-full max-w-xs" />
+                          </div>
+                        )}
+                        {item.type === 'text' && (
+                          <div className="p-6 bg-[#2D2926]/5 h-48 flex items-center justify-center text-[#2D2926]/60">Text content</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { setUnlocked(false); setUnlockMedia([]); setUnlockCode(''); setUnlockError(null); }}
+                  className="mt-6 text-sm text-[#2D2926]/60 hover:text-[#2D2926] underline"
+                >
+                  Unlock another code
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+
+      {/* Media viewer modal */}
       <AnimatePresence>
-        {selectedMedia !== null && media[selectedMedia] && (
+        {selectedMedia !== null && unlockMedia[selectedMedia] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
-            onClick={closeMediaViewer}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+            onClick={() => setSelectedMedia(null)}
           >
-            {/* Close Button */}
-            <motion.button
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              onClick={closeMediaViewer}
-              className="absolute top-4 right-4 z-[60] w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
+            <button
+              type="button"
+              onClick={() => setSelectedMedia(null)}
+              className="absolute top-4 right-4 z-[60] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </motion.button>
-
-            {/* Navigation Buttons */}
-            {media.length > 1 && (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            {unlockMedia.length > 1 && (
               <>
-                <motion.button
-                  initial={{ x: -50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -50, opacity: 0 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateMedia('prev');
-                  }}
-                  className="absolute left-4 z-[60] w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </motion.button>
-                <motion.button
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 50, opacity: 0 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateMedia('next');
-                  }}
-                  className="absolute right-4 z-[60] w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </motion.button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); navigateMedia('prev'); }} className="absolute left-4 z-[60] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">←</button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); navigateMedia('next'); }} className="absolute right-4 z-[60] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">→</button>
               </>
             )}
-
-            {/* Media Counter */}
-            {media.length > 1 && (
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[60] bg-white/10 backdrop-blur-md rounded-full px-4 py-2 text-white text-sm"
-              >
-                {selectedMedia + 1} / {media.length}
-              </motion.div>
-            )}
-
-            {/* Media Content */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-w-7xl w-full h-full flex items-center justify-center"
-            >
-              {media[selectedMedia].type === 'image' && (
-                <motion.img
-                  key={selectedMedia}
-                  src={media[selectedMedia].url}
-                  alt={`Media ${selectedMedia + 1}`}
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                />
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} onClick={(e) => e.stopPropagation()} className="relative max-w-4xl w-full">
+              {unlockMedia[selectedMedia].type === 'image' && (
+                <img src={unlockMedia[selectedMedia].url} alt="" className="max-w-full max-h-[85vh] object-contain rounded-lg mx-auto" />
               )}
-
-              {media[selectedMedia].type === 'video' && (
-                <motion.video
-                  key={selectedMedia}
-                  src={media[selectedMedia].url}
-                  controls
-                  autoPlay
-                  className="max-w-full max-h-[90vh] rounded-lg shadow-2xl"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                />
+              {unlockMedia[selectedMedia].type === 'video' && (
+                <video src={unlockMedia[selectedMedia].url} controls autoPlay className="max-w-full max-h-[85vh] rounded-lg mx-auto" />
               )}
-
-              {media[selectedMedia].type === 'audio' && (
-                <motion.div
-                  key={selectedMedia}
-                  className="w-full max-w-2xl bg-white/10 backdrop-blur-xl rounded-2xl p-12 border border-white/20 shadow-2xl"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex flex-col items-center justify-center">
-                    <motion.div
-                      className="w-32 h-32 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full flex items-center justify-center mb-8"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    >
-                      <svg className="w-16 h-16 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4-3.707a1 1 0 011.617.793zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
-                      </svg>
-                    </motion.div>
-                    <audio src={media[selectedMedia].url} controls className="w-full" />
-                    <p className="text-white/70 text-sm mt-4 text-center">
-                      {new Date(media[selectedMedia].createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </motion.div>
+              {unlockMedia[selectedMedia].type === 'audio' && (
+                <div className="bg-white/10 rounded-xl p-8">
+                  <audio src={unlockMedia[selectedMedia].url} controls className="w-full" />
+                </div>
               )}
-
-              {media[selectedMedia].type === 'text' && (
-                <motion.iframe
-                  key={selectedMedia}
-                  src={media[selectedMedia].url}
-                  className="w-full h-[90vh] rounded-lg shadow-2xl border border-white/20 bg-white"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                />
-              )}
-            </motion.div>
-
-            {/* Keyboard hint */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[60] bg-white/5 backdrop-blur-md rounded-full px-4 py-2 text-white/50 text-xs"
-            >
-              Press ESC to close {media.length > 1 && '• Arrow keys to navigate'}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function UnlockPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDF9F5] flex items-center justify-center">
+          <p className="text-[#2D2926]/60">Loading…</p>
+        </div>
+      }
+    >
+      <UnlockPageContent />
+    </Suspense>
   );
 }

@@ -9,6 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        ivory: "#fbf8f4",
+        paper: "#ffffff",
+        beige: "#f3ebe2",
+        ink: "#171310",
+        muted: "#6b5f58",
         primary: {
           DEFAULT: "#6366f1",
           dark: "#4f46e5",

@@ -91,25 +91,36 @@ export async function getShopifyCredentialsForAPI(): Promise<{
   baseUrl: string;
   apiVersion: string;
 }> {
-  // For API operations, always fall back to env if DB credentials require password
-  // This is safe because API operations don't need to decrypt DB credentials
-  const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-  const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-  const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
-  const baseUrl = process.env.BASE_URL || '';
-  const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
+  try {
+    // Try to get from DB first (without password - will fall back to env if encrypted)
+    const credentials = await getShopifyCredentials();
+    return {
+      storeDomain: credentials.storeDomain,
+      accessToken: credentials.accessToken,
+      webhookSecret: credentials.webhookSecret,
+      baseUrl: credentials.baseUrl,
+      apiVersion: credentials.apiVersion,
+    };
+  } catch (error) {
+    // Fall back to environment variables if DB credentials require password or don't exist
+    const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
+    const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
+    const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
+    const baseUrl = process.env.BASE_URL || '';
+    const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
 
-  if (!storeDomain || !accessToken || !webhookSecret) {
-    throw new Error('Shopify credentials not found in environment variables');
+    if (!storeDomain || !accessToken || !webhookSecret) {
+      throw new Error('Shopify credentials not found in database or environment variables');
+    }
+
+    return {
+      storeDomain,
+      accessToken,
+      webhookSecret,
+      baseUrl,
+      apiVersion,
+    };
   }
-
-  return {
-    storeDomain,
-    accessToken,
-    webhookSecret,
-    baseUrl,
-    apiVersion,
-  };
 }
 
 /**
