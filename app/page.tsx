@@ -183,6 +183,7 @@ type Product = {
   handle: string;
   image: string | null;
   imageAlt: string;
+  variantId: string | null;
 };
 
 function StoryIn() {
@@ -219,7 +220,6 @@ function StoryIn() {
     fetchProducts();
   }, []);
 
-  // When products finish loading, reveal cards after a short delay (one-time visible animation)
   useEffect(() => {
     if (loading || products.length === 0) return;
     const t = setTimeout(() => setProductsRevealed(true), 50);
@@ -249,7 +249,6 @@ function StoryIn() {
     return () => observer.disconnect();
   }, []);
 
-  // Map products to display format (include product for modal)
   const items = products.map((product) => {
     let subtitle = 'A small moment, beautifully delivered';
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
@@ -289,20 +288,19 @@ function StoryIn() {
             A Story in Every Key
           </h2>
 
-          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-16 xl:gap-20">
-            <div className="lg:col-span-7 space-y-8 sm:space-y-10">
+          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-12">
+            <div className="lg:col-span-8 space-y-8 sm:space-y-10">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-14">
                   {[1, 2, 3].map((idx) => (
                     <div key={idx} className="text-center">
-                      <div className="relative mx-auto h-[200px] sm:h-[240px] lg:h-[280px] xl:h-[340px] w-full max-w-[200px] sm:max-w-[220px] lg:max-w-[260px] mb-3 bg-[#2D2926]/5 animate-pulse rounded-lg" />
+                      <div className="relative mx-auto h-[280px] sm:h-[320px] lg:h-[380px] xl:h-[420px] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px] mb-3 bg-[#2D2926]/5 animate-pulse rounded-lg" />
                       <div className="h-5 bg-[#2D2926]/10 rounded mb-2 mx-auto w-3/4 animate-pulse" />
-                      <div className="h-4 bg-[#2D2926]/5 rounded mx-auto w-2/3 animate-pulse" />
                     </div>
                   ))}
                 </div>
               ) : items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-14">
                   {items.map((i, idx) => (
                     <button
                       type="button"
@@ -313,19 +311,19 @@ function StoryIn() {
                       }`}
                       style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
                     >
-                      <div className="relative mx-auto h-[180px] sm:h-[200px] lg:h-[220px] xl:h-[240px] w-full max-w-[180px] sm:max-w-[200px] lg:max-w-[220px] mb-4">
+                      <div className="relative mx-auto h-[280px] sm:h-[320px] lg:h-[380px] xl:h-[420px] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px] mb-6">
                         <Image
                           src={i.img}
                           alt={i.imageAlt || i.title}
                           fill
                           className="object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
-                          sizes="(min-width: 1280px) 220px, (min-width: 1024px) 200px, (min-width: 640px) 180px, 160px"
+                          sizes="(min-width: 1280px) 360px, (min-width: 1024px) 320px, (min-width: 640px) 280px, 260px"
                         />
                       </div>
                       <h4 className="font-serif text-[18px] sm:text-[19px] lg:text-[20px] text-[#2D2926] font-medium leading-tight">
                         {i.title}
                       </h4>
-                      <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[160px] mx-auto">
+                      <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[180px] mx-auto">
                         {i.subtitle}
                       </p>
                     </button>
@@ -358,12 +356,12 @@ function StoryIn() {
               </div>
             </div>
 
-            <div className="lg:col-span-5 flex flex-col justify-center pt-6 lg:pt-0 text-center lg:text-left animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
-              <div className="max-w-md mx-auto lg:mx-0">
-                <h3 className="font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] leading-[1.12] mb-4 lg:mb-5">
+            <div className="lg:col-span-4 flex flex-col justify-center pt-6 lg:pt-0 text-center lg:text-left animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
+              <div className="max-w-xs mx-auto lg:mx-0 lg:pl-2">
+                <h3 className="font-serif text-[18px] sm:text-[22px] lg:text-[26px] text-[#2D2926] leading-[1.12] mb-3 lg:mb-4">
                   Rooted in Reality
                 </h3>
-                <div className="space-y-3 sm:space-y-4 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
+                <div className="space-y-2 text-[13px] sm:text-[14px] lg:text-[15px] leading-relaxed text-[#2D2926]/75 font-light">
                   <p>For every key you hold, we plant a tree.</p>
                   <p>
                     We believe in preserving your memories and the world they were
@@ -376,7 +374,6 @@ function StoryIn() {
         </div>
       </div>
 
-      {/* Product detail modal */}
       {selectedProduct && (
         <ProductModal
           selected={selectedProduct}
@@ -387,7 +384,6 @@ function StoryIn() {
     </section>
   );
 }
-
 function ProductModal({
   selected,
   storeDomain,
@@ -414,9 +410,9 @@ function ProductModal({
       return;
     }
     setEmailError('');
-    if (storeDomain && product.handle) {
-      const url = `https://${storeDomain}/products/${product.handle}`;
-      window.open(url, '_blank');
+    if (storeDomain && product.variantId) {
+      const checkoutUrl = `https://${storeDomain}/cart/${product.variantId}:1?checkout`;
+      window.location.href = checkoutUrl;
     }
   };
 
@@ -497,13 +493,15 @@ function ProductModal({
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={!storeDomain}
+            disabled={!storeDomain || !product.variantId}
             className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Buy now
           </button>
-          {!storeDomain && (
-            <p className="text-center text-amber-700 text-xs mt-3">Store link not configured. Set Shopify credentials in admin.</p>
+          {(!storeDomain || !product.variantId) && (
+            <p className="text-center text-amber-700 text-xs mt-3">
+              {!storeDomain ? 'Store not configured. Set Shopify credentials in admin.' : 'Product variant not available.'}
+            </p>
           )}
         </div>
       </div>
@@ -553,14 +551,14 @@ function EmotionalPositioning() {
 
                 <div className="absolute inset-0 p-4 sm:p-6 lg:p-8 flex items-end">
                   <div className="max-w-xs text-[#FDF9F5]">
-                    <p className="font-serif text-lg sm:text-xl lg:text-2xl leading-tight animate-slide-up">
+                    {/* <p className="font-serif text-lg sm:text-xl lg:text-2xl leading-tight animate-slide-up">
                       Unlock a Moment
                       <br />
                       That Lasts Forever
                     </p>
                     <p className="mt-2 text-[8px] sm:text-[9px] lg:text-[10px] leading-relaxed text-[#FDF9F5]/85 animate-slide-up">
                       Hold onto what matters most—private memories saved for years.
-                    </p>
+                    </p> */}
 
                     <div className="mt-3 sm:mt-4 lg:mt-5 flex flex-wrap gap-2">
                       <a
@@ -584,14 +582,12 @@ function EmotionalPositioning() {
 
           <div className="text-center lg:text-left max-w-xl lg:pl-8 xl:pl-10 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
             <h2 className="font-serif text-[28px] sm:text-[34px] lg:text-[40px] xl:text-[44px] leading-[1.2] text-[#2D2926]">
-              Not just a gift.
+              Unlock a Moment
               <br />
-              <span className="italic">A moment.</span>
+              <span className="italic">That Lasts Forever</span>
             </h2>
             <p className="mt-4 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#2D2926]/60">
-              Unikmo turns memories into something you can hold. A small card
-              unlocks a personal video, voice message, or photo — saved for
-              years to come.
+              Hold onto what matters most—private memories saved for years.
             </p>
           </div>
         </div>
@@ -704,13 +700,13 @@ function ProductExperience() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-16 xl:gap-24 items-center">
           <div className="lg:col-span-6 w-full animate-on-scroll opacity-0 -translate-x-8 transition-all duration-1000">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+            <div className="relative aspect-[4/3] w-full rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
               <Image
                 src="/cardfrontunikmo.jpg"
                 alt="Moment Key Experience"
                 fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-contain"
+                sizes="(min-width: 1224px) 80vw, 130vw"
                 priority
               />
             </div>
@@ -766,7 +762,7 @@ function StoryInEveryKey() {
   const products = [
     {
       label: 'The',
-      name: 'spark',
+      name: 'Spark',
       desc: '1 Card',
       sub: 'A small moment',
     },
@@ -812,8 +808,8 @@ function StoryInEveryKey() {
               className="rounded-xl sm:rounded-2xl bg-white/40 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 text-center shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-white/60 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 group hover:bg-white/80 hover:shadow-xl"
               style={{ transitionDelay: `${index * 200}ms` }}
             >
-              <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 font-medium mb-1">{p.label}</p>
-              <p className="font-serif text-[22px] sm:text-[26px] lg:text-[28px] xl:text-[32px] text-[#2D2926] leading-none mb-2">{p.name}</p>
+              <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#000]/40 font-medium mb-1">{p.label}</p>
+              <p className="font-serif text-[22px] sm:text-[26px] lg:text-[28px] xl:text-[32px] text-[#000] leading-none mb-2">{p.name}</p>
               <p className="text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/50 mb-4 sm:mb-5 lg:mb-6">{p.desc}</p>
               
               <div className="h-px w-8 bg-[#2D2926]/10 mx-auto mb-4 sm:mb-5 lg:mb-6" />
@@ -876,9 +872,7 @@ function SocialProof() {
     <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#FDF9F5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center border-t border-b border-[#2D2926]/5 py-10 sm:py-12 lg:py-16">
-          <p className="text-[12px] sm:text-[14px] lg:text-[15px] xl:text-[16px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[#2D2926]/40 font-medium animate-on-scroll opacity-0 translate-y-4 transition-all duration-1000">
-            Social proof
-          </p>
+          
 
           <h2 className="mt-4 sm:mt-5 lg:mt-6 font-serif text-[24px] sm:text-[30px] lg:text-[36px] xl:text-[42px] text-[#2D2926] leading-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-200">
             Moments, Private, Shared.
@@ -887,6 +881,29 @@ function SocialProof() {
           <p className="mt-3 sm:mt-4 text-[16px] sm:text-[18px] lg:text-[20px] xl:text-[22px] text-[#2D2926]/50 font-light italic animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-400">
             A collection of emotional stories from our users.
           </p>
+
+          <h3 className="mt-10 sm:mt-12 lg:mt-14 font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-500">
+            Moments people never forget
+          </h3>
+
+          <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 max-w-4xl mx-auto">
+            <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-600">
+              <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/80 font-light leading-relaxed italic">
+                &ldquo;I gave this to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.&rdquo;
+              </p>
+              <footer className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/50 font-medium not-italic">
+                Matt L., London
+              </footer>
+            </blockquote>
+            <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-700">
+              <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/80 font-light leading-relaxed italic">
+                &ldquo;Such a simple idea, yet incredibly powerful. The moment we unlocked the message together, it became something we&apos;ll remember forever.&rdquo;
+              </p>
+              <footer className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/50 font-medium not-italic">
+                Daniel R., New York
+              </footer>
+            </blockquote>
+          </div>
         </div>
       </div>
     </section>

@@ -38,6 +38,13 @@ export async function GET(request: NextRequest) {
                 }
               }
             }
+            variants(first: 1) {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
           }
         }
       }
@@ -49,12 +56,15 @@ export async function GET(request: NextRequest) {
       ?.filter((node: any) => node !== null)
       .map((node: any) => {
         const image = node.featuredImage || node.images?.edges?.[0]?.node;
+        const variantGid = node.variants?.edges?.[0]?.node?.id;
+        const variantId = variantGid ? String(variantGid).split('/').pop() : null;
         return {
           id: node.id,
           title: node.title,
           handle: node.handle,
           image: image?.url || null,
           imageAlt: image?.altText || node.title,
+          variantId,
         };
       }) || [];
 

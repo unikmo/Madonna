@@ -395,7 +395,7 @@ function EmotionalPositioning() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
 
-                <div className="absolute inset-0 p-4 sm:p-6 lg:p-8 flex items-end">
+                {/* <div className="absolute inset-0 p-4 sm:p-6 lg:p-8 flex items-end">
                   <div className="max-w-xs text-[#FDF9F5]">
                     <p className="font-serif text-lg sm:text-xl lg:text-2xl leading-tight animate-slide-up">
                       Unlock a Moment
@@ -421,14 +421,14 @@ function EmotionalPositioning() {
                       </a>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
 
           <div className="text-center lg:text-left max-w-xl lg:pl-8 xl:pl-10 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
             <h2 className="font-serif text-[28px] sm:text-[34px] lg:text-[40px] xl:text-[44px] leading-[1.2] text-[#2D2926]">
-              Not just a gift.
+              Not just a gift
               <br />
               <span className="italic">A moment.</span>
             </h2>
