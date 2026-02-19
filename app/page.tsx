@@ -101,7 +101,6 @@ function SiteHeader() {
     </header>
   );
 }
-
 function Hero() {
   const heroRef = useRef(null);
 
@@ -125,10 +124,12 @@ function Hero() {
   }, []);
 
   return (
+    /* 1. min-h remove kar di hai taake section image ke mutabiq shrink ho sake */
     <section 
       ref={heroRef}
-      className="relative min-h-[500px] sm:min-h-[460px] lg:min-h-[520px] flex items-center overflow-hidden opacity-0 translate-y-8 transition-all duration-1000"
+      className="relative flex items-center overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#FDF9F5]"
     >
+      {/* Background Image (Optional: Agar aapko solid color chahiye toh is div ko hata sakte hain) */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/bg-hero1.png"
@@ -143,20 +144,26 @@ function Hero() {
 
       <div className="relative z-10 w-full">
         <Container>
-          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-0">
-            <div className="flex justify-center lg:justify-start items-end -mb-8 lg:mb-0 lg:-ml-4 xl:-ml-8">
-              <div className="relative w-[90%] sm:w-[80%] lg:w-[110%] xl:w-[120%] aspect-[16/11]">
+          {/* 2. items-stretch use kiya hai taake columns ki height barabar rahe */}
+          <div className="flex flex-col lg:grid lg:grid-cols-2 items-stretch">
+            
+            {/* Left Side: Image Container */}
+            <div className="flex justify-center lg:justify-start items-end">
+              <div className="relative w-[90%] sm:w-[80%] lg:w-[115%] xl:w-[125%] aspect-[16/11] lg:-ml-4 xl:-ml-8">
                 <Image
                   src="/heroimage1.png"
                   alt="Unikmo Card in Hand"
                   fill
                   priority
-                  className="object-contain object-bottom drop-shadow-[15px_25px_20px_rgba(0,0,0,0.12)]"
+                  /* 3. object-bottom aur -mb-1 (minus margin) se bottom gap khatam ho jayega */
+                  className="object-contain object-bottom drop-shadow-[15px_25px_20px_rgba(0,0,0,0.12)] -mb-1"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col justify-center px-4 lg:px-8 xl:px-12 text-center lg:text-left">
+            {/* Right Side: Text Content */}
+            {/* 4. py-12 ya py-16 ko adjust kar ke aap top/bottom spacing control kar sakte hain */}
+            <div className="flex flex-col justify-center py-10 lg:py-16 px-4 lg:px-8 xl:px-12 text-center lg:text-left">
               <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
                 Not just a gift. A moment.
               </h1>
@@ -170,6 +177,7 @@ function Hero() {
                 </p>
               </div>
             </div>
+
           </div>
         </Container>
       </div>
@@ -272,70 +280,80 @@ function StoryIn() {
   ];
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden py-12 sm:py-16 lg:py-24">
+    <section ref={sectionRef} className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
       <div className="absolute inset-0 z-0">
         <Image src="/story1.png" alt="" fill className="object-cover" sizes="100vw" />
         <div className="absolute inset-0 bg-[#FDF9F5]/10" />
       </div>
 
-      <div className="pointer-events-none absolute bottom-0 right-0 z-10 h-[400px] w-[250px] sm:h-[500px] sm:w-[300px] lg:h-[600px] lg:w-[400px] xl:h-[700px] xl:w-[500px] overflow-hidden opacity-60 lg:opacity-80">
-        <Image src="/plant.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
-      </div>
+      {/* 3. Plant Image: Shifted further down to align with section bottom */}
+     <div className="pointer-events-none absolute bottom-[-45px] right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
+  <Image 
+    src="/plant3.png" 
+    alt="" 
+    fill 
+    className="object-contain object-right-bottom" 
+    sizes="500px" 
+  />
+</div>
 
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] text-[#2D2926] mb-10 sm:mb-14 lg:mb-16 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
+          {/* 1. Main Title: Space reduced to mb-4 */}
+          <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] text-[#2D2926] mb-4 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
             A Story in Every Key
           </h2>
 
-          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-12">
-            <div className="lg:col-span-8 space-y-8 sm:space-y-10">
+          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
+            {/* Left Side: Images Section */}
+            <div className="lg:col-span-9 space-y-4">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-14">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
                   {[1, 2, 3].map((idx) => (
                     <div key={idx} className="text-center">
-                      <div className="relative mx-auto h-[280px] sm:h-[320px] lg:h-[380px] xl:h-[420px] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px] mb-3 bg-[#2D2926]/5 animate-pulse rounded-lg" />
-                      <div className="h-5 bg-[#2D2926]/10 rounded mb-2 mx-auto w-3/4 animate-pulse" />
+                      <div className="relative mx-auto h-[350px] sm:h-[400px] lg:h-[480px] xl:h-[520px] w-full mb-2 bg-[#2D2926]/5 animate-pulse rounded-lg" />
                     </div>
                   ))}
                 </div>
               ) : items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-14">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
                   {items.map((i, idx) => (
-                    <button
-                      type="button"
-                      key={i.product.id}
-                      onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
-                      className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 ${
-                        productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                      }`}
-                      style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
-                    >
-                      <div className="relative mx-auto h-[280px] sm:h-[320px] lg:h-[380px] xl:h-[420px] w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px] mb-6">
-                        <Image
-                          src={i.img}
-                          alt={i.imageAlt || i.title}
-                          fill
-                          className="object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
-                          sizes="(min-width: 1280px) 360px, (min-width: 1024px) 320px, (min-width: 640px) 280px, 260px"
-                        />
-                      </div>
-                      <h4 className="font-serif text-[18px] sm:text-[19px] lg:text-[20px] text-[#2D2926] font-medium leading-tight">
-                        {i.title}
-                      </h4>
-                      <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[180px] mx-auto">
-                        {i.subtitle}
-                      </p>
-                    </button>
-                  ))}
+  <button
+    type="button"
+    key={i.product.id}
+    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
+    className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 ${
+      productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+    }`}
+    style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
+  >
+    {/* MB-0 to ensure no bottom margin from image container */}
+    <div className="relative mx-auto h-[350px] sm:h-[400px] lg:h-[480px] xl:h-[520px] w-full max-w-full mb-0">
+      <Image
+        src={i.img}
+        alt={i.imageAlt || i.title}
+        fill
+        className="object-contain drop-shadow-[0_20px_25px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-500"
+        sizes="(min-width: 1280px) 450px, (min-width: 1024px) 400px, (min-width: 640px) 350px, 300px"
+        priority={idx < 3}
+      />
+    </div>
+    
+    {/* Increased negative margin (mt-[-15px] to mt-[-25px]) to pull title UP */}
+    <h4 className="font-serif text-[18px] sm:text-[19px] lg:text-[21px] text-[#2D2926] font-medium leading-tight mt-[-55px] sm:mt-[-55px] lg:mt-[-60px] relative z-20">
+      {i.title}
+    </h4>
+    
+    <p className="mt-1 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 leading-relaxed max-w-[200px] mx-auto">
+      {i.subtitle}
+    </p>
+  </button>
+))}
                 </div>
-              ) : (
-                <div className="text-center text-[#2D2926]/50 py-12">
-                  No products available
-                </div>
-              )}
+              ) : null}
 
-              <div className="space-y-6 sm:space-y-8">
+              {/* Action Buttons Area */}
+              <div className="space-y-4 pt-2">
                 <div className="flex justify-center">
                   <a
                     className="inline-flex items-center justify-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white hover:bg-black transition-colors duration-300 shadow-sm"
@@ -356,8 +374,9 @@ function StoryIn() {
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-col justify-center pt-6 lg:pt-0 text-center lg:text-left animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
-              <div className="max-w-xs mx-auto lg:mx-0 lg:pl-2">
+            {/* Right Side: Text Section */}
+            <div className="lg:col-span-3 flex flex-col justify-end pb-8 sm:pb-12 lg:pb-16 text-center lg:text-left animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
+              <div className="max-w-xs mx-auto lg:mx-0 lg:pl-6 border-l-0 lg:border-l lg:border-[#2D2926]/10 lg:pl-8">
                 <h3 className="font-serif text-[18px] sm:text-[22px] lg:text-[26px] text-[#2D2926] leading-[1.12] mb-3 lg:mb-4">
                   Rooted in Reality
                 </h3>
