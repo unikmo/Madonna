@@ -156,7 +156,7 @@ function Hero() {
                   fill
                   priority
                   /* 3. object-bottom aur -mb-1 (minus margin) se bottom gap khatam ho jayega */
-                  className="object-contain object-bottom drop-shadow-[15px_25px_20px_rgba(0,0,0,0.12)] -mb-1"
+                  // className="object-contain object-bottom drop-shadow-[15px_25px_20px_rgba(0,0,0,0.12)] -mb-1"
                 />
               </div>
             </div>
