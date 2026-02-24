@@ -4,23 +4,33 @@ import Image from 'next/image';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export default function LandingPage() {
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
+
+  const scrollToHowItWorks = () => {
+    const el = document.getElementById('how-it-works');
+    el?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#FDF9F5] text-[#1E1B18]">
-      <SiteHeader />
+      <SiteHeader onContactClick={() => setShowContactModal(true)} onHowItWorksClick={scrollToHowItWorks} />
 
       <main>
         <Hero />
-        <StoryIn />
+        <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         <EmotionalPositioning />
         <HowItWorks />
         <ProductExperience />
         {/* <StoryInEveryKey /> */}
         <SocialProof />
         <BrandStory />
-        <FinalCta />
+        <FinalCta onCreateMomentClick={() => setShowCreateMomentModal(true)} />
       </main>
 
       <SiteFooter />
+
+      {showContactModal && <ContactModal onClose={() => setShowContactModal(false)} />}
     </div>
   );
 }
@@ -53,7 +63,13 @@ function Button({
   );
 }
 
-function SiteHeader() {
+function SiteHeader({
+  onContactClick,
+  onHowItWorksClick,
+}: {
+  onContactClick: () => void;
+  onHowItWorksClick: () => void;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -73,12 +89,13 @@ function SiteHeader() {
       <Container>
         <div className="flex h-14 sm:h-16 items-center justify-between">
           <nav className="flex-1">
-            <a
+            <button
+              type="button"
+              onClick={onHowItWorksClick}
               className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block"
-              href="#how-it-works"
             >
               How it Works
-            </a>
+            </button>
           </nav>
 
           <a
@@ -89,12 +106,13 @@ function SiteHeader() {
           </a>
 
           <nav className="flex-1 flex justify-end">
-            <a 
+            <button
+              type="button"
+              onClick={onContactClick}
               className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1"
-              href="#shop"
             >
               Contact
-            </a>
+            </button>
           </nav>
         </div>
       </Container>
@@ -165,16 +183,11 @@ function Hero() {
             {/* 4. py-12 ya py-16 ko adjust kar ke aap top/bottom spacing control kar sakte hain */}
             <div className="flex flex-col justify-center py-10 lg:py-16 px-4 lg:px-8 xl:px-12 text-center lg:text-left">
               <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
-                Not just a gift. A moment.
+                Not Just a gift. A Moment.
               </h1>
               
               <div className="mt-4 sm:mt-6 lg:mt-8 space-y-1 text-[14px] sm:text-[16px] lg:text-[18px] xl:text-[19px] text-[#2D2926]/85 font-light leading-relaxed tracking-wide">
-                <p>Unikmo turns memories into something you can hold.</p>
-                <p>
-                  A card unlocks a personal video, voice message,
-                  <br className="hidden sm:block" />
-                  or photo—saved for years to come.
-                </p>
+                <p>A card that opens a private video, voice message, or memory — anytime, anywhere.</p>
               </div>
             </div>
 
@@ -194,7 +207,12 @@ type Product = {
   variantId: string | null;
 };
 
-function StoryIn() {
+type StoryInProps = {
+  showCreateMomentModal: boolean;
+  setShowCreateMomentModal: (v: boolean) => void;
+};
+
+function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInProps) {
   const sectionRef = useRef(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [storeDomain, setStoreDomain] = useState('');
@@ -205,6 +223,7 @@ function StoryIn() {
     subtitle: string;
     img: string;
     imageAlt: string;
+    displayTitle: string;
   } | null>(null);
 
   useEffect(() => {
@@ -258,18 +277,22 @@ function StoryIn() {
   }, []);
 
   const items = products.map((product) => {
-    let subtitle = 'A small moment, beautifully delivered';
+    let subtitle = 'A small moment, beautifully delivered.';
     let tierLabel = 'The Spark';
+    let displayTitle = 'Single Key';
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
-      subtitle = 'A collection of memories';
+      subtitle = 'A collection of memories.';
       tierLabel = 'The Journey';
+      displayTitle = '4-Key Set';
     } else if (product.title.toLowerCase().includes('7') || product.title.toLowerCase().includes('seven')) {
-      subtitle = 'A story told over time';
+      subtitle = 'A story told over time.';
       tierLabel = 'The History';
+      displayTitle = '7-Key Collection';
     }
     return {
       product,
       title: product.title,
+      displayTitle,
       tierLabel,
       subtitle,
       img: product.image || '/placeholder-product.png',
@@ -278,13 +301,15 @@ function StoryIn() {
   });
 
   const trustItems = [
+    { label: 'No app required', icon: <IconSpark /> },
+    { label: 'No login', icon: <IconLock /> },
     { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One code – one memory', icon: <IconCode /> },
+    { label: 'One code = one memory', icon: <IconCode /> },
     { label: 'A tree planted', icon: <IconLeaf /> },
   ];
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
+    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
       <div className="absolute inset-0 z-0">
         <Image src="/story1.png" alt="" fill className="object-cover" sizes="100vw" />
         <div className="absolute inset-0 bg-[#FDF9F5]/10" />
@@ -324,7 +349,7 @@ function StoryIn() {
                   <button
                     type="button"
                     key={i.product.id}
-                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
+                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt, displayTitle: i.displayTitle })}
                     className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 ${
                       productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                     }`}
@@ -335,36 +360,19 @@ function StoryIn() {
                     </p>
                     <div
                       className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}
-                      data-debug-product-img-wrap
                     >
                       {/* Plain img with absolute fill so it actually scales with container (no Next/Image limit) */}
-                      {/* First product image is 1.81 aspect; container 3:2 — use object-cover so it fills like 2nd/3rd (log evidence) */}
+                      {/* First product image is wider aspect; use object-cover + position so it fills like 2nd/3rd */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={i.img}
-                        alt={i.imageAlt || i.title}
+                        alt={i.imageAlt || i.displayTitle}
                         className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
                         loading={idx < 3 ? 'eager' : 'lazy'}
-                        data-debug-product-img
-                        onLoad={(e) => {
-                          const el = e.currentTarget;
-                          const wrap = el.closest('[data-debug-product-img-wrap]');
-                          const cw = wrap ? (wrap as HTMLElement).clientWidth : 0;
-                          const ch = wrap ? (wrap as HTMLElement).clientHeight : 0;
-                          const iw = el.naturalWidth;
-                          const ih = el.naturalHeight;
-                          const dw = el.clientWidth;
-                          const dh = el.clientHeight;
-                          const ratio = iw && ih ? (iw / ih).toFixed(2) : '';
-                          const wrapRatio = cw && ch ? (cw / ch).toFixed(2) : '';
-                          // #region agent log
-                          fetch('http://127.0.0.1:7551/ingest/bcc1a6d0-5b66-4a5a-b6f3-20ab45040c4a',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'59ad63'},body:JSON.stringify({sessionId:'59ad63',location:'page.tsx:product-img-onLoad',message:'Product image dimensions',data:{productIndex:idx,tierLabel:i.tierLabel,containerW:cw,containerH:ch,imgNaturalW:iw,imgNaturalH:ih,imgDisplayW:dw,imgDisplayH:dh,imgAspectRatio:ratio,containerAspectRatio:wrapRatio},timestamp:Date.now()})}).catch(()=>{});
-                          // #endregion
-                        }}
                       />
                     </div>
                     <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">
-                      {i.title}
+                      {i.displayTitle}
                     </h4>
                     <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto">
                       {i.subtitle}
@@ -377,12 +385,13 @@ function StoryIn() {
             {/* CTA + trust row */}
             <div className="space-y-6 pt-8 sm:pt-10">
               <div className="flex justify-center">
-                <a
+                <button
+                  type="button"
+                  onClick={() => setShowCreateMomentModal(true)}
                   className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
-                  href="#shop"
                 >
                   CREATE YOUR MOMENT
-                </a>
+                </button>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-4 border-t border-[#2D2926]/10">
                 {trustItems.map((t) => (
@@ -403,14 +412,23 @@ function StoryIn() {
             </h3>
             <div className="space-y-3 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
               <p>For every key you hold, we plant a tree.</p>
-              <p>
-                We believe in preserving your memories and the world they were
-                made in. A legacy that lives in the cloud, rooted in the earth.
-              </p>
+              <p>Preserving your memories — and the world they were made in.</p>
             </div>
             </div>
           </div>
       </div>
+
+      {showCreateMomentModal && (
+        <CreateMomentModal
+          items={items}
+          loading={loading}
+          onSelectProduct={(item) => {
+            setSelectedProduct({ product: item.product, subtitle: item.subtitle, img: item.img, imageAlt: item.imageAlt, displayTitle: item.displayTitle });
+            setShowCreateMomentModal(false);
+          }}
+          onClose={() => setShowCreateMomentModal(false)}
+        />
+      )}
 
       {selectedProduct && (
         <ProductModal
@@ -422,12 +440,85 @@ function StoryIn() {
     </section>
   );
 }
+
+type CreateMomentItem = {
+  product: Product;
+  title: string;
+  displayTitle: string;
+  tierLabel: string;
+  subtitle: string;
+  img: string;
+  imageAlt: string;
+};
+
+function CreateMomentModal({
+  items,
+  loading,
+  onSelectProduct,
+  onClose,
+}: {
+  items: CreateMomentItem[];
+  loading: boolean;
+  onSelectProduct: (item: CreateMomentItem) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-[1600px] w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-serif text-[22px] sm:text-[28px] text-[#2D2926]">Create Your Moment</h2>
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-10">
+              {[1, 2, 3].map((idx) => (
+                <div key={idx} className="text-center px-4">
+                  <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#2D2926]/5 animate-pulse rounded-lg" />
+                </div>
+              ))}
+            </div>
+          ) : items.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-10">
+              {items.map((i, idx) => (
+                <button
+                  type="button"
+                  key={i.product.id}
+                  onClick={() => onSelectProduct(i)}
+                  className="text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 opacity-100"
+                >
+                  <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">{i.tierLabel}</p>
+                  <div className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={i.img}
+                      alt={i.imageAlt || i.displayTitle}
+                      className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                      loading="eager"
+                    />
+                  </div>
+                  <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">{i.displayTitle}</h4>
+                  <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto">{i.subtitle}</p>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProductModal({
   selected,
   storeDomain,
   onClose,
 }: {
-  selected: { product: Product; subtitle: string; img: string; imageAlt: string };
+  selected: { product: Product; subtitle: string; img: string; imageAlt: string; displayTitle: string };
   storeDomain: string;
   onClose: () => void;
 }) {
@@ -488,7 +579,7 @@ function ProductModal({
             />
           </div>
           <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
-            {product.title}
+            {selected.displayTitle}
           </h3>
           <p className="text-[#2D2926]/60 text-sm text-center mb-6">{selected.subtitle}</p>
 
@@ -620,12 +711,10 @@ function EmotionalPositioning() {
 
           <div className="text-center lg:text-left max-w-xl lg:pl-8 xl:pl-10 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
             <h2 className="font-serif text-[28px] sm:text-[34px] lg:text-[40px] xl:text-[44px] leading-[1.2] text-[#2D2926]">
-              Unlock a Moment
-              <br />
-              <span className="italic">That Lasts Forever</span>
+              Not just a gift. A moment.
             </h2>
             <p className="mt-4 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#2D2926]/60">
-              Hold onto what matters most—private memories saved for years.
+              Unikmo turns memories into something you can hold. A small card unlocks a personal video, voice message, or photo — saved for years to come.
             </p>
           </div>
         </div>
@@ -664,14 +753,17 @@ function HowItWorks() {
     {
       title: 'Buy a Moment Key',
       icon: <IconKey />,
+      accentIcon: true,
     },
     {
       title: 'Add your video, photo, or message',
       icon: <IconUpload />,
+      accentIcon: false,
     },
     {
       title: 'They unlock it anytime',
       icon: <IconHeart />,
+      accentIcon: false,
     },
   ];
 
@@ -690,7 +782,7 @@ function HowItWorks() {
                 className="step-item flex flex-col items-center opacity-0 translate-y-4 scale-95 transition-all duration-500 group"
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <div className="text-[#2D2926]/55 group-hover:scale-110 group-hover:text-[#2D2926] transition-all duration-300">
+                <div className={`${s.accentIcon ? 'text-[#b08d57]' : 'text-[#2D2926]/55'} group-hover:scale-110 group-hover:text-[#2D2926] transition-all duration-300`}>
                   {s.icon}
                 </div>
                 <p className="mt-2 text-[9px] sm:text-[10px] lg:text-[11px] leading-4 text-[#2D2926]/55 group-hover:text-[#2D2926]/75 transition-colors duration-300">
@@ -741,7 +833,7 @@ function ProductExperience() {
             <div className="relative aspect-[4/3] w-full rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
               <Image
                 src="/cardfrontunikmo.jpg"
-                alt="Moment Key Experience"
+                alt="Card back with Moment Code"
                 fill
                 className="object-contain"
                 sizes="(min-width: 1224px) 80vw, 130vw"
@@ -756,14 +848,12 @@ function ProductExperience() {
                 Simple. Private. Personal.
               </h2>
 
-              <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6">
-                <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-                  <p className="text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926]/80 font-serif italic">Enter the Moment Code</p>
-                </div>
-
-                <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-                  <p className="text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926]/80 font-serif italic">Experience the memory</p>
-                </div>
+              <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6 text-[#2D2926]/80">
+                <p className="text-[16px] sm:text-[18px] lg:text-[20px] font-light leading-relaxed">
+                  Scan QR code. Make sure you see unikmo link below. Or type www.unikmo.com/unlock
+                </p>
+                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Enter the Moment Code</p>
+                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Experience the memory</p>
               </div>
             </div>
           </div>
@@ -910,19 +1000,9 @@ function SocialProof() {
     <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#FDF9F5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center border-t border-b border-[#2D2926]/5 py-10 sm:py-12 lg:py-16">
-          
-
-          <h2 className="mt-4 sm:mt-5 lg:mt-6 font-serif text-[24px] sm:text-[30px] lg:text-[36px] xl:text-[42px] text-[#2D2926] leading-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-200">
-            Moments, Private, Shared.
-          </h2>
-
-          <p className="mt-3 sm:mt-4 text-[16px] sm:text-[18px] lg:text-[20px] xl:text-[22px] text-[#2D2926]/50 font-light italic animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-400">
-            A collection of emotional stories from our users.
-          </p>
-
-          <h3 className="mt-10 sm:mt-12 lg:mt-14 font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-500">
+          <h2 className="font-serif text-[24px] sm:text-[30px] lg:text-[36px] xl:text-[42px] text-[#2D2926] leading-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000">
             Moments people never forget
-          </h3>
+          </h2>
 
           <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 max-w-4xl mx-auto">
             <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-600">
@@ -973,7 +1053,7 @@ function BrandStory() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-16 sm:py-20 lg:py-24 xl:py-28 bg-[#FDF9F5]">
+    <section ref={sectionRef} className="py-16 sm:py-20 lg:py-24 xl:py-28 bg-[#F7F1EA]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <p className="text-[10px] sm:text-[11px] lg:text-[12px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[#2D2926]/40 font-medium animate-on-scroll opacity-0 translate-y-4 transition-all duration-1000">
           Brand Story
@@ -981,7 +1061,7 @@ function BrandStory() {
 
         <div className="mt-6 sm:mt-7 lg:mt-8 space-y-3 sm:space-y-4 animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-300">
           <p className="font-serif text-[18px] sm:text-[22px] lg:text-[26px] xl:text-[30px] text-[#2D2926] leading-[1.4] font-light">
-            In a world of instant messages and disappearing content, 
+            In a world of instant messages and disappearing content,
             Unikmo was created to preserve what truly matters.
           </p>
           
@@ -996,7 +1076,7 @@ function BrandStory() {
   );
 }
 
-function FinalCta() {
+function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) {
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -1028,7 +1108,11 @@ function FinalCta() {
         </h2>
 
         <div className="mt-8 sm:mt-10 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-300">
-          <button className="inline-flex items-center justify-center bg-[#2D2926] hover:bg-[#1a1816] text-white text-[12px] sm:text-[13px] lg:text-[14px] tracking-[0.15em] uppercase px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full transition-all duration-500 hover:scale-[1.02] shadow-[0_10px_30px_rgba(0,0,0,0.15)] group">
+          <button
+            type="button"
+            onClick={onCreateMomentClick}
+            className="inline-flex items-center justify-center bg-[#2D2926] hover:bg-[#1a1816] text-white text-[12px] sm:text-[13px] lg:text-[14px] tracking-[0.15em] uppercase px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full transition-all duration-500 hover:scale-[1.02] shadow-[0_10px_30px_rgba(0,0,0,0.15)] group"
+          >
             Create Your Moment
             <span className="ml-2 group-hover:translate-x-1 transition-transform duration-300">→</span>
           </button>
@@ -1037,6 +1121,101 @@ function FinalCta() {
         <div className="mt-16 sm:mt-20 lg:mt-24 h-px w-full bg-[#2D2926]/5" />
       </div>
     </section>
+  );
+}
+
+function ContactModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), message: message.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong');
+        setStatus('error');
+        return;
+      }
+      setStatus('success');
+      setEmail('');
+      setMessage('');
+    } catch {
+      setError('Failed to send');
+      setStatus('error');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-serif text-[20px] sm:text-[24px] text-[#2D2926]">Contact</h3>
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          {status === 'success' ? (
+            <p className="text-[#2D2926]/80">Thank you. We&apos;ll get back to you soon.</p>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="contact-email" className="block text-sm font-medium text-[#2D2926] mb-1">Email</label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-message" className="block text-sm font-medium text-[#2D2926] mb-1">Message</label>
+                <textarea
+                  id="contact-message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Your query or message..."
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30 resize-none"
+                />
+              </div>
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="flex-1 py-3 rounded-full bg-[#2D2926] text-white text-sm font-medium uppercase tracking-wide hover:bg-[#1a1816] transition-colors disabled:opacity-50"
+                >
+                  {status === 'sending' ? 'Sending...' : 'Send'}
+                </button>
+                <button type="button" onClick={onClose} className="px-6 py-3 rounded-full border border-[#2D2926]/20 text-[#2D2926] text-sm font-medium hover:bg-[#2D2926]/5 transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

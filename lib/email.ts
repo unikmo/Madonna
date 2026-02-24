@@ -52,7 +52,7 @@ async function sendEmailViaSMTP(to: string, subject: string, html: string): Prom
 /**
  * Sends email using the external email service API, with SMTP fallback
  */
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   // Try email service API first
   try {
     console.log("EmailService:: Attempting to send email to:", to);
