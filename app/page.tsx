@@ -14,7 +14,7 @@ export default function LandingPage() {
         <EmotionalPositioning />
         <HowItWorks />
         <ProductExperience />
-        <StoryInEveryKey />
+        {/* <StoryInEveryKey /> */}
         <SocialProof />
         <BrandStory />
         <FinalCta />
@@ -93,7 +93,7 @@ function SiteHeader() {
               className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1"
               href="#shop"
             >
-              Shop
+              Contact
             </a>
           </nav>
         </div>
@@ -151,7 +151,7 @@ function Hero() {
             <div className="flex justify-center lg:justify-start items-end">
               <div className="relative w-[90%] sm:w-[80%] lg:w-[115%] xl:w-[125%] aspect-[16/11] lg:-ml-4 xl:-ml-8">
                 <Image
-                  src="/heroimage1.png"
+                  src="/heroimage.png"
                   alt="Unikmo Card in Hand"
                   fill
                   priority
@@ -259,14 +259,18 @@ function StoryIn() {
 
   const items = products.map((product) => {
     let subtitle = 'A small moment, beautifully delivered';
+    let tierLabel = 'The Spark';
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
       subtitle = 'A collection of memories';
+      tierLabel = 'The Journey';
     } else if (product.title.toLowerCase().includes('7') || product.title.toLowerCase().includes('seven')) {
       subtitle = 'A story told over time';
+      tierLabel = 'The History';
     }
     return {
       product,
       title: product.title,
+      tierLabel,
       subtitle,
       img: product.image || '/placeholder-product.png',
       imageAlt: product.imageAlt || product.title,
@@ -299,98 +303,113 @@ function StoryIn() {
 
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 1. Main Title: Space reduced to mb-4 */}
-          <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] text-[#2D2926] mb-4 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
-            A Story in Every Key
+          <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
+            CREATE YOUR MOMENT
           </h2>
+        </div>
 
-          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Left Side: Images Section */}
-            <div className="lg:col-span-9 space-y-4">
-              {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                  {[1, 2, 3].map((idx) => (
-                    <div key={idx} className="text-center">
-                      <div className="relative mx-auto h-[350px] sm:h-[400px] lg:h-[480px] xl:h-[520px] w-full mb-2 bg-[#2D2926]/5 animate-pulse rounded-lg" />
-                    </div>
-                  ))}
-                </div>
-              ) : items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                  {items.map((i, idx) => (
-  <button
-    type="button"
-    key={i.product.id}
-    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
-    className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 ${
-      productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-    }`}
-    style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
-  >
-    {/* MB-0 to ensure no bottom margin from image container */}
-    <div className="relative mx-auto h-[350px] sm:h-[400px] lg:h-[480px] xl:h-[520px] w-full max-w-full mb-0">
-      <Image
-        src={i.img}
-        alt={i.imageAlt || i.title}
-        fill
-        className="object-contain drop-shadow-[0_20px_25px_rgba(0,0,0,0.15)] group-hover:scale-105 transition-transform duration-500"
-        sizes="(min-width: 1280px) 450px, (min-width: 1024px) 400px, (min-width: 640px) 350px, 300px"
-        priority={idx < 3}
-      />
-    </div>
-    
-    {/* Increased negative margin (mt-[-15px] to mt-[-25px]) to pull title UP */}
-    <h4 className="font-serif text-[18px] sm:text-[19px] lg:text-[21px] text-[#2D2926] font-medium leading-tight mt-[-55px] sm:mt-[-55px] lg:mt-[-60px] relative z-20">
-      {i.title}
-    </h4>
-    
-    <p className="mt-1 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 leading-relaxed max-w-[200px] mx-auto">
-      {i.subtitle}
-    </p>
-  </button>
-))}
-                </div>
-              ) : null}
-
-              {/* Action Buttons Area */}
-              <div className="space-y-4 pt-2">
-                <div className="flex justify-center">
-                  <a
-                    className="inline-flex items-center justify-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white hover:bg-black transition-colors duration-300 shadow-sm"
-                    href="#shop"
-                  >
-                    CREATE YOUR MOMENT
-                  </a>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3 pt-4 border-t border-[#2D2926]/10">
-                  {trustItems.map((t) => (
-                    <div key={t.label} className="flex items-center gap-2">
-                      <span className="text-[#2D2926]/50">{t.icon}</span>
-                      <span className="text-[10px] sm:text-[11px] text-[#2D2926]/70 font-medium tracking-wide">{t.label}</span>
-                    </div>
-                  ))}
-                </div>
+          {/* Outside max-w-7xl so row can be 1400px and containerW reaches ~460 (log showed 341) */}
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-10">
+                {[1, 2, 3].map((idx) => (
+                  <div key={idx} className="text-center px-4">
+                    <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#2D2926]/5 animate-pulse rounded-lg" />
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : items.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-10">
+                {items.map((i, idx) => (
+                  <button
+                    type="button"
+                    key={i.product.id}
+                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt })}
+                    className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 ${
+                      productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                    }`}
+                    style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
+                  >
+                    <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">
+                      {i.tierLabel}
+                    </p>
+                    <div
+                      className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}
+                      data-debug-product-img-wrap
+                    >
+                      {/* Plain img with absolute fill so it actually scales with container (no Next/Image limit) */}
+                      {/* First product image is 1.81 aspect; container 3:2 — use object-cover so it fills like 2nd/3rd (log evidence) */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={i.img}
+                        alt={i.imageAlt || i.title}
+                        className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                        loading={idx < 3 ? 'eager' : 'lazy'}
+                        data-debug-product-img
+                        onLoad={(e) => {
+                          const el = e.currentTarget;
+                          const wrap = el.closest('[data-debug-product-img-wrap]');
+                          const cw = wrap ? (wrap as HTMLElement).clientWidth : 0;
+                          const ch = wrap ? (wrap as HTMLElement).clientHeight : 0;
+                          const iw = el.naturalWidth;
+                          const ih = el.naturalHeight;
+                          const dw = el.clientWidth;
+                          const dh = el.clientHeight;
+                          const ratio = iw && ih ? (iw / ih).toFixed(2) : '';
+                          const wrapRatio = cw && ch ? (cw / ch).toFixed(2) : '';
+                          // #region agent log
+                          fetch('http://127.0.0.1:7551/ingest/bcc1a6d0-5b66-4a5a-b6f3-20ab45040c4a',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'59ad63'},body:JSON.stringify({sessionId:'59ad63',location:'page.tsx:product-img-onLoad',message:'Product image dimensions',data:{productIndex:idx,tierLabel:i.tierLabel,containerW:cw,containerH:ch,imgNaturalW:iw,imgNaturalH:ih,imgDisplayW:dw,imgDisplayH:dh,imgAspectRatio:ratio,containerAspectRatio:wrapRatio},timestamp:Date.now()})}).catch(()=>{});
+                          // #endregion
+                        }}
+                      />
+                    </div>
+                    <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">
+                      {i.title}
+                    </h4>
+                    <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto">
+                      {i.subtitle}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
-            {/* Right Side: Text Section */}
-            <div className="lg:col-span-3 flex flex-col justify-end pb-8 sm:pb-12 lg:pb-16 text-center lg:text-left animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
-              <div className="max-w-xs mx-auto lg:mx-0 lg:pl-6 border-l-0 lg:border-l lg:border-[#2D2926]/10 lg:pl-8">
-                <h3 className="font-serif text-[18px] sm:text-[22px] lg:text-[26px] text-[#2D2926] leading-[1.12] mb-3 lg:mb-4">
-                  Rooted in Reality
-                </h3>
-                <div className="space-y-2 text-[13px] sm:text-[14px] lg:text-[15px] leading-relaxed text-[#2D2926]/75 font-light">
-                  <p>For every key you hold, we plant a tree.</p>
-                  <p>
-                    We believe in preserving your memories and the world they were
-                    made in. A legacy that lives in the cloud, rooted in the earth.
-                  </p>
-                </div>
+            {/* CTA + trust row */}
+            <div className="space-y-6 pt-8 sm:pt-10">
+              <div className="flex justify-center">
+                <a
+                  className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
+                  href="#shop"
+                >
+                  CREATE YOUR MOMENT
+                </a>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-4 border-t border-[#2D2926]/10">
+                {trustItems.map((t) => (
+                  <div key={t.label} className="flex items-center gap-2">
+                    <span className="text-[#2D2926]/50">{t.icon}</span>
+                    <span className="text-[10px] sm:text-[11px] text-[#2D2926]/70 font-medium tracking-wide">{t.label}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Rooted in Reality */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-16 lg:mt-20 text-center">
+            <div className="max-w-2xl mx-auto animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
+            <h3 className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] leading-[1.12] mb-4">
+              Rooted in Reality
+            </h3>
+            <div className="space-y-3 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
+              <p>For every key you hold, we plant a tree.</p>
+              <p>
+                We believe in preserving your memories and the world they were
+                made in. A legacy that lives in the cloud, rooted in the earth.
+              </p>
+            </div>
+            </div>
+          </div>
       </div>
 
       {selectedProduct && (
