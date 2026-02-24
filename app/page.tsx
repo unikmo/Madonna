@@ -540,7 +540,9 @@ function ProductModal({
     }
     setEmailError('');
     if (storeDomain && product.variantId) {
-      const checkoutUrl = `https://${storeDomain}/cart/${product.variantId}:1?checkout`;
+      const params = new URLSearchParams();
+      params.set('checkout[email]', trimmed);
+      const checkoutUrl = `https://${storeDomain}/cart/${product.variantId}:1?checkout&${params.toString()}`;
       window.location.href = checkoutUrl;
     }
   };
@@ -581,27 +583,16 @@ function ProductModal({
           <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
             {selected.displayTitle}
           </h3>
-          <p className="text-[#2D2926]/60 text-sm text-center mb-6">{selected.subtitle}</p>
+          <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
 
-          <div className="space-y-4 mb-6 text-[#2D2926]/80 text-sm">
-            <div>
-              <h4 className="font-semibold text-[#2D2926] mb-1">What you get</h4>
-              <ul className="list-disc list-inside space-y-0.5">
-                <li>{keyCount} unique Moment Code{keyCount > 1 ? 's' : ''} delivered by email</li>
-                <li>Delivery options: Physical + Digital, Split, or Full Digital</li>
-                <li>One code = one private memory (video, voice, or photo)</li>
-                <li>A tree planted for every key</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-[#2D2926] mb-1">How it works</h4>
-              <ol className="list-decimal list-inside space-y-0.5">
-                <li>Buy → you receive your code(s) by email</li>
-                <li>Upload your moment at unikmo.com/unlock (or /upload)</li>
-                <li>Share the code or card with the recipient</li>
-                <li>They unlock and view at unikmo.com/unlock</li>
-              </ol>
-            </div>
+          <div className="mb-6">
+            <h4 className="font-semibold text-[#2D2926] text-sm mb-2">What you get</h4>
+            <ul className="list-disc list-inside space-y-0.5 text-[13px] text-[#2D2926]/80">
+              <li>{keyCount} unique Moment Code{keyCount > 1 ? 's' : ''} delivered by email</li>
+              <li>Delivery options: Physical + Digital, Split, or Full Digital</li>
+              <li>One code = one private memory (video, voice, or photo)</li>
+              <li>A tree planted for every key</li>
+            </ul>
           </div>
 
           <div className="space-y-2 mb-6">
