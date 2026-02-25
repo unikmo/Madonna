@@ -6,31 +6,40 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 export default function LandingPage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
+  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
 
-  const scrollToHowItWorks = () => {
-    const el = document.getElementById('how-it-works');
-    el?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    const openIfHash = () => {
+      if (typeof window !== 'undefined' && window.location.hash === '#how-it-works') {
+        setShowHowItWorksModal(true);
+      }
+    };
+    openIfHash();
+    window.addEventListener('hashchange', openIfHash);
+    return () => window.removeEventListener('hashchange', openIfHash);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FDF9F5] text-[#1E1B18]">
-      <SiteHeader onContactClick={() => setShowContactModal(true)} onHowItWorksClick={scrollToHowItWorks} />
+      <SiteHeader onContactClick={() => setShowContactModal(true)} onHowItWorksClick={() => setShowHowItWorksModal(true)} />
 
       <main>
         <Hero />
+        <TrustBullets />
+        <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
-        <EmotionalPositioning />
-        <HowItWorks />
-        <ProductExperience />
-        {/* <StoryInEveryKey /> */}
+        {/* <EmotionalPositioning /> */}
+        {/* <ProductExperience /> */}
         <SocialProof />
         <BrandStory />
         <FinalCta onCreateMomentClick={() => setShowCreateMomentModal(true)} />
+        <RootedInReality />
       </main>
 
       <SiteFooter />
 
       {showContactModal && <ContactModal onClose={() => setShowContactModal(false)} />}
+      {showHowItWorksModal && <HowItWorksModal onClose={() => setShowHowItWorksModal(false)} />}
     </div>
   );
 }
@@ -55,7 +64,7 @@ function Button({
   const styles =
     variant === 'primary'
       ? 'bg-[#1E1B18] text-[#FDF9F5] hover:bg-[#2F2A26] shadow-lg hover:shadow-xl'
-      : 'border border-[#1E1B18]/20 bg-transparent text-[#1E1B18] hover:bg-[#1E1B18]/5';
+      : 'bg-transparent text-[#1E1B18] hover:bg-[#1E1B18]/5';
   return (
     <a className={`${base} ${styles}`} href={href}>
       {children}
@@ -198,6 +207,65 @@ function Hero() {
   );
 }
 
+const heroTrustItems = [
+  { label: 'No app required', icon: <IconSpark /> },
+  { label: 'No login', icon: <IconLock /> },
+  { label: 'Private & secure', icon: <IconShield /> },
+  { label: 'One code = one memory', icon: <IconCode /> },
+  { label: 'A tree planted', icon: <IconLeaf /> },
+];
+
+const storyInEveryCardItems = [
+  { label: 'The', name: 'Spark', desc: '1 Card', sub: 'A small moment' },
+  { label: 'The', name: 'Journey', desc: '4 cards', sub: 'A collection of memories' },
+  { label: 'The', name: 'History', desc: '7 cards', sub: 'A story told over time' },
+];
+
+function TrustBullets() {
+  return (
+    <section className="py-8 sm:py-10 lg:py-12 bg-[#EFE8E5]">
+      <Container>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10">
+          {heroTrustItems.map((item) => (
+            <div
+              key={item.label}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="text-[#2D2926]/40 mb-2 sm:mb-3">
+                {item.icon}
+              </div>
+              <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
+                {item.label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* A Story in every card — merged under trust bullets */}
+        <div className="mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 lg:pt-14 border-t border-[#2D2926]/10">
+          <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] xl:text-[38px] text-[#2D2926] tracking-tight mb-8 sm:mb-10 lg:mb-12">
+            A Story in every card
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 xl:gap-8">
+            {storyInEveryCardItems.map((p, index) => (
+              <div
+                key={p.name}
+                className="rounded-xl sm:rounded-2xl bg-white/70 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 text-center shadow-[0_10px_40px_rgba(0,0,0,0.04)] group hover:bg-white/90 hover:shadow-xl transition-all duration-300"
+              >
+                <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 font-medium mb-1">{p.label}</p>
+                <p className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] xl:text-[30px] text-[#2D2926] leading-none mb-2">{p.name}</p>
+                <p className="text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/50 mb-4 sm:mb-5 lg:mb-6">{p.desc}</p>
+                <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-[#2D2926]/60 font-light italic">{p.sub}</p>
+                <span className="inline-block mt-4 text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 font-medium group-hover:text-[#2D2926]/60 transition-colors">Discover →</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 type Product = {
   id: string;
   title: string;
@@ -224,6 +292,7 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
     img: string;
     imageAlt: string;
     displayTitle: string;
+    isFirstImage?: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -300,31 +369,12 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
     };
   });
 
-  const trustItems = [
-    { label: 'No app required', icon: <IconSpark /> },
-    { label: 'No login', icon: <IconLock /> },
-    { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One code = one memory', icon: <IconCode /> },
-    { label: 'A tree planted', icon: <IconLeaf /> },
-  ];
-
   return (
     <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
       <div className="absolute inset-0 z-0">
         <Image src="/story1.png" alt="" fill className="object-cover" sizes="100vw" />
         <div className="absolute inset-0 bg-[#FDF9F5]/10" />
       </div>
-
-      {/* 3. Plant Image: Shifted further down to align with section bottom */}
-     <div className="pointer-events-none absolute bottom-[-45px] right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
-  <Image 
-    src="/plant3.png" 
-    alt="" 
-    fill 
-    className="object-contain object-right-bottom" 
-    sizes="500px" 
-  />
-</div>
 
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -349,18 +399,16 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
                   <button
                     type="button"
                     key={i.product.id}
-                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt, displayTitle: i.displayTitle })}
+                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt, displayTitle: i.displayTitle, isFirstImage: idx === 0 })}
                     className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 ${
                       productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                     }`}
                     style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
                   >
-                    <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">
+                    <p className={`text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4 ${idx === 0 ? 'mt-[25px]' : ''}`}>
                       {i.tierLabel}
                     </p>
-                    <div
-                      className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}
-                    >
+                    <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5]">
                       {/* Plain img with absolute fill so it actually scales with container (no Next/Image limit) */}
                       {/* First product image is wider aspect; use object-cover + position so it fills like 2nd/3rd */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -382,38 +430,15 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
               </div>
             ) : null}
 
-            {/* CTA + trust row */}
-            <div className="space-y-6 pt-8 sm:pt-10">
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateMomentModal(true)}
-                  className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
-                >
-                  CREATE YOUR MOMENT
-                </button>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-4 border-t border-[#2D2926]/10">
-                {trustItems.map((t) => (
-                  <div key={t.label} className="flex items-center gap-2">
-                    <span className="text-[#2D2926]/50">{t.icon}</span>
-                    <span className="text-[10px] sm:text-[11px] text-[#2D2926]/70 font-medium tracking-wide">{t.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Rooted in Reality */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-16 lg:mt-20 text-center">
-            <div className="max-w-2xl mx-auto animate-on-scroll opacity-0 translate-y-6 transition-all duration-700">
-            <h3 className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] leading-[1.12] mb-4">
-              Rooted in Reality
-            </h3>
-            <div className="space-y-3 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
-              <p>For every key you hold, we plant a tree.</p>
-              <p>Preserving your memories — and the world they were made in.</p>
-            </div>
+            {/* CTA */}
+            <div className="pt-8 sm:pt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowCreateMomentModal(true)}
+                className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
+              >
+                CREATE YOUR MOMENT
+              </button>
             </div>
           </div>
       </div>
@@ -422,8 +447,8 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
         <CreateMomentModal
           items={items}
           loading={loading}
-          onSelectProduct={(item) => {
-            setSelectedProduct({ product: item.product, subtitle: item.subtitle, img: item.img, imageAlt: item.imageAlt, displayTitle: item.displayTitle });
+          onSelectProduct={(item, index) => {
+            setSelectedProduct({ product: item.product, subtitle: item.subtitle, img: item.img, imageAlt: item.imageAlt, displayTitle: item.displayTitle, isFirstImage: index === 0 });
             setShowCreateMomentModal(false);
           }}
           onClose={() => setShowCreateMomentModal(false)}
@@ -459,12 +484,12 @@ function CreateMomentModal({
 }: {
   items: CreateMomentItem[];
   loading: boolean;
-  onSelectProduct: (item: CreateMomentItem) => void;
+  onSelectProduct: (item: CreateMomentItem, index: number) => void;
   onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-[1600px] w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-[1600px] w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="p-6 sm:p-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="font-serif text-[22px] sm:text-[28px] text-[#2D2926]">Create Your Moment</h2>
@@ -488,7 +513,7 @@ function CreateMomentModal({
                 <button
                   type="button"
                   key={i.product.id}
-                  onClick={() => onSelectProduct(i)}
+                  onClick={() => onSelectProduct(i, idx)}
                   className="text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 opacity-100"
                 >
                   <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">{i.tierLabel}</p>
@@ -518,7 +543,7 @@ function ProductModal({
   storeDomain,
   onClose,
 }: {
-  selected: { product: Product; subtitle: string; img: string; imageAlt: string; displayTitle: string };
+  selected: { product: Product; subtitle: string; img: string; imageAlt: string; displayTitle: string; isFirstImage?: boolean };
   storeDomain: string;
   onClose: () => void;
 }) {
@@ -526,6 +551,7 @@ function ProductModal({
   const [emailError, setEmailError] = useState('');
   const product = selected.product;
   const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
+  const isFirstImage = selected.isFirstImage ?? false;
 
   const handleBuyNow = () => {
     const trimmed = email.trim();
@@ -555,7 +581,7 @@ function ProductModal({
       aria-modal="true"
     >
       <div
-        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10"
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 sm:p-8">
@@ -571,13 +597,13 @@ function ProductModal({
               </svg>
             </button>
           </div>
-          <div className="relative aspect-[4/3] w-full max-w-[280px] mx-auto rounded-xl overflow-hidden mb-6">
+          <div className="relative aspect-[3/2] w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] mx-auto rounded-xl overflow-hidden mb-6 bg-[#E8E4DF] shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
             <Image
               src={selected.img}
               alt={selected.imageAlt}
               fill
-              className="object-contain"
-              sizes="280px"
+              className={isFirstImage ? 'object-cover object-[50%_85%]' : 'object-contain'}
+              sizes="(max-width: 640px) 460px, (max-width: 1024px) 500px, 560px"
             />
           </div>
           <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
@@ -585,15 +611,6 @@ function ProductModal({
           </h3>
           <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
 
-          <div className="mb-6">
-            <h4 className="font-semibold text-[#2D2926] text-sm mb-2">What you get</h4>
-            <ul className="list-disc list-inside space-y-0.5 text-[13px] text-[#2D2926]/80">
-              <li>{keyCount} unique Moment Code{keyCount > 1 ? 's' : ''} delivered by email</li>
-              <li>Delivery options: Physical + Digital, Split, or Full Digital</li>
-              <li>One code = one private memory (video, voice, or photo)</li>
-              <li>A tree planted for every key</li>
-            </ul>
-          </div>
 
           <div className="space-y-2 mb-6">
             <label htmlFor="product-modal-email" className="block text-sm font-medium text-[#2D2926]">
@@ -605,7 +622,7 @@ function ProductModal({
               value={email}
               onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30"
+              className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
             />
             {emailError && <p className="text-red-600 text-xs">{emailError}</p>}
           </div>
@@ -658,7 +675,7 @@ function EmotionalPositioning() {
       <Container>
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="w-full max-w-[500px] lg:max-w-[560px] mx-auto lg:mx-0 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg ring-1 ring-black/10 group">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg group">
               <div className="relative aspect-[16/10] w-full">
                 <Image
                   src="/Gemini_Generated_Image_sv1zpdsv1zpdsv1z.png"
@@ -714,7 +731,7 @@ function EmotionalPositioning() {
   );
 }
 
-function HowItWorks() {
+function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -759,9 +776,9 @@ function HowItWorks() {
   ];
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="pb-12 sm:pb-14 lg:pb-16 xl:pb-20 bg-gradient-to-b from-[#FDF9F5] to-[#F7F1EA]">
+    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-gradient-to-b from-[#FDF9F5] to-[#F7F1EA]">
       <Container>
-        <div className="mx-auto max-w-2xl sm:max-w-3xl rounded-xl sm:rounded-2xl bg-[#FBF7F2]/80 px-4 sm:px-8 lg:px-10 py-6 sm:py-7 lg:py-8 text-center ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)]">
+        <div className="mx-auto max-w-2xl sm:max-w-3xl rounded-xl sm:rounded-2xl bg-[#FBF7F2]/80 px-4 sm:px-8 lg:px-10 py-6 sm:py-7 lg:py-8 text-center shadow-[0_10px_26px_rgba(0,0,0,0.06)]">
           <p className="font-serif text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/70">
             How It Works
           </p>
@@ -782,6 +799,18 @@ function HowItWorks() {
               </div>
             ))}
           </div>
+
+          {onLearnMoreClick && (
+            <div className="mt-5 sm:mt-6">
+              <button
+                type="button"
+                onClick={onLearnMoreClick}
+                className="font-semibold text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
+              >
+                Learn more
+              </button>
+            </div>
+          )}
         </div>
       </Container>
     </section>
@@ -931,30 +960,12 @@ function StoryInEveryKey() {
               <p className="font-serif text-[22px] sm:text-[26px] lg:text-[28px] xl:text-[32px] text-[#000] leading-none mb-2">{p.name}</p>
               <p className="text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/50 mb-4 sm:mb-5 lg:mb-6">{p.desc}</p>
               
-              <div className="h-px w-8 bg-[#2D2926]/10 mx-auto mb-4 sm:mb-5 lg:mb-6" />
               
               <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-[#2D2926]/60 font-light mb-6 sm:mb-7 lg:mb-8 italic">{p.sub}</p>
               
               <button className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 group-hover:text-[#2D2926] transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
                 Discover <span className="text-[12px] sm:text-[13px] lg:text-[14px]">→</span>
               </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 xl:gap-12 pt-8 sm:pt-10 border-t border-[#2D2926]/5">
-          {trustItems.map((i, index) => (
-            <div 
-              key={i.label} 
-              className="flex flex-col items-center text-center animate-on-scroll opacity-0 translate-y-6 transition-all duration-700"
-              style={{ transitionDelay: `${600 + index * 100}ms` }}
-            >
-              <div className="text-[#2D2926]/30 mb-2 sm:mb-3 group-hover:text-[#2D2926]/60 transition-colors">
-                {i.icon}
-              </div>
-              <p className="text-[9px] sm:text-[10px] lg:text-[11px] uppercase tracking-[0.15em] text-[#2D2926]/50 font-medium leading-tight">
-                {i.label}
-              </p>
             </div>
           ))}
         </div>
@@ -990,7 +1001,7 @@ function SocialProof() {
   return (
     <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#FDF9F5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center border-t border-b border-[#2D2926]/5 py-10 sm:py-12 lg:py-16">
+        <div className="text-center py-10 sm:py-12 lg:py-16">
           <h2 className="font-serif text-[24px] sm:text-[30px] lg:text-[36px] xl:text-[42px] text-[#2D2926] leading-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000">
             Moments people never forget
           </h2>
@@ -1061,7 +1072,7 @@ function BrandStory() {
           </p>
         </div>
 
-        <div className="mt-10 sm:mt-11 lg:mt-12 h-px w-12 bg-[#2D2926]/10 mx-auto animate-on-scroll opacity-0 transition-all duration-1000 delay-700" />
+        <div className="mt-10 sm:mt-11 lg:mt-12 animate-on-scroll opacity-0 transition-all duration-1000 delay-700" />
       </div>
     </section>
   );
@@ -1093,7 +1104,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
 
   return (
     <section ref={sectionRef} id="final-cta" className="py-16 sm:py-20 lg:py-24 xl:py-32 bg-[#FDF9F5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center border-t border-[#2D2926]/5 pt-12 sm:pt-16 lg:pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center pt-12 sm:pt-16 lg:pt-20">
         <h2 className="font-serif text-[20px] sm:text-[24px] lg:text-[30px] xl:text-[36px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
           Give something they will keep forever.
         </h2>
@@ -1109,9 +1120,142 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
           </button>
         </div>
 
-        <div className="mt-16 sm:mt-20 lg:mt-24 h-px w-full bg-[#2D2926]/5" />
+        <div className="mt-16 sm:mt-20 lg:mt-24" />
       </div>
     </section>
+  );
+}
+
+function RootedInReality() {
+  return (
+    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-gradient-to-b from-[#FDF9F5] to-[#F7F1EA] text-center">
+      {/* Plant image — sticks to section bottom edge (no gap); text keeps normal padding */}
+      <div className="pointer-events-none absolute -bottom-12 sm:-bottom-14 lg:-bottom-16 right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
+        <Image src="/plant3.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <h3 className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] leading-[1.12] mb-4">
+            Rooted in Reality
+          </h3>
+          <div className="space-y-3 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
+            <p>For every key you hold, we plant a tree.</p>
+            <p>Preserving your memories — and the world they were made in.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const UNLOCK_URL = 'https://unikmo.com/unlock';
+const UNLOCK_LINK_CLASS = 'font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors';
+
+// Grid order as in design: row1 = 1, 2, 4 | row2 = 3, 4, 5 (step 4 appears twice)
+const HOW_IT_WORKS_GRID = [
+  { num: 1, title: 'Choose your Key', body: 'Select the card option that fits your story — Single Key, 4-Key Bundle or 7-Key Collection.' },
+  { num: 2, title: 'Receive your Moment Code', body: 'After purchase, the code is sent only to YOU by email. Unikmo never sends codes to recipients.' },
+  {
+    num: 4,
+    title: 'Share your Moment',
+    body: (
+      <>
+        The recipient enters the code at{' '}
+        <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
+          www.unikmo.com/unlock
+        </a>
+        . Your memory becomes theirs to revisit anytime.
+      </>
+    ),
+  },
+  {
+    num: 3,
+    title: 'Create your Moment',
+    body: (
+      <>
+        Go to{' '}
+        <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
+          www.unikmo.com/unlock
+        </a>
+        . Upload your video, voice message, photo or text. One code = one private memory.
+      </>
+    ),
+  },
+  { num: 4, title: '', body: 'You decide how to share: Send the code yourself, Give the physical card, Or both. Only the person you trust can unlock it.' },
+  {
+    num: 5,
+    title: 'They unlock & keep it',
+    body: (
+      <>
+        <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
+          www.unikmo.com/unlock
+        </a>
+        . Your memory becomes theirs to revisit anytime.
+      </>
+    ),
+  },
+];
+
+const DELIVERY_OPTIONS = [
+  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the code by email.', defaultChecked: true },
+  { id: 'digital-only', label: 'Digital Only', desc: 'You receive a digital card and the code by email.', defaultChecked: false },
+  { id: 'split', label: 'Split Delivery', desc: 'We deliver the card to the recipient. You receive the code by email.', defaultChecked: false },
+];
+
+function HowItWorksModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="how-it-works-title">
+      <div
+        className="bg-[#EFE8E5] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8 lg:p-10">
+          <div className="flex justify-end -mt-1 mb-1">
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <h2 id="how-it-works-title" className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-8 sm:mb-10">
+            How It Works
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10 sm:mb-12">
+            {HOW_IT_WORKS_GRID.map((step, idx) => (
+              <div key={idx} className="flex gap-3 sm:gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2D2926] text-white text-sm font-semibold flex items-center justify-center">
+                  {step.num}
+                </span>
+                <div className="min-w-0">
+                  {step.title && <h3 className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] mb-1">{step.title}</h3>}
+                  <p className="text-[13px] sm:text-[14px] text-[#2D2926]/90 leading-relaxed">{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-6 sm:pt-8">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg flex-shrink-0" aria-hidden>🚚</span>
+              <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px]">Delivery Options</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4">
+              {DELIVERY_OPTIONS.map((opt) => (
+                <label key={opt.id} className="flex gap-3 cursor-pointer group">
+                  <input type="radio" name="delivery" defaultChecked={opt.defaultChecked} className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/30 focus:ring-[#2D2926]/50" />
+                  <div>
+                    <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block group-hover:text-[#1E1B18]">{opt.label}</span>
+                    <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1149,7 +1293,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
       <div
-        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-[#2D2926]/10"
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 sm:p-8">
@@ -1174,7 +1318,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30"
+                  className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                 />
               </div>
               <div>
@@ -1186,7 +1330,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
                   placeholder="Your query or message..."
                   required
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/30 resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20 resize-none"
                 />
               </div>
               {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -1198,7 +1342,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
                 >
                   {status === 'sending' ? 'Sending...' : 'Send'}
                 </button>
-                <button type="button" onClick={onClose} className="px-6 py-3 rounded-full border border-[#2D2926]/20 text-[#2D2926] text-sm font-medium hover:bg-[#2D2926]/5 transition-colors">
+                <button type="button" onClick={onClose} className="px-6 py-3 rounded-full text-[#2D2926] text-sm font-medium hover:bg-[#2D2926]/5 transition-colors">
                   Cancel
                 </button>
               </div>
@@ -1214,7 +1358,7 @@ function SiteFooter() {
   return (
     <footer className="bg-[#FDF9F5] py-6 sm:py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="h-px w-full bg-[#2D2926]/5 mb-6 sm:mb-8" />
+        <div className="mb-6 sm:mb-8" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
           
