@@ -134,219 +134,188 @@ export async function sendMomentCodesEmail(
           body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: #e2e8f0;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #2D2926;
+            background: #F7F1EA;
             padding: 40px 20px;
             min-height: 100vh;
           }
           .email-container {
             max-width: 600px;
             margin: 0 auto;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: #FDF9F5;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(45, 41, 38, 0.08);
           }
           .header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            padding: 40px 30px;
+            background: #EFE8E5;
+            padding: 36px 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-          }
-          .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
           }
           .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: #2D2926;
+            margin-bottom: 8px;
+            font-family: Georgia, 'Times New Roman', serif;
+            letter-spacing: 0.02em;
           }
           .header-subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            position: relative;
-            z-index: 1;
+            color: #2D2926;
+            font-size: 15px;
+            opacity: 0.85;
           }
           .content {
-            padding: 40px 30px;
+            padding: 36px 30px;
           }
           .greeting {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #2D2926;
+            margin-bottom: 16px;
+            font-family: Georgia, 'Times New Roman', serif;
           }
           .message {
-            color: #cbd5e1;
-            font-size: 16px;
-            margin-bottom: 30px;
-            line-height: 1.8;
+            color: #2D2926;
+            font-size: 15px;
+            margin-bottom: 28px;
+            line-height: 1.7;
+            opacity: 0.9;
           }
           .order-info {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
+            background: #EFE8E5;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
           }
           .order-label {
-            color: #a78bfa;
-            font-size: 12px;
+            color: #b08d57;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.12em;
+            margin-bottom: 6px;
             font-weight: 600;
           }
           .order-number {
-            color: #ffffff;
+            color: #2D2926;
             font-size: 20px;
             font-weight: 700;
             font-family: 'Courier New', monospace;
           }
           .codes-section {
-            margin: 30px 0;
+            margin: 28px 0;
           }
           .codes-title {
-            color: #ffffff;
-            font-size: 18px;
+            color: #2D2926;
+            font-size: 17px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
+            font-family: Georgia, 'Times New Roman', serif;
           }
           .code-item {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.4);
+            background: #FBF7F2;
+            border: 1px solid rgba(45, 41, 38, 0.08);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
-            backdrop-filter: blur(10px);
-            transition: transform 0.2s, box-shadow 0.2s;
-          }
-          .code-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 16px rgba(45, 41, 38, 0.04);
           }
           .code-label {
-            color: #a78bfa;
-            font-size: 12px;
+            color: #b08d57;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.12em;
             margin-bottom: 8px;
             font-weight: 600;
           }
           .code-value {
-            color: #ffffff;
-            font-size: 22px;
+            color: #2D2926;
+            font-size: 20px;
             font-weight: 700;
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
           }
           .actions {
-            margin: 40px 0;
+            margin: 32px 0;
             text-align: center;
           }
           .button {
             display: inline-block;
-            padding: 16px 32px;
-            margin: 10px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            color: #ffffff;
+            padding: 14px 28px;
+            margin: 8px;
+            background: #2D2926;
+            color: #FDF9F5;
             text-decoration: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
           }
           .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+            background: #1E1B18;
           }
           .button-secondary {
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.4);
+            background: transparent;
+            color: #2D2926;
+            border: 1px solid rgba(45, 41, 38, 0.25);
           }
           .button-secondary:hover {
-            background: rgba(139, 92, 246, 0.3);
+            background: rgba(45, 41, 38, 0.06);
           }
           .info-box {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: #EFE8E5;
             border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-            backdrop-filter: blur(10px);
+            padding: 18px 20px;
+            margin: 28px 0;
           }
           .info-title {
-            color: #60a5fa;
-            font-size: 14px;
+            color: #2D2926;
+            font-size: 13px;
             font-weight: 600;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
           }
           .info-text {
-            color: #cbd5e1;
+            color: #2D2926;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.65;
+            opacity: 0.85;
           }
           .footer {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(45, 41, 38, 0.1);
             text-align: center;
           }
           .footer-text {
-            color: #94a3b8;
-            font-size: 14px;
-            line-height: 1.8;
+            color: #2D2926;
+            font-size: 13px;
+            line-height: 1.75;
+            opacity: 0.75;
           }
           .footer-brand {
-            color: #a78bfa;
+            color: #2D2926;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 12px;
+            font-family: Georgia, 'Times New Roman', serif;
           }
           .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
-            margin: 30px 0;
+            background: rgba(45, 41, 38, 0.1);
+            margin: 28px 0;
           }
           @media only screen and (max-width: 600px) {
             .content {
-              padding: 30px 20px;
+              padding: 28px 20px;
             }
             .header {
-              padding: 30px 20px;
+              padding: 28px 20px;
             }
             .button {
               display: block;
-              margin: 10px 0;
+              margin: 8px 0;
             }
           }
         </style>

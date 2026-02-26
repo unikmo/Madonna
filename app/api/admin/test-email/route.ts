@@ -133,64 +133,66 @@ export async function POST(request: NextRequest) {
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              color: #e2e8f0;
-              background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+              color: #2D2926;
+              background: #F7F1EA;
               padding: 40px 20px;
             }
             .email-container {
               max-width: 600px;
               margin: 0 auto;
-              background: rgba(15, 23, 42, 0.95);
-              backdrop-filter: blur(20px);
-              border-radius: 24px;
+              background: #FDF9F5;
+              border-radius: 16px;
               overflow: hidden;
-              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+              box-shadow: 0 10px 40px rgba(45, 41, 38, 0.08);
             }
             .header {
-              background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-              padding: 40px 30px;
+              background: #EFE8E5;
+              padding: 36px 30px;
               text-align: center;
             }
             .logo {
-              font-size: 32px;
+              font-size: 28px;
               font-weight: 700;
-              color: #ffffff;
-              margin-bottom: 10px;
+              color: #2D2926;
+              margin-bottom: 0;
+              font-family: Georgia, 'Times New Roman', serif;
             }
             .content {
-              padding: 40px 30px;
+              padding: 36px 30px;
             }
             .greeting {
-              font-size: 24px;
+              font-size: 22px;
               font-weight: 600;
-              color: #ffffff;
-              margin-bottom: 20px;
+              color: #2D2926;
+              margin-bottom: 16px;
+              font-family: Georgia, 'Times New Roman', serif;
             }
             .message {
-              color: #cbd5e1;
-              font-size: 16px;
-              margin-bottom: 30px;
-              line-height: 1.8;
+              color: #2D2926;
+              font-size: 15px;
+              margin-bottom: 24px;
+              line-height: 1.7;
+              opacity: 0.9;
             }
             .success-box {
-              background: rgba(34, 197, 94, 0.1);
-              border: 1px solid rgba(34, 197, 94, 0.3);
+              background: #EFE8E5;
               border-radius: 12px;
               padding: 20px;
-              margin: 30px 0;
+              margin: 28px 0;
             }
             .success-text {
-              color: #4ade80;
-              font-size: 16px;
+              color: #2D2926;
+              font-size: 15px;
               font-weight: 600;
             }
             .footer {
-              margin-top: 40px;
-              padding-top: 30px;
-              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              margin-top: 36px;
+              padding-top: 24px;
+              border-top: 1px solid rgba(45, 41, 38, 0.1);
               text-align: center;
-              color: #94a3b8;
-              font-size: 14px;
+              color: #2D2926;
+              font-size: 13px;
+              opacity: 0.75;
             }
           </style>
         </head>

@@ -123,8 +123,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate HMAC (will get secret from DB or env)
-    const isValid = await validateShopifyHMAC(rawBody, signature);
-    
+    // TEMPORARY: bypass HMAC to test flow — remove this and use real validation in production
+    const bypassHmac = process.env.BYPASS_SHOPIFY_WEBHOOK_HMAC === 'true';
+    const isValid = bypassHmac || (await validateShopifyHMAC(rawBody, signature));
+    if (bypassHmac) console.warn('[TEMPORARY] Shopify webhook HMAC validation bypassed (BYPASS_SHOPIFY_WEBHOOK_HMAC=true)');
+
     if (!isValid) {
       console.error('Invalid HMAC signature');
       console.error('- Received signature:', signature.substring(0, 20) + '...');
