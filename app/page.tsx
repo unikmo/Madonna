@@ -26,7 +26,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <TrustBullets />
-        <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
+        {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
@@ -156,18 +156,8 @@ function Hero() {
       ref={heroRef}
       className="relative flex items-center overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#FDF9F5]"
     >
-      {/* Background Image (Optional: Agar aapko solid color chahiye toh is div ko hata sakte hain) */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/bg-hero1.png"
-          alt=""
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-[#FDF9F5]/40" />
-      </div>
+      {/* Background: same as How it works section (no image) */}
+      <div className="absolute inset-0 z-0 bg-[#EFE8E5]" />
 
       <div className="relative z-10 w-full">
         <Container>
@@ -242,7 +232,7 @@ function TrustBullets() {
         </div>
 
         {/* A Story in every card — merged under trust bullets */}
-        <div className="mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 lg:pt-14 border-t border-[#2D2926]/10">
+        {/* <div className="mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 lg:pt-14 border-t border-[#2D2926]/10">
           <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] xl:text-[38px] text-[#2D2926] tracking-tight mb-8 sm:mb-10 lg:mb-12">
             A Story in every card
           </h2>
@@ -260,7 +250,7 @@ function TrustBullets() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </Container>
     </section>
   );
@@ -273,6 +263,8 @@ type Product = {
   image: string | null;
   imageAlt: string;
   variantId: string | null;
+  price?: string | null;
+  currencyCode?: string | null;
 };
 
 type StoryInProps = {
@@ -366,16 +358,13 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
       subtitle,
       img: product.image || '/placeholder-product.png',
       imageAlt: product.imageAlt || product.title,
+      price: product.price,
+      currencyCode: product.currencyCode,
     };
   });
 
   return (
-    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
-      <div className="absolute inset-0 z-0">
-        <Image src="/story1.png" alt="" fill className="object-cover" sizes="100vw" />
-        <div className="absolute inset-0 bg-[#FDF9F5]/10" />
-      </div>
-
+    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#EFE8E5]">
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
@@ -405,26 +394,31 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
                     }`}
                     style={{ transitionDelay: productsRevealed ? `${idx * 80}ms` : undefined }}
                   >
-                    <p className={`text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4 ${idx === 0 ? 'mt-[25px]' : ''}`}>
+                    <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">
                       {i.tierLabel}
                     </p>
-                    <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5]">
+                    <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-white rounded-lg overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
                       {/* Plain img with absolute fill so it actually scales with container (no Next/Image limit) */}
                       {/* First product image is wider aspect; use object-cover + position so it fills like 2nd/3rd */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={i.img}
                         alt={i.imageAlt || i.displayTitle}
-                        className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                        className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 brightness-105 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
                         loading={idx < 3 ? 'eager' : 'lazy'}
                       />
                     </div>
                     <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">
                       {i.displayTitle}
                     </h4>
-                    <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto">
+                    <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">
                       {i.subtitle}
                     </p>
+                    {i.price != null && (
+                      <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
+                        {i.currencyCode === 'EUR' ? '€' : i.currencyCode === 'USD' ? '$' : i.currencyCode ?? ''}{Number(i.price).toFixed(2)}
+                      </p>
+                    )}
                   </button>
                 ))}
               </div>
@@ -474,6 +468,8 @@ type CreateMomentItem = {
   subtitle: string;
   img: string;
   imageAlt: string;
+  price?: string | null;
+  currencyCode?: string | null;
 };
 
 function CreateMomentModal({
@@ -527,7 +523,12 @@ function CreateMomentModal({
                     />
                   </div>
                   <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">{i.displayTitle}</h4>
-                  <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto">{i.subtitle}</p>
+                  <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">{i.subtitle}</p>
+                  {i.price != null && (
+                    <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
+                      {i.currencyCode === 'EUR' ? '€' : i.currencyCode === 'USD' ? '$' : i.currencyCode ?? ''}{Number(i.price).toFixed(2)}
+                    </p>
+                  )}
                 </button>
               ))}
             </div>
@@ -734,85 +735,59 @@ function EmotionalPositioning() {
 function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   const sectionRef = useRef(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.step-item').forEach((el, index) => {
-              setTimeout(() => {
-                el.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-              }, index * 200);
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const steps = [
-    {
-      title: 'Buy a Moment Key',
-      icon: <IconKey />,
-      accentIcon: true,
-    },
-    {
-      title: 'Add your video, photo, or message',
-      icon: <IconUpload />,
-      accentIcon: false,
-    },
-    {
-      title: 'They unlock it anytime',
-      icon: <IconHeart />,
-      accentIcon: false,
-    },
-  ];
-
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-gradient-to-b from-[#FDF9F5] to-[#F7F1EA]">
-      <Container>
-        <div className="mx-auto max-w-2xl sm:max-w-3xl rounded-xl sm:rounded-2xl bg-[#FBF7F2]/80 px-4 sm:px-8 lg:px-10 py-6 sm:py-7 lg:py-8 text-center shadow-[0_10px_26px_rgba(0,0,0,0.06)]">
-          <p className="font-serif text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/70">
+    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-[#FEF9F5]">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-8 sm:mb-10">
             How It Works
-          </p>
+          </h2>
 
-          <div className="mt-4 sm:mt-5 grid grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
-            {steps.map((s, index) => (
-              <div 
-                key={s.title} 
-                className="step-item flex flex-col items-center opacity-0 translate-y-4 scale-95 transition-all duration-500 group"
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                <div className={`${s.accentIcon ? 'text-[#b08d57]' : 'text-[#2D2926]/55'} group-hover:scale-110 group-hover:text-[#2D2926] transition-all duration-300`}>
-                  {s.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10 sm:mb-12">
+            {HOW_IT_WORKS_GRID.map((step, idx) => (
+              <div key={idx} className="flex gap-3 sm:gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2D2926] text-white text-sm font-semibold flex items-center justify-center">
+                  {step.num}
+                </span>
+                <div className="min-w-0">
+                  {step.title ? <h3 className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] mb-1">{step.title}</h3> : null}
+                  <p className="text-[13px] sm:text-[14px] text-[#2D2926]/90 leading-relaxed">{step.body}</p>
                 </div>
-                <p className="mt-2 text-[9px] sm:text-[10px] lg:text-[11px] leading-4 text-[#2D2926]/55 group-hover:text-[#2D2926]/75 transition-colors duration-300">
-                  {s.title}
-                </p>
               </div>
             ))}
           </div>
 
+          <div className="pt-6 sm:pt-8">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg flex-shrink-0" aria-hidden>🚚</span>
+              <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px]">Delivery Options</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4">
+              {DELIVERY_OPTIONS.map((opt) => (
+                <label key={opt.id} className="flex gap-3 cursor-pointer group">
+                  <input type="radio" name="delivery-section" defaultChecked={opt.defaultChecked} className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/30 focus:ring-[#2D2926]/50" readOnly tabIndex={-1} />
+                  <div>
+                    <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block group-hover:text-[#1E1B18]">{opt.label}</span>
+                    <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
           {onLearnMoreClick && (
-            <div className="mt-5 sm:mt-6">
+            <div className="mt-8 sm:mt-10 text-center">
               <button
                 type="button"
                 onClick={onLearnMoreClick}
-                className="font-semibold text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
+                className="font-semibold text-[13px] sm:text-[14px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
               >
                 Learn more
               </button>
             </div>
           )}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

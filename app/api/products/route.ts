@@ -21,6 +21,9 @@ export async function GET(request: NextRequest) {
 
     const query = `
       query getProducts($ids: [ID!]!) {
+        shop {
+          currencyCode
+        }
         nodes(ids: $ids) {
           ... on Product {
             id
@@ -42,6 +45,7 @@ export async function GET(request: NextRequest) {
               edges {
                 node {
                   id
+                  price
                 }
               }
             }
@@ -51,13 +55,16 @@ export async function GET(request: NextRequest) {
     `;
 
     const data = await shopifyClient.query(query, { ids: productIds });
+    const shopCurrency = data?.shop?.currencyCode ?? null;
 
     const products = data?.nodes
       ?.filter((node: any) => node !== null)
       .map((node: any) => {
         const image = node.featuredImage || node.images?.edges?.[0]?.node;
-        const variantGid = node.variants?.edges?.[0]?.node?.id;
+        const variant = node.variants?.edges?.[0]?.node;
+        const variantGid = variant?.id;
         const variantId = variantGid ? String(variantGid).split('/').pop() : null;
+        const price = variant?.price != null ? String(variant.price) : null;
         return {
           id: node.id,
           title: node.title,
@@ -65,6 +72,8 @@ export async function GET(request: NextRequest) {
           image: image?.url || null,
           imageAlt: image?.altText || node.title,
           variantId,
+          price,
+          currencyCode: shopCurrency,
         };
       }) || [];
 
