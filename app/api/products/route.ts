@@ -55,7 +55,10 @@ export async function GET(request: NextRequest) {
     `;
 
     const data = await shopifyClient.query(query, { ids: productIds });
-    const shopCurrency = data?.shop?.currencyCode ?? null;
+    let shopCurrency = data?.shop?.currencyCode ?? null;
+    if (process.env.CURRENCY_OVERRIDE) {
+      shopCurrency = process.env.CURRENCY_OVERRIDE.toUpperCase();
+    }
 
     const products = data?.nodes
       ?.filter((node: any) => node !== null)

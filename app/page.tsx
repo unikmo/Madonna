@@ -26,6 +26,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <TrustBullets />
+        <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
         <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         {/* <EmotionalPositioning /> */}
@@ -172,8 +173,7 @@ function Hero() {
                   alt="Unikmo Card in Hand"
                   fill
                   priority
-                  /* 3. object-bottom aur -mb-1 (minus margin) se bottom gap khatam ho jayega */
-                  // className="object-contain object-bottom drop-shadow-[15px_25px_20px_rgba(0,0,0,0.12)] -mb-1"
+                  className="!max-w-none !w-[110%] !left-1/2 !-translate-x-1/2 object-contain"
                 />
               </div>
             </div>
@@ -416,7 +416,7 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
                     </p>
                     {i.price != null && (
                       <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
-                        {i.currencyCode === 'EUR' ? '€' : i.currencyCode === 'USD' ? '$' : i.currencyCode ?? ''}{Number(i.price).toFixed(2)}
+                        {(i.currencyCode?.toUpperCase?.() === 'EUR' ? '€' : i.currencyCode?.toUpperCase?.() === 'USD' ? '$' : i.currencyCode ?? '')}{Number(i.price).toFixed(2)}
                       </p>
                     )}
                   </button>
@@ -526,7 +526,7 @@ function CreateMomentModal({
                   <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">{i.subtitle}</p>
                   {i.price != null && (
                     <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
-                      {i.currencyCode === 'EUR' ? '€' : i.currencyCode === 'USD' ? '$' : i.currencyCode ?? ''}{Number(i.price).toFixed(2)}
+                      {(i.currencyCode?.toUpperCase?.() === 'EUR' ? '€' : i.currencyCode?.toUpperCase?.() === 'USD' ? '$' : i.currencyCode ?? '')}{Number(i.price).toFixed(2)}
                     </p>
                   )}
                 </button>
@@ -774,20 +774,51 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
               ))}
             </div>
           </div>
-
-          {onLearnMoreClick && (
-            <div className="mt-8 sm:mt-10 text-center">
-              <button
-                type="button"
-                onClick={onLearnMoreClick}
-                className="font-semibold text-[13px] sm:text-[14px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
-              >
-                Learn more
-              </button>
-            </div>
-          )}
         </div>
       </div>
+    </section>
+  );
+}
+
+function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
+  const sectionRef = useRef(null);
+
+  return (
+    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-[#FEF9F5]">
+      <Container>
+        <div className="text-center max-w-4xl mx-auto">
+          <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
+            How It Works
+          </h2>
+          <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
+            ① Choose Your Key &nbsp;→&nbsp; ② Receive Code &nbsp;→&nbsp; ③ Upload Moment &nbsp;→&nbsp; ④ Share &nbsp;→&nbsp; ⑤ They Unlock
+            {onLearnMoreClick && (
+              <>
+                {' '}
+                <button
+                  type="button"
+                  onClick={onLearnMoreClick}
+                  className="font-semibold text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
+                >
+                  more
+                </button>
+              </>
+            )}
+          </p>
+          <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed mb-6">
+            We never send codes to recipients. You decide who receives your moment.
+          </p>
+          {onLearnMoreClick && (
+            <button
+              type="button"
+              onClick={onLearnMoreClick}
+              className="font-semibold text-[15px] sm:text-[16px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
+            >
+              Learn more
+            </button>
+          )}
+        </div>
+      </Container>
     </section>
   );
 }
