@@ -27,7 +27,7 @@ export default function LandingPage() {
         <Hero />
         <TrustBullets />
         <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
-        <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
+        {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
