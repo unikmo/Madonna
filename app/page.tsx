@@ -27,7 +27,7 @@ export default function LandingPage() {
         <Hero />
         <TrustBullets />
         <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
-        {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
+        <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
@@ -265,6 +265,7 @@ type Product = {
   variantId: string | null;
   price?: string | null;
   currencyCode?: string | null;
+  variants?: { id: string | null; title: string; price?: string | null }[];
 };
 
 type StoryInProps = {
@@ -550,9 +551,25 @@ function ProductModal({
 }) {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [deliveryType, setDeliveryType] = useState<'physical' | 'digital'>('physical');
   const product = selected.product;
   const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
   const isFirstImage = selected.isFirstImage ?? false;
+
+  const getVariantIdForDelivery = () => {
+    const variants = product.variants || [];
+    if (variants.length === 0) return product.variantId;
+
+    const digitalVariant = variants.find((v) => /digital/i.test(v.title));
+    const physicalVariant = variants.find((v) => /physical/i.test(v.title));
+
+    const chosen =
+      deliveryType === 'digital'
+        ? digitalVariant || physicalVariant || variants[0]
+        : physicalVariant || digitalVariant || variants[0];
+
+    return chosen?.id || product.variantId;
+  };
 
   const handleBuyNow = () => {
     const trimmed = email.trim();
@@ -566,10 +583,12 @@ function ProductModal({
       return;
     }
     setEmailError('');
-    if (storeDomain && product.variantId) {
+    const chosenVariantId = getVariantIdForDelivery();
+    if (storeDomain && chosenVariantId) {
       const params = new URLSearchParams();
       params.set('checkout[email]', trimmed);
-      const checkoutUrl = `https://${storeDomain}/cart/${product.variantId}:1?checkout&${params.toString()}`;
+      params.set('attributes[Delivery preference]', deliveryType === 'physical' ? 'Physical card + digital access' : 'Digital only');
+      const checkoutUrl = `https://${storeDomain}/cart/${chosenVariantId}:1?checkout&${params.toString()}`;
       window.location.href = checkoutUrl;
     }
   };
@@ -612,6 +631,41 @@ function ProductModal({
           </h3>
           <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
 
+          <div className="mb-6">
+            <p className="text-sm font-medium text-[#2D2926] mb-2">How do you want to receive it?</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex items-start gap-2 rounded-xl border border-[#2D2926]/15 px-3 py-3 cursor-pointer hover:border-[#2D2926]/40 transition-colors">
+                <input
+                  type="radio"
+                  name="delivery-type"
+                  value="physical"
+                  checked={deliveryType === 'physical'}
+                  onChange={() => setDeliveryType('physical')}
+                  className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/40 focus:ring-[#2D2926]/40"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-[#2D2926]">Physical card + digital access</p>
+                  <p className="text-xs text-[#2D2926]/70">We ship the card and send your Moment Code by email.</p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-2 rounded-xl border border-[#2D2926]/15 px-3 py-3 cursor-pointer hover:border-[#2D2926]/40 transition-colors">
+                <input
+                  type="radio"
+                  name="delivery-type"
+                  value="digital"
+                  checked={deliveryType === 'digital'}
+                  onChange={() => setDeliveryType('digital')}
+                  className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/40 focus:ring-[#2D2926]/40"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-[#2D2926]">Digital only</p>
+                  <p className="text-xs text-[#2D2926]/70">We only send the Moment Code by email. No physical card.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
 
           <div className="space-y-2 mb-6">
             <label htmlFor="product-modal-email" className="block text-sm font-medium text-[#2D2926]">
@@ -631,14 +685,14 @@ function ProductModal({
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={!storeDomain || !product.variantId}
+            disabled={!storeDomain || !getVariantIdForDelivery()}
             className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Buy now
           </button>
-          {(!storeDomain || !product.variantId) && (
+          {(!storeDomain || !getVariantIdForDelivery()) && (
             <p className="text-center text-amber-700 text-xs mt-3">
-              {!storeDomain ? 'Store not configured. Set Shopify credentials in admin.' : 'Product variant not available.'}
+              {!storeDomain ? 'Store not configured. Set Shopify credentials in admin.' : 'Product variant not available for this option.'}
             </p>
           )}
         </div>

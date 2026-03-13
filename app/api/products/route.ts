@@ -41,10 +41,11 @@ export async function GET(request: NextRequest) {
                 }
               }
             }
-            variants(first: 1) {
+            variants(first: 10) {
               edges {
                 node {
                   id
+                  title
                   price
                 }
               }
@@ -64,10 +65,24 @@ export async function GET(request: NextRequest) {
       ?.filter((node: any) => node !== null)
       .map((node: any) => {
         const image = node.featuredImage || node.images?.edges?.[0]?.node;
-        const variant = node.variants?.edges?.[0]?.node;
-        const variantGid = variant?.id;
-        const variantId = variantGid ? String(variantGid).split('/').pop() : null;
-        const price = variant?.price != null ? String(variant.price) : null;
+        const variantsEdges = node.variants?.edges || [];
+        const variants =
+          variantsEdges.map((edge: any) => {
+            const v = edge?.node;
+            const gid = v?.id;
+            const id = gid ? String(gid).split('/').pop() : null;
+            const price = v?.price != null ? String(v.price) : null;
+            return {
+              id,
+              title: v?.title || '',
+              price,
+            };
+          }) || [];
+
+        const defaultVariant = variants[0] || null;
+        const variantId = defaultVariant?.id || null;
+        const price = defaultVariant?.price || null;
+
         return {
           id: node.id,
           title: node.title,
@@ -77,6 +92,7 @@ export async function GET(request: NextRequest) {
           variantId,
           price,
           currencyCode: shopCurrency,
+          variants,
         };
       }) || [];
 
