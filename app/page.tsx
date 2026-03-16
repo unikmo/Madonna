@@ -1445,14 +1445,31 @@ function SiteFooter({ onContactClick }: { onContactClick: () => void }) {
               </svg>
             </div>
             
-            <a 
-              href="https://instagram.com" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="hover:text-[#2D2926] transition-colors"
-            >
-              INSTAGRAM
-            </a>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <a 
+                href="https://www.instagram.com/myunikmo" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="hover:text-[#2D2926] transition-colors"
+              >
+                INSTAGRAM
+              </a>
+              <a
+                href="https://www.tiktok.com/@myunikmo"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-[#2D2926] transition-colors flex items-center gap-1"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current"
+                >
+                  <path d="M16.5 3c.4 1.3 1.4 2.4 2.7 2.9v3.1c-1.1-.1-2.1-.4-3-1v6.4c0 3.4-2.7 6.1-6.1 6.1S4 17.8 4 14.4c0-3.4 2.7-6.1 6.1-6.1.4 0 .8 0 1.1.1v3.1c-.3-.1-.7-.2-1.1-.2-1.6 0-2.9 1.3-2.9 3.1 0 1.7 1.3 3 2.9 3s2.9-1.3 2.9-3V3h3.5z" />
+                </svg>
+                <span>TIKTOK</span>
+              </a>
+            </div>
           </div>
         </div>
 
