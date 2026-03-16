@@ -37,7 +37,7 @@ export default function LandingPage() {
         <RootedInReality />
       </main>
 
-      <SiteFooter />
+      <SiteFooter onContactClick={() => setShowContactModal(true)} />
 
       {showContactModal && <ContactModal onClose={() => setShowContactModal(false)} />}
       {showHowItWorksModal && <HowItWorksModal onClose={() => setShowHowItWorksModal(false)} />}
@@ -587,7 +587,10 @@ function ProductModal({
     if (storeDomain && chosenVariantId) {
       const params = new URLSearchParams();
       params.set('checkout[email]', trimmed);
-      params.set('attributes[Delivery preference]', deliveryType === 'physical' ? 'Physical card + digital access' : 'Digital only');
+      params.set(
+        'attributes[Delivery preference]',
+        deliveryType === 'physical' ? 'Physical card + digital access' : 'Digital card ( Images )'
+      );
       const checkoutUrl = `https://${storeDomain}/cart/${chosenVariantId}:1?checkout&${params.toString()}`;
       window.location.href = checkoutUrl;
     }
@@ -659,8 +662,10 @@ function ProductModal({
                   className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/40 focus:ring-[#2D2926]/40"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-[#2D2926]">Digital only</p>
-                  <p className="text-xs text-[#2D2926]/70">We only send the Moment Code by email. No physical card.</p>
+                  <p className="text-sm font-semibold text-[#2D2926]">Digital card ( Images )</p>
+                  <p className="text-xs text-[#2D2926]/70">
+                    We email you a digital card image with your Moment Code and QR — no physical card is shipped.
+                  </p>
                 </div>
               </label>
             </div>
@@ -1163,13 +1168,13 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
   }, []);
 
   return (
-    <section ref={sectionRef} id="final-cta" className="py-16 sm:py-20 lg:py-24 xl:py-32 bg-[#FDF9F5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center pt-12 sm:pt-16 lg:pt-20">
+    <section ref={sectionRef} id="final-cta" className="py-10 sm:py-12 lg:py-14 xl:py-16 bg-[#FDF9F5]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center pt-6 sm:pt-8 lg:pt-10">
         <h2 className="font-serif text-[20px] sm:text-[24px] lg:text-[30px] xl:text-[36px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
           Give something they will keep forever.
         </h2>
 
-        <div className="mt-8 sm:mt-10 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-300">
+        <div className="mt-6 sm:mt-7 lg:mt-8 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-300">
           <button
             type="button"
             onClick={onCreateMomentClick}
@@ -1180,7 +1185,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
           </button>
         </div>
 
-        <div className="mt-16 sm:mt-20 lg:mt-24" />
+        <div className="mt-8 sm:mt-10 lg:mt-12" />
       </div>
     </section>
   );
@@ -1414,7 +1419,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function SiteFooter() {
+function SiteFooter({ onContactClick }: { onContactClick: () => void }) {
   return (
     <footer className="bg-[#FDF9F5] py-6 sm:py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1425,7 +1430,7 @@ function SiteFooter() {
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
             <span className="font-semibold text-[#2D2926]/80">UNIKMO © 2024</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
-            <span className="italic">A physical key to a private memory.</span>
+            <span>A physical key to a private memory.</span>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-5 lg:gap-6">
@@ -1454,7 +1459,13 @@ function SiteFooter() {
         <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/30">
           <a href="#privacy" className="hover:text-[#2D2926]/60 transition-colors">Privacy</a>
           <a href="#legal" className="hover:text-[#2D2926]/60 transition-colors">Legal</a>
-          <a href="#contact" className="hover:text-[#2D2926]/60 transition-colors">Contact</a>
+          <button
+            type="button"
+            onClick={onContactClick}
+            className="hover:text-[#2D2926]/60 transition-colors"
+          >
+            Contact
+          </button>
         </div>
       </div>
     </footer>

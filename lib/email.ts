@@ -117,7 +117,7 @@ export async function sendMomentCodesEmail(
 ): Promise<void> {
   const baseUrl = process.env.BASE_URL || 'https://yourdomain.com';
   const uploadUrl = `${baseUrl}/upload?code=${codes[0]}`;
-  const unlockUrl = `${baseUrl}/unlock`;
+  const unlockBaseUrl = `${baseUrl}/unlock`;
 
   const html = `
     <!DOCTYPE html>
@@ -340,20 +340,31 @@ export async function sendMomentCodesEmail(
             </div>
             
             <div class="codes-section">
-              <div class="codes-title">Your Moment Code${codes.length > 1 ? 's' : ''}</div>
-              ${codes.map((code, index) => `
-                <div class="code-item">
-                  <div class="code-label">${codes.length > 1 ? `Code ${index + 1}` : 'Your Code'}</div>
-                  <div class="code-value">${code}</div>
-                </div>
-              `).join('')}
+              <div class="codes-title">Your Moment Code${codes.length > 1 ? 's' : ''} & Digital Card${codes.length > 1 ? 's' : ''}</div>
+              ${codes
+                .map((code, index) => {
+                  const unlockUrlForCode = `${unlockBaseUrl}?code=${encodeURIComponent(code)}`;
+                  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                    unlockUrlForCode
+                  )}`;
+                  return `
+                    <div class="code-item">
+                      <div class="code-label">${codes.length > 1 ? `Card ${index + 1}` : 'Your Digital Card'}</div>
+                      <div class="code-value">${code}</div>
+                      <div style="margin-top: 8px;">
+                        <img src="${qrUrl}" alt="QR code for your Moment" style="width: 140px; height: 140px; border-radius: 12px;" />
+                      </div>
+                    </div>
+                  `;
+                })
+                .join('')}
             </div>
             
             <div class="divider"></div>
             
             <div class="actions">
               <a href="${uploadUrl}" class="button">📤 Upload Your Media</a>
-              <a href="${unlockUrl}" class="button button-secondary">🔓 Unlock Moment</a>
+              <a href="${unlockBaseUrl}" class="button button-secondary">🔓 Unlock Moment</a>
             </div>
             
             <div class="info-box">
