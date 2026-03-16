@@ -27,7 +27,7 @@ export default function LandingPage() {
         <Hero />
         <TrustBullets />
         <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
-        <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} />
+      {/*  <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
@@ -511,37 +511,23 @@ function CreateMomentModal({
                   type="button"
                   key={i.product.id}
                   onClick={() => onSelectProduct(i, idx)}
-                  className="text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4"
+                  className="text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 opacity-100"
                 >
-                  <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">
-                    {i.tierLabel}
-                  </p>
-                  <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-white rounded-lg overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-                    {/* Plain img with absolute fill to match landing page cards */}
+                  <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">{i.tierLabel}</p>
+                  <div className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={i.img}
                       alt={i.imageAlt || i.displayTitle}
-                      className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 brightness-105 ${
-                        idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'
-                      }`}
-                      loading={idx < 3 ? 'eager' : 'lazy'}
+                      className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                      loading="eager"
                     />
                   </div>
-                  <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">
-                    {i.displayTitle}
-                  </h4>
-                  <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">
-                    {i.subtitle}
-                  </p>
+                  <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">{i.displayTitle}</h4>
+                  <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">{i.subtitle}</p>
                   {i.price != null && (
                     <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
-                      {(i.currencyCode?.toUpperCase?.() === 'EUR'
-                        ? '€'
-                        : i.currencyCode?.toUpperCase?.() === 'USD'
-                          ? '$'
-                          : i.currencyCode ?? '')}
-                      {Number(i.price).toFixed(2)}
+                      {(i.currencyCode?.toUpperCase?.() === 'EUR' ? '€' : i.currencyCode?.toUpperCase?.() === 'USD' ? '$' : i.currencyCode ?? '')}{Number(i.price).toFixed(2)}
                     </p>
                   )}
                 </button>
