@@ -373,7 +373,7 @@ export async function sendMomentCodesEmail(
               </div>
               <div class="info-text">
                 <strong>Upload your media:</strong> Visit ${uploadUrl}<br>
-                <strong>Share with recipient:</strong> Give them the code above and they can unlock at ${unlockUrl}<br>
+                <strong>Share with recipient:</strong> Give them the code above and they can unlock at ${unlockBaseUrl}<br>
                 <strong>Remember:</strong> Keep your code safe - it's the only way to access your moment!
               </div>
             </div>
