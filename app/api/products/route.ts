@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createShopifyClient } from '@/lib/shopify';
 import { getShopifyCredentialsForAPI } from '@/lib/shopify';
+import { getEffectiveShopifyTestMode } from '@/lib/shopify-test-mode';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,11 +10,18 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    const productIds = [
-      'gid://shopify/Product/16094803853657', // Single key
-      'gid://shopify/Product/16094852219225', // 4 key
-      'gid://shopify/Product/16094859526489', // 7 key
-    ];
+    const isTestMode = await getEffectiveShopifyTestMode();
+    const productIds = isTestMode
+      ? [
+          'gid://shopify/Product/8326274121914', // Single key (test)
+          'gid://shopify/Product/8326277005498', // 4 key (test)
+          'gid://shopify/Product/8326277234874', // 7 key (test)
+        ]
+      : [
+          'gid://shopify/Product/16094803853657', // Single key (live)
+          'gid://shopify/Product/16094852219225', // 4 key (live)
+          'gid://shopify/Product/16094859526489', // 7 key (live)
+        ];
 
     const shopifyClient = await createShopifyClient();
     const credentials = await getShopifyCredentialsForAPI();

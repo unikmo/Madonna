@@ -68,170 +68,128 @@ export default function CodesPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    router.push('/admin/login');
-    router.refresh();
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-[#2D2926] text-lg">Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Codes Management
-          </h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 hover:bg-red-500/30 transition-all"
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Filters */}
+      <div className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by code..."
+            className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] text-sm focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
           >
-            Logout
+            <option value="">All status</option>
+            <option value="new">New</option>
+            <option value="claimed">Claimed</option>
+          </select>
+          <select
+            value={quantityFilter}
+            onChange={(e) => setQuantityFilter(e.target.value)}
+            className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] text-sm focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+          >
+            <option value="">All quantities</option>
+            <option value="1">1</option>
+            <option value="4">4</option>
+            <option value="7">7</option>
+          </select>
+          <select
+            value={deliveryTypeFilter}
+            onChange={(e) => setDeliveryTypeFilter(e.target.value)}
+            className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] text-sm focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+          >
+            <option value="">All types</option>
+            <option value="digital">Digital</option>
+            <option value="physical">Physical</option>
+            <option value="split">Split</option>
+          </select>
+          <button
+            onClick={() => {
+              setSearch('');
+              setStatusFilter('');
+              setQuantityFilter('');
+              setDeliveryTypeFilter('');
+            }}
+            className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] hover:bg-[#F5ECE3] transition-colors text-sm"
+          >
+            Clear
           </button>
         </div>
+      </div>
 
-        {/* Navigation */}
-        <div className="flex gap-4 mb-8">
-          <Link
-            href="/admin/dashboard"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Overview
-          </Link>
-          <Link
-            href="/admin/buyers"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Buyers
-          </Link>
-          <Link
-            href="/admin/codes"
-            className="px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-xl text-purple-300"
-          >
-            Codes
-          </Link>
-        </div>
-
-        {/* Filters */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by code..."
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Status</option>
-              <option value="new">New</option>
-              <option value="claimed">Claimed</option>
-            </select>
-            <select
-              value={quantityFilter}
-              onChange={(e) => setQuantityFilter(e.target.value)}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Quantities</option>
-              <option value="1">1</option>
-              <option value="4">4</option>
-              <option value="7">7</option>
-            </select>
-            <select
-              value={deliveryTypeFilter}
-              onChange={(e) => setDeliveryTypeFilter(e.target.value)}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Types</option>
-              <option value="digital">Digital</option>
-              <option value="physical">Physical</option>
-              <option value="split">Split</option>
-            </select>
-            <button
-              onClick={() => {
-                setSearch('');
-                setStatusFilter('');
-                setQuantityFilter('');
-                setDeliveryTypeFilter('');
-              }}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-white/5">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Code</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Buyer</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Order</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Quantity</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Type</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Media</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {codes.map((code, index) => (
-                <motion.tr
-                  key={code._id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="border-t border-white/10 hover:bg-white/5 transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/admin/codes/${code._id}`}
-                      className="text-purple-400 hover:text-purple-300 font-mono"
-                    >
+      {/* Table */}
+      <div className="rounded-2xl border border-[#E3DAD0] bg-white overflow-hidden shadow-sm">
+        <table className="w-full">
+          <thead className="bg-[#F5ECE3]">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Code</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Buyer</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Order</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Quantity</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Type</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Status</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Media</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {codes.map((code, index) => (
+              <motion.tr
+                key={code._id}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.03 }}
+                className="border-t border-[#EFE3D8] hover:bg-[#FDF7F0] transition-colors"
+              >
+                <td className="px-6 py-4">
+                  <Link
+                    href={`/admin/codes/${code._id}`}
+                    className="text-[#2D2926] hover:underline font-mono text-sm"
+                  >
                       {code.code}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-white">{code.user?.email}</td>
-                  <td className="px-6 py-4 text-gray-300">{code.order?.shopifyOrderId}</td>
-                  <td className="px-6 py-4 text-gray-300">{code.quantity}</td>
-                  <td className="px-6 py-4 text-gray-300 capitalize">{code.deliveryType}</td>
+                  <td className="px-6 py-4 text-[#2D2926]">{code.user?.email}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75">{code.order?.shopifyOrderId}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75">{code.quantity}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75 capitalize">{code.deliveryType}</td>
                   <td className="px-6 py-4">
                     <span
-                      className={`px-2 py-1 rounded-lg text-xs ${
+                      className={`px-2 py-1 rounded-full text-[11px] ${
                         code.status === 'claimed'
-                          ? 'bg-green-500/20 text-green-300'
-                          : 'bg-yellow-500/20 text-yellow-300'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-amber-50 text-amber-700'
                       }`}
                     >
                       {code.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-300">{code.mediaCount}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75">{code.mediaCount}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleAction(code._id, 'revoke')}
-                        className="px-3 py-1 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-300 text-xs hover:bg-blue-500/30"
+                        className="px-3 py-1 rounded-full border border-blue-300 bg-blue-50 text-blue-700 text-xs hover:bg-blue-100 transition-colors"
                       >
                         Revoke
                       </button>
                       <button
                         onClick={() => handleAction(code._id, 'reset')}
-                        className="px-3 py-1 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300 text-xs hover:bg-red-500/30"
+                        className="px-3 py-1 rounded-full border border-red-300 bg-red-50 text-red-700 text-xs hover:bg-red-100 transition-colors"
                       >
                         Reset
                       </button>
@@ -242,10 +200,9 @@ export default function CodesPage() {
             </tbody>
           </table>
           {codes.length === 0 && (
-            <div className="p-12 text-center text-gray-400">No codes found</div>
+            <div className="p-12 text-center text-[#2D2926]/50">No codes found</div>
           )}
         </div>
-      </div>
     </div>
   );
 }

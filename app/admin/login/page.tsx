@@ -62,45 +62,43 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-[#FDF9F5] flex items-center justify-center p-6 sm:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="backdrop-blur-xl bg-white/10 rounded-2xl p-8 shadow-2xl border border-white/20 w-full max-w-md"
+        className="w-full max-w-md rounded-2xl bg-white shadow-[0_18px_45px_rgba(0,0,0,0.08)] border border-[#E3DAD0] px-6 sm:px-8 py-8"
       >
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-center">
-          Admin Login
-        </h1>
-        <p className="text-gray-300 text-center mb-8">Access the admin dashboard</p>
+        <h1 className="text-center font-serif text-[24px] sm:text-[28px] text-[#2D2926] mb-2">Admin Login</h1>
+        <p className="text-center text-sm text-[#2D2926]/60 mb-8">Access the admin dashboard</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <label className="block text-sm font-medium text-[#2D2926] mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
               placeholder="admin@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label className="block text-sm font-medium text-[#2D2926] mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-sm">
+            <div className="p-3 rounded-xl border border-red-300 bg-red-50 text-red-700 text-sm">
               {error}
             </div>
           )}
@@ -110,7 +108,7 @@ export default function AdminLoginPage() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-500 hover:to-pink-500 transition-all"
+            className="w-full py-3 rounded-full bg-[#2D2926] text-[#FDF9F5] text-[11px] tracking-[0.2em] uppercase font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1E1B18] transition-colors"
           >
             {loading ? 'Logging in...' : 'Login'}
           </motion.button>

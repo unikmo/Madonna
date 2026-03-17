@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 interface Buyer {
   _id: string;
@@ -46,79 +45,37 @@ export default function BuyersPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    router.push('/admin/login');
-    router.refresh();
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-[#2D2926] text-lg">Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Buyers
-          </h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 hover:bg-red-500/30 transition-all"
-          >
-            Logout
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex gap-4 mb-8">
-          <Link
-            href="/admin/dashboard"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Overview
-          </Link>
-          <Link
-            href="/admin/buyers"
-            className="px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-xl text-purple-300"
-          >
-            Buyers
-          </Link>
-          <Link
-            href="/admin/codes"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Codes
-          </Link>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 mb-6">
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Search and Filters */}
+      <div className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm">
           <div className="flex gap-4">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by email..."
-              className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
             />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] text-sm focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
             >
               <option value="createdAt">Sort by Date</option>
               <option value="email">Sort by Email</option>
             </select>
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
+              className="px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] hover:bg-[#F5ECE3] transition-colors"
             >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </button>
@@ -126,14 +83,14 @@ export default function BuyersPage() {
         </div>
 
         {/* Table */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 overflow-hidden">
+        <div className="rounded-2xl border border-[#E3DAD0] bg-white overflow-hidden shadow-sm">
           <table className="w-full">
-            <thead className="bg-white/5">
+            <thead className="bg-[#F5ECE3]">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Email</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Orders</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Codes</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Created</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]/80">Email</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]/80">Orders</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]/80">Codes</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[#2D2926]/80">Created</th>
               </tr>
             </thead>
             <tbody>
@@ -143,12 +100,12 @@ export default function BuyersPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-t border-white/10 hover:bg-white/5 transition-colors"
+                  className="border-t border-[#EFE3D8] hover:bg-[#FDF7F0] transition-colors"
                 >
-                  <td className="px-6 py-4 text-white">{buyer.email}</td>
-                  <td className="px-6 py-4 text-gray-300">{buyer.ordersCount}</td>
-                  <td className="px-6 py-4 text-gray-300">{buyer.codesCount}</td>
-                  <td className="px-6 py-4 text-gray-400">
+                  <td className="px-6 py-4 text-[#2D2926]">{buyer.email}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75">{buyer.ordersCount}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/75">{buyer.codesCount}</td>
+                  <td className="px-6 py-4 text-[#2D2926]/60">
                     {new Date(buyer.createdAt).toLocaleDateString()}
                   </td>
                 </motion.tr>
@@ -156,10 +113,9 @@ export default function BuyersPage() {
             </tbody>
           </table>
           {buyers.length === 0 && (
-            <div className="p-12 text-center text-gray-400">No buyers found</div>
+            <div className="p-12 text-center text-[#2D2926]/50">No buyers found</div>
           )}
         </div>
-      </div>
     </div>
   );
 }

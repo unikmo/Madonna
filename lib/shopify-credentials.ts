@@ -1,6 +1,7 @@
 import connectDB from './db';
 import ShopifyCredentials from '@/models/ShopifyCredentials';
 import { encrypt, decrypt } from './encryption';
+import { getEffectiveShopifyTestMode } from './shopify-test-mode';
 
 /**
  * Gets Shopify credentials from DB or falls back to env variables
@@ -35,7 +36,7 @@ export async function getShopifyCredentials(password?: string): Promise<{
           storeDomain: credentials.storeDomain,
           accessToken: decryptedAccessToken,
           webhookSecret: decryptedWebhookSecret,
-          baseUrl: credentials.baseUrl || process.env.BASE_URL || '',
+          baseUrl: process.env.BASE_URL || '',
           apiVersion: credentials.apiVersion || '2024-10',
           source: 'db',
         };
@@ -45,10 +46,10 @@ export async function getShopifyCredentials(password?: string): Promise<{
       }
     }
 
-    // Fall back to environment variables
-    const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-    const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-    const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
+    const isTestMode = await getEffectiveShopifyTestMode();
+    const storeDomain = isTestMode ? process.env.TEST_SHOPIFY_STORE_DOMAIN : process.env.SHOPIFY_STORE_DOMAIN;
+    const accessToken = isTestMode ? process.env.TEST_SHOPIFY_ACCESS_TOKEN : process.env.SHOPIFY_ACCESS_TOKEN;
+    const webhookSecret = isTestMode ? process.env.TEST_SHOPIFY_WEBHOOK_SECRET : process.env.SHOPIFY_WEBHOOK_SECRET;
     const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
 
     if (!storeDomain || !accessToken || !webhookSecret) {
@@ -64,10 +65,11 @@ export async function getShopifyCredentials(password?: string): Promise<{
       source: 'env',
     };
   } catch (error: any) {
-    // Final fallback to env
-    const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-    const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-    const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
+    // Final fallback to env (still respecting admin override)
+    const isTestMode = await getEffectiveShopifyTestMode();
+    const storeDomain = isTestMode ? process.env.TEST_SHOPIFY_STORE_DOMAIN : process.env.SHOPIFY_STORE_DOMAIN;
+    const accessToken = isTestMode ? process.env.TEST_SHOPIFY_ACCESS_TOKEN : process.env.SHOPIFY_ACCESS_TOKEN;
+    const webhookSecret = isTestMode ? process.env.TEST_SHOPIFY_WEBHOOK_SECRET : process.env.SHOPIFY_WEBHOOK_SECRET;
     const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
 
     if (!storeDomain || !accessToken || !webhookSecret) {
@@ -102,30 +104,34 @@ export async function getShopifyCredentialsRaw(): Promise<{
     
     const credentials = await ShopifyCredentials.findOne();
     
-    if (credentials && credentials.accessToken && credentials.webhookSecret) {
+      if (credentials && credentials.accessToken && credentials.webhookSecret) {
       return {
         storeDomain: credentials.storeDomain,
         accessToken: credentials.accessToken,
         webhookSecret: credentials.webhookSecret,
-        baseUrl: credentials.baseUrl || process.env.BASE_URL || '',
+        baseUrl: process.env.BASE_URL || '',
         apiVersion: credentials.apiVersion || '2024-10',
         hasCredentials: true,
       };
     }
 
+    const isTestMode = await getEffectiveShopifyTestMode();
+
     return {
-      storeDomain: process.env.SHOPIFY_STORE_DOMAIN || '',
-      accessToken: process.env.SHOPIFY_ACCESS_TOKEN || '',
-      webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || '',
+      storeDomain: isTestMode ? process.env.TEST_SHOPIFY_STORE_DOMAIN || '' : process.env.SHOPIFY_STORE_DOMAIN || '',
+      accessToken: isTestMode ? process.env.TEST_SHOPIFY_ACCESS_TOKEN || '' : process.env.SHOPIFY_ACCESS_TOKEN || '',
+      webhookSecret: isTestMode ? process.env.TEST_SHOPIFY_WEBHOOK_SECRET || '' : process.env.SHOPIFY_WEBHOOK_SECRET || '',
       baseUrl: process.env.BASE_URL || '',
       apiVersion: process.env.SHOPIFY_API_VERSION || '2024-10',
       hasCredentials: false,
     };
   } catch (error: any) {
+    const isTestMode = await getEffectiveShopifyTestMode();
+
     return {
-      storeDomain: process.env.SHOPIFY_STORE_DOMAIN || '',
-      accessToken: process.env.SHOPIFY_ACCESS_TOKEN || '',
-      webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || '',
+      storeDomain: isTestMode ? process.env.TEST_SHOPIFY_STORE_DOMAIN || '' : process.env.SHOPIFY_STORE_DOMAIN || '',
+      accessToken: isTestMode ? process.env.TEST_SHOPIFY_ACCESS_TOKEN || '' : process.env.SHOPIFY_ACCESS_TOKEN || '',
+      webhookSecret: isTestMode ? process.env.TEST_SHOPIFY_WEBHOOK_SECRET || '' : process.env.SHOPIFY_WEBHOOK_SECRET || '',
       baseUrl: process.env.BASE_URL || '',
       apiVersion: process.env.SHOPIFY_API_VERSION || '2024-10',
       hasCredentials: false,

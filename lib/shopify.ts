@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { getShopifyCredentials } from './shopify-credentials';
+import { getEffectiveShopifyTestMode } from './shopify-test-mode';
 
 /**
  * Validates Shopify webhook HMAC signature
@@ -103,9 +104,10 @@ export async function getShopifyCredentialsForAPI(): Promise<{
     };
   } catch (error) {
     // Fall back to environment variables if DB credentials require password or don't exist
-    const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-    const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-    const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
+    const isTestMode = await getEffectiveShopifyTestMode();
+    const storeDomain = isTestMode ? process.env.TEST_SHOPIFY_STORE_DOMAIN : process.env.SHOPIFY_STORE_DOMAIN;
+    const accessToken = isTestMode ? process.env.TEST_SHOPIFY_ACCESS_TOKEN : process.env.SHOPIFY_ACCESS_TOKEN;
+    const webhookSecret = isTestMode ? process.env.TEST_SHOPIFY_WEBHOOK_SECRET : process.env.SHOPIFY_WEBHOOK_SECRET;
     const baseUrl = process.env.BASE_URL || '';
     const apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
 
@@ -154,8 +156,9 @@ export class ShopifyGraphQLClient {
       this.apiVersion = credentials.apiVersion || '2024-10';
     } else {
       // Fallback to env variables
-      this.storeDomain = process.env.SHOPIFY_STORE_DOMAIN || '';
-      this.accessToken = process.env.SHOPIFY_ACCESS_TOKEN || '';
+      const isTestModeEnv = process.env.SHOPIFY_TEST_MODE === 'true';
+      this.storeDomain = (isTestModeEnv ? process.env.TEST_SHOPIFY_STORE_DOMAIN : process.env.SHOPIFY_STORE_DOMAIN) || '';
+      this.accessToken = (isTestModeEnv ? process.env.TEST_SHOPIFY_ACCESS_TOKEN : process.env.SHOPIFY_ACCESS_TOKEN) || '';
       this.apiVersion = process.env.SHOPIFY_API_VERSION || '2024-10';
     }
 

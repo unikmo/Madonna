@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 interface CredentialsStatus {
@@ -28,6 +27,10 @@ export default function ShopifyCredentialsPage() {
   const router = useRouter();
   const [status, setStatus] = useState<CredentialsStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testModeEffective, setTestModeEffective] = useState<boolean | null>(null);
+  const [testModeOverride, setTestModeOverride] = useState<boolean | null>(null);
+  const [testModeEnvDefault, setTestModeEnvDefault] = useState<boolean | null>(null);
+  const [savingTestMode, setSavingTestMode] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordForView, setPasswordForView] = useState('');
@@ -42,6 +45,7 @@ export default function ShopifyCredentialsPage() {
     password: '',
   });
   const [saving, setSaving] = useState(false);
+  const [subscribingWebhook, setSubscribingWebhook] = useState(false);
 
   useEffect(() => {
     fetchStatus();
@@ -61,11 +65,47 @@ export default function ShopifyCredentialsPage() {
       }
       const data = await response.json();
       setStatus(data);
+
+      const testModeRes = await fetch('/api/admin/settings/shopify-test-mode', {
+        credentials: 'include',
+      });
+      if (testModeRes.ok) {
+        const tm = await testModeRes.json();
+        setTestModeEffective(tm.effective);
+        setTestModeOverride(tm.override);
+        setTestModeEnvDefault(tm.envDefault);
+      }
     } catch (error) {
       console.error('Failed to fetch credentials status:', error);
       toast.error('Failed to load credentials status');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleTestMode = async (value: boolean | null) => {
+    try {
+      setSavingTestMode(true);
+      const response = await fetch('/api/admin/settings/shopify-test-mode', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ override: value }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to update test mode');
+        return;
+      }
+      setTestModeOverride(data.override);
+      setTestModeEffective(data.effective);
+      setTestModeEnvDefault(data.envDefault);
+      toast.success(`Shopify test mode ${data.effective ? 'enabled' : 'disabled'}`);
+    } catch (error: any) {
+      console.error('Failed to update test mode:', error);
+      toast.error(error.message || 'Failed to update test mode');
+    } finally {
+      setSavingTestMode(false);
     }
   };
 
@@ -135,6 +175,33 @@ export default function ShopifyCredentialsPage() {
     }
   };
 
+  const handleSubscribeWebhook = async () => {
+    try {
+      setSubscribingWebhook(true);
+      const response = await fetch('/api/admin/shopify-webhooks/subscribe', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to subscribe webhook');
+        return;
+      }
+
+      if (data.alreadySubscribed) {
+        toast.success('Webhook is already subscribed for orders/paid');
+      } else {
+        toast.success('Webhook subscribed successfully');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to subscribe webhook');
+    } finally {
+      setSubscribingWebhook(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!formData.storeDomain || !formData.accessToken || !formData.webhookSecret || !formData.password) {
       toast.error('Please fill all fields including password');
@@ -179,276 +246,278 @@ export default function ShopifyCredentialsPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    router.push('/admin/login');
-    router.refresh();
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-[#2D2926] text-lg">Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Shopify Connection
-          </h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 hover:bg-red-500/30 transition-all"
-          >
-            Logout
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex gap-4 mb-8">
-          <Link
-            href="/admin/dashboard"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Overview
-          </Link>
-          <Link
-            href="/admin/buyers"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Buyers
-          </Link>
-          <Link
-            href="/admin/codes"
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-all"
-          >
-            Codes
-          </Link>
-          <Link
-            href="/admin/shopify"
-            className="px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-xl text-purple-300"
-          >
-            Shopify
-          </Link>
-        </div>
-
-        {/* Status Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 mb-6"
-        >
-          <h2 className="text-2xl font-semibold text-white mb-4">Connection Status</h2>
-          <div className="space-y-3">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Status Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm"
+      >
+        <h2 className="text-lg font-semibold text-[#2D2926] mb-4">Connection status</h2>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">Credentials stored</span>
+            <span className={`font-semibold text-sm ${status?.hasCredentials ? 'text-emerald-600' : 'text-amber-600'}`}>
+              {status?.hasCredentials ? 'Yes (database)' : 'No (env)'}
+            </span>
+          </div>
+          {status?.storeDomain && (
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Credentials Stored:</span>
-              <span className={`font-semibold ${status?.hasCredentials ? 'text-green-400' : 'text-yellow-400'}`}>
-                {status?.hasCredentials ? 'Yes (Database)' : 'No (Using Env Variables)'}
-              </span>
+              <span className="text-[#2D2926]/70 text-sm">Store domain</span>
+              <span className="text-[#2D2926] font-mono text-sm">{status.storeDomain}</span>
             </div>
-            {status?.storeDomain && (
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Store Domain:</span>
-                <span className="text-white font-mono text-sm">{status.storeDomain}</span>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">API version</span>
+            <span className="text-[#2D2926]">{status?.apiVersion || '2024-10'}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">Access token</span>
+            <span className={`font-semibold text-sm ${status?.hasAccessToken ? 'text-emerald-600' : 'text-red-600'}`}>
+              {status?.hasAccessToken ? '✓ Set' : '✗ Not set'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">Webhook secret</span>
+            <span className={`font-semibold text-sm ${status?.hasWebhookSecret ? 'text-emerald-600' : 'text-red-600'}`}>
+              {status?.hasWebhookSecret ? '✓ Set' : '✗ Not set'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">Base URL</span>
+            <span className="text-[#2D2926] font-mono text-sm break-all text-right max-w-[60%]">
+              {status?.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '')}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#2D2926]/70 text-sm">Webhook URL</span>
+            <span className="text-[#2D2926] font-mono text-sm break-all text-right max-w-[60%]">
+              {status?.baseUrl
+                ? `${status.baseUrl.replace(/\/$/, '')}/api/webhooks/shopify/orders-paid`
+                : typeof window !== 'undefined'
+                  ? `${window.location.origin}/api/webhooks/shopify/orders-paid`
+                  : '/api/webhooks/shopify/orders-paid'}
+            </span>
+          </div>
+          <div className="mt-4 pt-4 border-t border-[#E3DAD0]">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <span className="block text-[#2D2926] text-sm font-medium">Shopify test mode</span>
+                <span className="block text-xs text-[#2D2926]/55">
+                  {testModeOverride === null
+                    ? `Following env (SHOPIFY_TEST_MODE=${String(testModeEnvDefault)})`
+                    : 'Overridden in admin'}
+                </span>
               </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleToggleTestMode(false)}
+                  className={`px-3 py-1 text-xs rounded-full border ${
+                    testModeEffective === false ? 'bg-[#2D2926] text-[#FDF9F5] border-[#2D2926]' : 'border-[#D3C7BB] text-[#2D2926]/70'
+                  }`}
+                  disabled={savingTestMode}
+                >
+                  Live
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleTestMode(true)}
+                  className={`px-3 py-1 text-xs rounded-full border ${
+                    testModeEffective === true ? 'bg-[#2D2926] text-[#FDF9F5] border-[#2D2926]' : 'border-[#D3C7BB] text-[#2D2926]/70'
+                  }`}
+                  disabled={savingTestMode}
+                >
+                  Test
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleTestMode(null)}
+                  className="px-3 py-1 text-xs rounded-full border border-dashed border-[#D3C7BB] text-[#2D2926]/55"
+                  disabled={savingTestMode}
+                >
+                  Use env
+                </button>
+              </div>
+            </div>
+            {typeof testModeEffective === 'boolean' && (
+              <p className="text-xs text-[#2D2926]/60 mt-1">
+                Using <span className="font-semibold text-[#2D2926]">{testModeEffective ? 'TEST' : 'LIVE'}</span> store & products.
+              </p>
             )}
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">API Version:</span>
-              <span className="text-white">{status?.apiVersion || '2024-10'}</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Actions */}
+      <div className="flex flex-wrap gap-3">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleViewCredentials}
+          className="px-4 py-2 rounded-full border border-[#2D2926]/20 text-[#2D2926] text-sm font-medium hover:bg-[#2D2926] hover:text-[#FDF9F5] transition-colors"
+        >
+          View credentials
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleEdit}
+          className="px-4 py-2 rounded-full bg-[#2D2926] text-[#FDF9F5] text-sm font-medium hover:bg-[#1E1B18] transition-colors"
+        >
+          {status?.hasCredentials ? 'Edit credentials' : 'Set credentials'}
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleSubscribeWebhook}
+          disabled={subscribingWebhook}
+          className="px-4 py-2 rounded-full border border-[#2D2926]/20 text-[#2D2926] text-sm font-medium hover:bg-[#2D2926] hover:text-[#FDF9F5] disabled:opacity-50 transition-colors"
+        >
+          {subscribingWebhook ? 'Subscribing…' : 'Subscribe orders/paid webhook'}
+        </motion.button>
+      </div>
+
+      {/* Decrypted Credentials Display */}
+      {decryptedCredentials && !showEditForm && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-[#2D2926] mb-4">Decrypted credentials</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">Store domain</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm">
+                {decryptedCredentials.storeDomain}
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Access Token:</span>
-              <span className={`font-semibold ${status?.hasAccessToken ? 'text-green-400' : 'text-red-400'}`}>
-                {status?.hasAccessToken ? '✓ Set' : '✗ Not Set'}
-              </span>
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">Access token</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
+                {decryptedCredentials.accessToken}
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Webhook Secret:</span>
-              <span className={`font-semibold ${status?.hasWebhookSecret ? 'text-green-400' : 'text-red-400'}`}>
-                {status?.hasWebhookSecret ? '✓ Set' : '✗ Not Set'}
-              </span>
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">Webhook secret</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
+                {decryptedCredentials.webhookSecret}
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Base URL:</span>
-              <span className="text-white font-mono text-sm break-all text-right max-w-[60%]">
-                {status?.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '')}
-              </span>
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">Base URL</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
+                {decryptedCredentials.baseUrl}
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Webhook URL:</span>
-              <span className="text-white font-mono text-sm break-all text-right max-w-[60%]">
-                {status?.baseUrl 
-                  ? `${status.baseUrl.replace(/\/$/, '')}/api/webhooks/shopify/orders-paid`
-                  : typeof window !== 'undefined' 
-                    ? `${window.location.origin}/api/webhooks/shopify/orders-paid`
-                    : '/api/webhooks/shopify/orders-paid'}
-              </span>
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">API version</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926]">
+                {decryptedCredentials.apiVersion}
+              </div>
+            </div>
+            <div>
+              <label className="text-[#2D2926]/70 text-sm">Source</label>
+              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926]">
+                {decryptedCredentials.source === 'db' ? 'Database' : 'Environment'}
+              </div>
             </div>
           </div>
         </motion.div>
-
-        {/* Actions */}
-        <div className="flex gap-4 mb-6">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleViewCredentials}
-            className="px-6 py-3 bg-purple-500/20 border border-purple-500/50 rounded-xl text-purple-300 hover:bg-purple-500/30 transition-all"
-          >
-            View Credentials
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleEdit}
-            className="px-6 py-3 bg-blue-500/20 border border-blue-500/50 rounded-xl text-blue-300 hover:bg-blue-500/30 transition-all"
-          >
-            {status?.hasCredentials ? 'Edit Credentials' : 'Set Credentials'}
-          </motion.button>
-        </div>
-
-        {/* Decrypted Credentials Display */}
-        {decryptedCredentials && !showEditForm && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 mb-6"
-          >
-            <h2 className="text-2xl font-semibold text-white mb-4">Decrypted Credentials</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-gray-400 text-sm">Store Domain</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white font-mono text-sm">
-                  {decryptedCredentials.storeDomain}
-                </div>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Access Token</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white font-mono text-sm break-all">
-                  {decryptedCredentials.accessToken}
-                </div>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Webhook Secret</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white font-mono text-sm break-all">
-                  {decryptedCredentials.webhookSecret}
-                </div>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Base URL</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white font-mono text-sm break-all">
-                  {decryptedCredentials.baseUrl}
-                </div>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">API Version</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white">
-                  {decryptedCredentials.apiVersion}
-                </div>
-              </div>
-              <div>
-                <label className="text-gray-400 text-sm">Source</label>
-                <div className="mt-1 px-4 py-2 bg-black/20 rounded-lg text-white">
-                  {decryptedCredentials.source === 'db' ? 'Database' : 'Environment Variables'}
-                </div>
-              </div>
-            </div>
-          </motion.div>
         )}
 
-        {/* Edit Form */}
+      {/* Edit Form */}
         <AnimatePresence>
           {showEditForm && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20"
+              exit={{ opacity: 0, y: -12 }}
+              className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm"
             >
-              <h2 className="text-2xl font-semibold text-white mb-4">
-                {status?.hasCredentials ? 'Edit Credentials' : 'Set Credentials'}
+              <h2 className="text-lg font-semibold text-[#2D2926] mb-4">
+                {status?.hasCredentials ? 'Edit credentials' : 'Set credentials'}
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Store Domain</label>
+                  <label className="block text-[#2D2926] text-sm mb-2">Store domain</label>
                   <input
                     type="text"
                     value={formData.storeDomain}
                     onChange={(e) => setFormData({ ...formData, storeDomain: e.target.value })}
                     placeholder="your-store.myshopify.com"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Access Token</label>
+                  <label className="block text-[#2D2926] text-sm mb-2">Access token</label>
                   <input
                     type="password"
                     value={formData.accessToken}
                     onChange={(e) => setFormData({ ...formData, accessToken: e.target.value })}
-                    placeholder="Enter Shopify Access Token"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Shopify access token"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Webhook Secret</label>
+                  <label className="block text-[#2D2926] text-sm mb-2">Webhook secret</label>
                   <input
                     type="password"
                     value={formData.webhookSecret}
                     onChange={(e) => setFormData({ ...formData, webhookSecret: e.target.value })}
-                    placeholder="Enter Webhook Secret"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Webhook secret"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">Base URL</label>
+                  <label className="block text-[#2D2926] text-sm mb-2">Base URL</label>
                   <input
                     type="text"
                     value={formData.baseUrl}
                     onChange={(e) => setFormData({ ...formData, baseUrl: e.target.value })}
                     placeholder="https://yourdomain.com"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
-                  <p className="text-gray-500 text-xs mt-1">
-                    Base URL for webhook callbacks (e.g., https://yourdomain.com)
-                  </p>
+                  <p className="text-[#2D2926]/55 text-xs mt-1">Webhook callbacks base URL</p>
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">API Version</label>
+                  <label className="block text-[#2D2926] text-sm mb-2">API version</label>
                   <input
                     type="text"
                     value={formData.apiVersion}
                     onChange={(e) => setFormData({ ...formData, apiVersion: e.target.value })}
                     placeholder="2024-10"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">
-                    Encryption Password <span className="text-yellow-400">*</span>
-                  </label>
+                  <label className="block text-[#2D2926] text-sm mb-2">Encryption password <span className="text-amber-600">*</span></label>
                   <input
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Enter password to encrypt credentials"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Password to encrypt credentials"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                   />
-                  <p className="text-gray-500 text-xs mt-1">
-                    This password will be used to encrypt your credentials. Remember it - you&apos;ll need it to view/edit later.
-                  </p>
+                  <p className="text-[#2D2926]/55 text-xs mt-1">Required to view or edit later.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-6 py-2 bg-green-500/20 border border-green-500/50 rounded-xl text-green-300 hover:bg-green-500/30 transition-all disabled:opacity-50"
+                    className="px-4 py-2 rounded-full bg-[#2D2926] text-[#FDF9F5] text-sm font-medium hover:bg-[#1E1B18] disabled:opacity-50 transition-colors"
                   >
-                    {saving ? 'Saving...' : 'Save'}
+                    {saving ? 'Saving…' : 'Save'}
                   </button>
                   <button
                     onClick={() => {
@@ -462,7 +531,7 @@ export default function ShopifyCredentialsPage() {
                         password: '',
                       });
                     }}
-                    className="px-6 py-2 bg-gray-500/20 border border-gray-500/50 rounded-xl text-gray-300 hover:bg-gray-500/30 transition-all"
+                    className="px-4 py-2 rounded-full border border-[#D3C7BB] text-[#2D2926] text-sm hover:bg-[#F5ECE3] transition-colors"
                   >
                     Cancel
                   </button>
@@ -472,44 +541,42 @@ export default function ShopifyCredentialsPage() {
           )}
         </AnimatePresence>
 
-        {/* Password Modal */}
+      {/* Password modal */}
         <AnimatePresence>
           {showPasswordModal && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
               onClick={() => setShowPasswordModal(false)}
             >
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
+                initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="backdrop-blur-xl bg-slate-800/90 rounded-2xl p-8 border border-white/20 max-w-md w-full mx-4"
+                className="rounded-2xl p-6 sm:p-8 bg-white border border-[#E3DAD0] shadow-xl max-w-md w-full"
               >
-                <h2 className="text-2xl font-semibold text-white mb-4">Enter Password</h2>
-                <p className="text-gray-400 mb-6">
-                  Enter the password used to encrypt the credentials to view them.
+                <h2 className="text-lg font-semibold text-[#2D2926] mb-2">Enter password</h2>
+                <p className="text-[#2D2926]/60 text-sm mb-4">
+                  Password used to encrypt credentials.
                 </p>
                 <div className="space-y-4">
                   <input
                     type="password"
                     value={passwordForView}
                     onChange={(e) => setPasswordForView(e.target.value)}
-                    placeholder="Enter encryption password"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Encryption password"
+                    className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleDecryptCredentials();
-                      }
+                      if (e.key === 'Enter') handleDecryptCredentials();
                     }}
                   />
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <button
                       onClick={handleDecryptCredentials}
-                      className="flex-1 px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-xl text-purple-300 hover:bg-purple-500/30 transition-all"
+                      className="flex-1 px-4 py-2 rounded-full bg-[#2D2926] text-[#FDF9F5] text-sm font-medium hover:bg-[#1E1B18] transition-colors"
                     >
                       Decrypt
                     </button>
@@ -519,7 +586,7 @@ export default function ShopifyCredentialsPage() {
                         setPasswordForView('');
                         setDecryptedCredentials(null);
                       }}
-                      className="flex-1 px-4 py-2 bg-gray-500/20 border border-gray-500/50 rounded-xl text-gray-300 hover:bg-gray-500/30 transition-all"
+                      className="flex-1 px-4 py-2 rounded-full border border-[#D3C7BB] text-[#2D2926] text-sm hover:bg-[#F5ECE3] transition-colors"
                     >
                       Cancel
                     </button>
@@ -529,7 +596,6 @@ export default function ShopifyCredentialsPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
     </div>
   );
 }

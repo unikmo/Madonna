@@ -145,89 +145,50 @@ export function ShopifyConnectionStatus() {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
+        exit={{ opacity: 0, y: -12 }}
         className="fixed top-4 right-4 z-50"
       >
-        <div className="backdrop-blur-xl bg-yellow-500/20 border border-yellow-500/50 rounded-2xl p-6 shadow-2xl max-w-md relative">
-          {/* Dismiss button */}
+        <div className="rounded-2xl p-5 border border-amber-200 bg-amber-50 shadow-lg max-w-md relative">
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 text-yellow-300 hover:text-white transition-colors"
+            className="absolute top-3 right-3 text-[#2D2926]/50 hover:text-[#2D2926] transition-colors"
             aria-label="Dismiss"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          <div className="flex items-start gap-4 pr-6">
-            <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg
-                className="w-6 h-6 text-yellow-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
+          <div className="flex items-start gap-3 pr-8">
+            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Shopify Connection Issue
-              </h3>
-              <p className="text-yellow-200 text-sm mb-4">
+              <h3 className="text-base font-semibold text-[#2D2926] mb-1">Shopify connection issue</h3>
+              <p className="text-[#2D2926]/75 text-sm mb-4">
                 {status?.error ||
                   (status?.connected && !status?.webhookSubscribed
-                    ? 'Webhook is not subscribed. Please reconnect.'
-                    : 'We are working to maintain the connection.')}
+                    ? 'Webhook not subscribed. Reconnect to fix.'
+                    : 'Connection problem. Check status or reconnect.')}
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={handleReconnect}
                   disabled={reconnecting}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold text-sm hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 rounded-full bg-[#2D2926] text-[#FDF9F5] text-xs font-medium hover:bg-[#1E1B18] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {reconnecting ? (
-                    <span className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
+                    <>
+                      <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      Reconnecting...
-                    </span>
+                      Reconnecting…
+                    </>
                   ) : (
                     'Reconnect'
                   )}
@@ -235,9 +196,9 @@ export function ShopifyConnectionStatus() {
                 <button
                   onClick={checkConnection}
                   disabled={loading}
-                  className="px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white text-sm hover:bg-white/20 transition-all disabled:opacity-50"
+                  className="px-3 py-1.5 rounded-full border border-[#2D2926]/20 text-[#2D2926] text-xs font-medium hover:bg-[#2D2926]/5 disabled:opacity-50"
                 >
-                  Check Status
+                  Check status
                 </button>
               </div>
             </div>
