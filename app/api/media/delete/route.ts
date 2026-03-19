@@ -65,6 +65,7 @@ export async function DELETE(request: NextRequest) {
 
     // Remove from database
     momentCode.media.splice(mediaIndex, 1);
+    momentCode.unlockable = momentCode.media.length > 0;
     await momentCode.save();
 
     return NextResponse.json({

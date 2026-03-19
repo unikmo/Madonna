@@ -58,6 +58,9 @@ function UnlockPageContent() {
   const [unlockCode, setUnlockCode] = useState('');
   const [unlockLoading, setUnlockLoading] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
+  const [unlockBlockedMessage, setUnlockBlockedMessage] = useState<string | null>(null);
+  const [unlockBlockedTitle, setUnlockBlockedTitle] = useState('Moment Not Ready Yet');
+  const [unlockBlockedEmoji, setUnlockBlockedEmoji] = useState('🔒😔');
   const [unlockMedia, setUnlockMedia] = useState<MediaItem[]>([]);
   const [unlocked, setUnlocked] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
@@ -348,12 +351,32 @@ function UnlockPageContent() {
       });
       const data = await parseResponseSafely(res);
       if (!res.ok) {
-        setUnlockError(data.error || 'Failed to unlock');
-        toast.error(data.error || 'Failed to unlock');
+        if (data.reason === 'not_unlockable') {
+          const blockedMessage =
+            data.message ||
+            'This moment cannot be unlocked because the owner has not uploaded media yet.';
+          setUnlockBlockedTitle('Moment Not Ready Yet');
+          setUnlockBlockedEmoji('🔒😔');
+          setUnlockError(data.error || 'This moment cannot be unlocked yet.');
+          setUnlockBlockedMessage(blockedMessage);
+          toast.error('This moment is not unlockable yet');
+        } else if (data.reason === 'revoked') {
+          const blockedMessage =
+            data.message || 'This code is unavailable. Please contact the UNIKMO team.';
+          setUnlockBlockedTitle('Code Unavailable');
+          setUnlockBlockedEmoji('🚫🔐');
+          setUnlockError(data.error || 'This code is unavailable.');
+          setUnlockBlockedMessage(blockedMessage);
+          toast.error('This code is unavailable');
+        } else {
+          setUnlockError(data.error || 'Failed to unlock');
+          toast.error(data.error || 'Failed to unlock');
+        }
         return;
       }
       setUnlockMedia(data.media || []);
       setUnlocked(true);
+      setUnlockBlockedMessage(null);
       toast.success('Moment unlocked!');
     } catch {
       setUnlockError('Failed to unlock');
@@ -552,6 +575,45 @@ function UnlockPageContent() {
           </div>
         </section>
       </main>
+
+      <AnimatePresence>
+        {unlockBlockedMessage && !unlocked && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4"
+            onClick={() => setUnlockBlockedMessage(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+              className="w-full max-w-md rounded-2xl border border-[#D3C7BB] bg-[#FBF7F2] shadow-2xl p-5 sm:p-6 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                animate={{ rotate: [0, -7, 7, -5, 5, 0], scale: [1, 1.08, 1] }}
+                transition={{ duration: 0.65, ease: 'easeInOut' }}
+                className="text-4xl sm:text-5xl"
+              >
+                {unlockBlockedEmoji}
+              </motion.div>
+              <h3 className="mt-3 font-serif text-xl text-[#2D2926]">{unlockBlockedTitle}</h3>
+              <p className="mt-2 text-sm sm:text-base text-[#2D2926]/75">{unlockBlockedMessage}</p>
+              <button
+                type="button"
+                onClick={() => setUnlockBlockedMessage(null)}
+                className="mt-5 px-5 py-2.5 rounded-full bg-[#2D2926] text-white text-sm font-medium hover:bg-[#1E1B18] transition-colors"
+              >
+                Okay
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+      </AnimatePresence>
 
       <AnimatePresence>
         {showWelcomeAnimation && (

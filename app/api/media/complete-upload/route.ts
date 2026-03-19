@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
         createdAt: new Date(),
       });
     }
+    momentCode.unlockable = Array.isArray(momentCode.media) && momentCode.media.length > 0;
 
     await momentCode.save();
 

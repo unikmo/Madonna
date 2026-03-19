@@ -12,7 +12,8 @@ export interface IMomentCode extends Document {
   order: Types.ObjectId;
   quantity: 1 | 4 | 7;
   deliveryType: 'digital' | 'physical' | 'split';
-  status: 'new' | 'claimed';
+  status: 'new' | 'claimed' | 'revoked';
+  unlockable: boolean;
   claimedAt?: Date;
   media: IMedia[];
   createdAt: Date;
@@ -69,8 +70,13 @@ const MomentCodeSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: ['new', 'claimed'],
+      enum: ['new', 'claimed', 'revoked'],
       default: 'new',
+      required: true,
+    },
+    unlockable: {
+      type: Boolean,
+      default: false,
       required: true,
     },
     claimedAt: {

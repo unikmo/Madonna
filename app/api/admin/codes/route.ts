@@ -81,13 +81,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'revoke') {
-      code.status = 'new';
+      code.status = 'revoked';
       code.claimedAt = undefined;
       await code.save();
     } else if (action === 'reset') {
       code.status = 'new';
       code.claimedAt = undefined;
       code.media = [];
+      code.unlockable = false;
       await code.save();
     }
 

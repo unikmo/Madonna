@@ -96,6 +96,7 @@ export default function CodesPage() {
             <option value="">All status</option>
             <option value="new">New</option>
             <option value="claimed">Claimed</option>
+            <option value="revoked">Revoked</option>
           </select>
           <select
             value={quantityFilter}
@@ -189,6 +190,8 @@ export default function CodesPage() {
                       className={`px-2 py-1 rounded-full text-[11px] ${
                         code.status === 'claimed'
                           ? 'bg-emerald-50 text-emerald-700'
+                          : code.status === 'revoked'
+                            ? 'bg-red-50 text-red-700'
                           : 'bg-amber-50 text-amber-700'
                       }`}
                     >

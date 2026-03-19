@@ -55,6 +55,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (momentCode.status === 'revoked') {
+      return NextResponse.json(
+        {
+          error: 'This code is unavailable.',
+          reason: 'revoked',
+          message: 'This code is unavailable. Please contact the UNIKMO team.',
+        },
+        { status: 403 }
+      );
+    }
+
+    const hasMedia = Array.isArray(momentCode.media) && momentCode.media.length > 0;
+    const isUnlockable = Boolean((momentCode as any).unlockable) || hasMedia;
+    if (!isUnlockable) {
+      return NextResponse.json(
+        {
+          error: 'This moment cannot be unlocked yet.',
+          reason: 'not_unlockable',
+          message:
+            'This moment cannot be unlocked because the owner has not uploaded media yet.',
+        },
+        { status: 403 }
+      );
+    }
+
     // Update claimed status on first unlock
     if (momentCode.status === 'new') {
       momentCode.status = 'claimed';

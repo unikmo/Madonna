@@ -128,6 +128,7 @@ export async function POST(request: NextRequest) {
       url: uploadResult.url,
       createdAt: new Date(),
     }];
+    momentCode.unlockable = true;
 
     await momentCode.save();
 
