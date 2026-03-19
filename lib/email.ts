@@ -115,9 +115,15 @@ export async function sendMomentCodesEmail(
   codes: string[],
   orderId: string
 ): Promise<void> {
-  const baseUrl = process.env.BASE_URL || 'https://yourdomain.com';
+  const baseUrl = (process.env.BASE_URL || 'https://yourdomain.com').replace(/\/$/, '');
   const uploadUrl = `${baseUrl}/upload?code=${codes[0]}`;
   const unlockBaseUrl = `${baseUrl}/unlock`;
+  const productPackUrl = `${baseUrl}/email-product-pack.png`;
+  const firstCode = codes[0] || '';
+  const unlockUrlForFirstCode = `${unlockBaseUrl}?code=${encodeURIComponent(firstCode)}`;
+  const qrUrlForFirstCode = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+    unlockUrlForFirstCode
+  )}`;
 
   const html = `
     <!DOCTYPE html>
@@ -248,7 +254,7 @@ export async function sendMomentCodesEmail(
             background: #2D2926;
             color: #FDF9F5;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 14px;
             letter-spacing: 0.08em;
@@ -258,12 +264,13 @@ export async function sendMomentCodesEmail(
             background: #1E1B18;
           }
           .button-secondary {
-            background: transparent;
+            background: #FDF9F5;
             color: #2D2926;
-            border: 1px solid rgba(45, 41, 38, 0.25);
+            border: 1px solid #D3C7BB;
+            padding: 14px 28px;
           }
           .button-secondary:hover {
-            background: rgba(45, 41, 38, 0.06);
+            background: #EFE8E5;
           }
           .info-box {
             background: #EFE8E5;
@@ -341,25 +348,42 @@ export async function sendMomentCodesEmail(
             
             <div class="codes-section">
               <div class="codes-title">Your Moment Code${codes.length > 1 ? 's' : ''} & Digital Card${codes.length > 1 ? 's' : ''}</div>
-              ${codes
-                .map((code, index) => {
-                  const unlockUrlForCode = `${unlockBaseUrl}?code=${encodeURIComponent(code)}`;
-                  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-                    unlockUrlForCode
-                  )}`;
-                  return `
-                    <div class="code-item">
-                      <div class="code-label">${codes.length > 1 ? `Card ${index + 1}` : 'Your Digital Card'}</div>
-                      <div class="code-value">${code}</div>
-                      <div style="margin-top: 8px;">
-                        <img src="${qrUrl}" alt="QR code for your Moment" style="width: 140px; height: 140px; border-radius: 12px;" />
+
+              <!-- One image only: product pack with QR overlay -->
+              <div style="position: relative; width: 100%; max-width: 520px; margin: 18px auto 0;">
+                <img
+                  src="${productPackUrl}"
+                  alt="UNIKMO Digital Card"
+                  style="width:100%; height:auto; display:block; margin: 0 auto; border-radius: 14px;"
+                />
+                <div style="position:absolute; top:50%; left:50%; margin-top:-70px; margin-left:-70px;">
+                  <img
+                    src="${qrUrlForFirstCode}"
+                    alt="QR code for your Moment"
+                    style="width:140px; height:140px; border-radius: 12px;"
+                  />
+                </div>
+              </div>
+
+              <!-- Codes are separate text under the image -->
+              <div style="margin-top: 18px; text-align:center;">
+                ${codes
+                  .map((code, index) => {
+                    return `
+                      <div style="margin: 10px 0;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b08d57; font-weight: 600; margin-bottom: 6px;">
+                          ${codes.length > 1 ? `Card ${index + 1}` : 'Your Digital Card'}
+                        </div>
+                        <div style="color: #2D2926; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: 2px;">
+                          ${code}
+                        </div>
                       </div>
-                    </div>
-                  `;
-                })
-                .join('')}
+                    `;
+                  })
+                  .join('')}
+              </div>
             </div>
-            
+
             <div class="divider"></div>
             
             <div class="actions">
