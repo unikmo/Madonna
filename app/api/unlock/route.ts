@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
+import { sendUnlockNotificationEmail } from '@/lib/email';
 
 // Simple in-memory rate limiting (in production, use Redis)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -59,6 +60,20 @@ export async function POST(request: NextRequest) {
       momentCode.status = 'claimed';
       momentCode.claimedAt = new Date();
       await momentCode.save();
+
+      const buyerEmail = momentCode?.user?.email;
+      if (buyerEmail) {
+        try {
+          await sendUnlockNotificationEmail({
+            to: buyerEmail,
+            code: momentCode.code,
+            unlockedAt: momentCode.claimedAt,
+          });
+        } catch (emailError) {
+          // Do not block unlock success if email fails
+          console.error('Unlock notification email failed:', emailError);
+        }
+      }
     }
 
     // Return media (no sensitive user data)

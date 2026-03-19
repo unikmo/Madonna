@@ -464,7 +464,7 @@ function UnlockPageContent() {
                 A private memory is waiting for you
               </h1>
               <p className="text-sm sm:text-base text-[#2D2926]/65 mt-3 max-w-2xl mx-auto">
-                Enter your Moment Key to unlock the memory.
+                Enter your Moment Key to unlock it.
               </p>
             </div>
           </motion.div>
