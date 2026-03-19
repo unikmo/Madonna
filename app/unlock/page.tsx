@@ -133,36 +133,6 @@ function UnlockPageContent() {
     }
   };
 
-  const handleDownloadMedia = async (
-    url: string,
-    type: MediaItem['type'],
-    index: number
-  ) => {
-    const extensionByType: Record<MediaItem['type'], string> = {
-      image: 'jpg',
-      video: 'mp4',
-      audio: 'mp3',
-      text: 'txt',
-    };
-    const filename = `unikmo-moment-${index + 1}.${extensionByType[type]}`;
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch file');
-      const blob = await response.blob();
-      const objectUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = objectUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(objectUrl);
-    } catch {
-      // Fallback for cross-origin restrictions.
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
 
   const parseResponseSafely = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -418,7 +388,7 @@ function UnlockPageContent() {
   useEffect(() => {
     if (!unlocked) return;
     setShowCelebration(true);
-    const t = window.setTimeout(() => setShowCelebration(false), 12000);
+    const t = window.setTimeout(() => setShowCelebration(false), 2600);
     return () => window.clearTimeout(t);
   }, [unlocked]);
 
@@ -428,7 +398,7 @@ function UnlockPageContent() {
     playCelebrationSound();
     const interval = window.setInterval(() => {
       playCelebrationSound();
-    }, 2800);
+    }, 1200);
     return () => window.clearInterval(interval);
   }, [showCelebration, soundEnabled]);
 
@@ -449,8 +419,8 @@ function UnlockPageContent() {
           : { x: 0, y: 0 }
       }
       transition={{
-        duration: 0.45,
-        repeat: showCelebration ? 20 : 0,
+        duration: 0.32,
+        repeat: showCelebration ? 6 : 0,
         ease: 'easeInOut',
       }}
     >
@@ -466,37 +436,39 @@ function UnlockPageContent() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="rounded-2xl bg-[#FBF7F2]/95 px-5 sm:px-8 py-8 sm:py-10 ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)] mb-10 text-center relative overflow-hidden"
-        >
+        {!unlocked && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0.4 }}
-            animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#D9C8B4]"
-          />
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0.4 }}
-            animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-            className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#E9DCCF]"
-          />
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="rounded-2xl bg-[#FBF7F2]/95 px-5 sm:px-8 py-8 sm:py-10 ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)] mb-10 text-center relative overflow-hidden"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0.4 }}
+              animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#D9C8B4]"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0.4 }}
+              animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+              className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#E9DCCF]"
+            />
 
-          <div className="relative z-10">
-            <p className="font-serif text-[11px] sm:text-[12px] text-[#2D2926]/70 uppercase tracking-wide">
-              Unlock Your Moment
-            </p>
-            <h1 className="font-serif text-2xl sm:text-4xl text-[#2D2926] mt-2">
-              A private memory is waiting for you
-            </h1>
-            <p className="text-sm sm:text-base text-[#2D2926]/65 mt-3 max-w-2xl mx-auto">
-              Enter your Moment Key to unlock the memory.
-            </p>
-          </div>
-        </motion.div>
+            <div className="relative z-10">
+              <p className="font-serif text-[11px] sm:text-[12px] text-[#2D2926]/70 uppercase tracking-wide">
+                Unlock Your Moment
+              </p>
+              <h1 className="font-serif text-2xl sm:text-4xl text-[#2D2926] mt-2">
+                A private memory is waiting for you
+              </h1>
+              <p className="text-sm sm:text-base text-[#2D2926]/65 mt-3 max-w-2xl mx-auto">
+                Enter your Moment Key to unlock the memory.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Unlock a moment */}
         <section>
@@ -561,15 +533,8 @@ function UnlockPageContent() {
                             <div className="p-6 bg-[#2D2926]/5 h-48 flex items-center justify-center text-[#2D2926]/60">Text content</div>
                           )}
                         </button>
-                        <div className="p-3 border-t border-[#2D2926]/10 flex justify-between items-center">
+                        <div className="p-3 border-t border-[#2D2926]/10">
                           <p className="text-xs text-[#2D2926]/60 capitalize">{item.type}</p>
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadMedia(item.url, item.type, index)}
-                            className="px-3 py-1 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
-                          >
-                            Download
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -612,7 +577,7 @@ function UnlockPageContent() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: [0.95, 1.08, 1.02], opacity: [0, 0.2, 0.12] }}
-              transition={{ duration: 2.8, repeat: 3, ease: 'easeOut' }}
+              transition={{ duration: 1.25, repeat: 1, ease: 'easeOut' }}
               className="absolute inset-0"
               style={{
                 background:
@@ -627,10 +592,10 @@ function UnlockPageContent() {
                 initial={{ scale: 0.2, opacity: 0.5 }}
                 animate={{ scale: [0.3, 1.8, 2.5], opacity: [0.35, 0.22, 0] }}
                 transition={{
-                  duration: 1.8,
+                  duration: 1.05,
                   delay: i * 0.14,
-                  repeat: 3,
-                  repeatDelay: 0.25,
+                  repeat: 1,
+                  repeatDelay: 0.08,
                   ease: 'easeOut',
                 }}
                 className="absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border"
@@ -659,9 +624,9 @@ function UnlockPageContent() {
                     opacity: [0, 1, 0],
                   }}
                   transition={{
-                    duration: 1.25 + (i % 7) * 0.22,
+                    duration: 0.8 + (i % 7) * 0.09,
                     delay: (i % 14) * 0.06,
-                    repeat: 4,
+                    repeat: 1,
                     repeatType: 'loop',
                     ease: 'easeOut',
                   }}
@@ -693,9 +658,9 @@ function UnlockPageContent() {
                     opacity: [0, 0.9, 0],
                   }}
                   transition={{
-                    duration: 1.7,
+                    duration: 0.95,
                     delay: (i % 10) * 0.1,
-                    repeat: 3,
+                    repeat: 1,
                     ease: 'easeOut',
                   }}
                   className="absolute block"
@@ -713,7 +678,7 @@ function UnlockPageContent() {
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -8], scale: [0.95, 1, 1.02, 1] }}
-              transition={{ duration: 2.8, ease: 'easeOut' }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
               className="absolute left-1/2 top-[27%] -translate-x-1/2 text-center"
             >
               <p className="font-serif text-2xl sm:text-4xl text-[#2D2926] tracking-wide">Moment Unlocked</p>
@@ -746,22 +711,6 @@ function UnlockPageContent() {
                 <button type="button" onClick={(e) => { e.stopPropagation(); navigateMedia('next'); }} className="absolute right-4 z-[60] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">→</button>
               </>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (selectedMedia !== null && unlockMedia[selectedMedia]) {
-                  handleDownloadMedia(
-                    unlockMedia[selectedMedia].url,
-                    unlockMedia[selectedMedia].type,
-                    selectedMedia
-                  );
-                }
-              }}
-              className="absolute top-4 left-4 z-[60] px-3 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs"
-            >
-              Download
-            </button>
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} onClick={(e) => e.stopPropagation()} className="relative max-w-4xl w-full">
               {unlockMedia[selectedMedia].type === 'image' && (
                 <img src={unlockMedia[selectedMedia].url} alt="" className="max-w-full max-h-[85vh] object-contain rounded-lg mx-auto" />
