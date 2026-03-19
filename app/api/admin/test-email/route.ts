@@ -85,6 +85,9 @@ export async function POST(request: NextRequest) {
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT),
         secure: process.env.SMTP_PORT === '465',
+        connectionTimeout: 12000,
+        greetingTimeout: 12000,
+        socketTimeout: 15000,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,

@@ -55,7 +55,10 @@ export default function AdminDashboardPage() {
     }
 
     setTestingEmail(true);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     try {
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), 20000);
       const response = await fetch('/api/admin/test-email', {
         method: 'POST',
         headers: {
@@ -63,7 +66,10 @@ export default function AdminDashboardPage() {
         },
         credentials: 'include',
         body: JSON.stringify({ testEmail }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
+      timeoutId = null;
 
       const data = await response.json();
 
@@ -79,9 +85,13 @@ export default function AdminDashboardPage() {
       setTestEmail('');
       setShowTestEmail(false);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send test email');
+      const message = error?.name === 'AbortError'
+        ? 'Email test timed out. Please verify SMTP host/port and try again.'
+        : (error.message || 'Failed to send test email');
+      toast.error(message);
       console.error('Test email error:', error);
     } finally {
+      if (timeoutId) clearTimeout(timeoutId);
       setTestingEmail(false);
     }
   };

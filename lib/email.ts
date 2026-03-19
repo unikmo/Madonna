@@ -18,6 +18,9 @@ function createEmailTransporter() {
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT),
     secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+    connectionTimeout: 12000,
+    greetingTimeout: 12000,
+    socketTimeout: 15000,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -51,14 +54,13 @@ async function sendEmailViaSMTP(to: string, subject: string, html: string): Prom
 }
 
 /**
- * Sends email using the external email service API, with SMTP fallback
+ * Sends email using the external email service API.
  */
-export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
-  // Try email service API first
+async function sendEmailViaApi(to: string, subject: string, html: string): Promise<boolean> {
   try {
     console.log("EmailService:: Attempting to send email to:", to);
     console.log("EmailService:: Subject:", subject);
-    
+
     const sendEmailResponse = await fetch('https://glonetex-email-service.vercel.app/fitwell/email', {
       method: 'POST',
       headers: {
@@ -70,42 +72,62 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
         html,
       })
     });
-    
+
     if (!sendEmailResponse.ok) {
       console.error("EmailServiceError:: HTTP error:", sendEmailResponse.status, sendEmailResponse.statusText);
       const errorText = await sendEmailResponse.text();
       console.error("EmailServiceError:: Response body:", errorText);
       throw new Error(`Email service API returned ${sendEmailResponse.status}`);
     }
-    
+
     const response = await sendEmailResponse?.json();
     console.log("EmailServiceResponse:: ", JSON.stringify(response, null, 2));
-    
+
     // Check response status - true means success, false means error
     if (response && response.status === true) {
       console.log("EmailService:: ✅ Email has been sent successfully for ", to);
       return true;
-    } else {
-      const errorMsg = response?.msg || response?.message || 'Unknown error';
-      console.error("EmailServiceError:: ❌ Email failed to send");
-      console.error("EmailServiceError:: Error details:", errorMsg);
-      if (response?.msg?.response) {
-        console.error("EmailServiceError:: SMTP Response:", response.msg.response);
-      }
-      throw new Error(`Email service returned error: ${errorMsg}`);
     }
+
+    const errorMsg = response?.msg || response?.message || 'Unknown error';
+    console.error("EmailServiceError:: ❌ Email failed to send");
+    console.error("EmailServiceError:: Error details:", errorMsg);
+    if (response?.msg?.response) {
+      console.error("EmailServiceError:: SMTP Response:", response.msg.response);
+    }
+    throw new Error(`Email service returned error: ${errorMsg}`);
   } catch (error: any) {
     console.error("EmailServiceError:: Exception occurred:", error?.message);
-    console.log("EmailService:: Falling back to SMTP...");
-    
-    // Fallback to SMTP
-    try {
-      return await sendEmailViaSMTP(to, subject, html);
-    } catch (smtpError: any) {
-      console.error("SMTP:: ❌ SMTP fallback also failed:", smtpError?.message);
-      return false;
-    }
+    return false;
   }
+}
+
+/**
+ * Sends email using configured provider.
+ * EMAIL_PROVIDER=smtp  -> SMTP only (recommended for custom mailbox)
+ * EMAIL_PROVIDER=api   -> API first, then SMTP fallback
+ * unset/other          -> SMTP first, then API fallback
+ */
+export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  const provider = (process.env.EMAIL_PROVIDER || '').toLowerCase().trim();
+
+  if (provider === 'smtp') {
+    return sendEmailViaSMTP(to, subject, html);
+  }
+
+  if (provider === 'api') {
+    const viaApi = await sendEmailViaApi(to, subject, html);
+    if (viaApi) return true;
+    console.log("EmailService:: API failed, falling back to SMTP...");
+    return sendEmailViaSMTP(to, subject, html);
+  }
+
+  // Default: SMTP first for reliability with custom mailbox integrations.
+  const viaSmtp = await sendEmailViaSMTP(to, subject, html);
+  if (viaSmtp) return true;
+
+  console.log("SMTP:: Failed, falling back to EmailService API...");
+  return sendEmailViaApi(to, subject, html);
 }
 
 /**
