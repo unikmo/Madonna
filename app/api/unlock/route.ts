@@ -61,7 +61,10 @@ export async function POST(request: NextRequest) {
       momentCode.claimedAt = new Date();
       await momentCode.save();
 
-      const buyerEmail = momentCode?.user?.email;
+      const buyerEmail =
+        momentCode.user && typeof momentCode.user === 'object' && 'email' in momentCode.user
+          ? String((momentCode.user as { email?: string }).email || '')
+          : '';
       if (buyerEmail) {
         try {
           await sendUnlockNotificationEmail({
