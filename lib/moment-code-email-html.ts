@@ -1,0 +1,243 @@
+/**
+ * Builds the exact HTML used for the Moment Codes email.
+ * This is intentionally "HTML-only" (no nodemailer / server deps) so it can be used
+ * both in the email sender and in the admin preview (client-side iframe).
+ */
+
+import type { DeliveryType, Quantity } from './code-generator';
+
+type BuildArgs = {
+  codes: string[];
+  orderId: string;
+  baseUrl?: string; // e.g. https://yourdomain.com (no trailing slash recommended)
+  // Optional override: if you ever want physical/split templates later.
+  deliveryType?: DeliveryType;
+};
+
+type TierConfig = {
+  productImagePath: string; // path under /public (no baseUrl)
+  // QR placement relative to the rendered product image box.
+  // Values are in percentages of image width/height after scaling.
+  qr: {
+    leftPct: number;
+    topPct: number;
+    // QR overlay size in percentages of product image width/height after scaling.
+    sizeXPct: number;
+    sizeYPct: number;
+  };
+  // For converting bbox pixels (detected from original assets) into rendered px.
+  // Email HTML sets the product image width to 520px on desktop.
+  // These are used to compute QR px size that matches scaling.
+  original: { imgW: number; qrW: number; qrH: number };
+};
+
+const TIER_BY_COUNT: Record<1 | 4 | 7, TierConfig> = {
+  1: {
+    productImagePath: '/cardfrontunikmo.jpg',
+    qr: { leftPct: 47.239583333333336, topPct: 33.28703703703704, sizeXPct: 16.71875, sizeYPct: 30.0 },
+    // Detected from `/public/cardfrontunikmo.jpg` at threshold ~80.
+    original: { imgW: 1920, qrW: 321, qrH: 324 },
+  },
+  4: {
+    productImagePath: '/cardfrontsite_staged.jpg',
+    qr: {
+      leftPct: 47.97794117647059,
+      topPct: 47.6063829787234,
+      sizeXPct: 16.470588235294116,
+      sizeYPct: 29.920212765957448,
+    },
+    // Detected from `/public/cardfrontsite_staged.jpg` at threshold ~80.
+    original: { imgW: 1360, qrW: 224, qrH: 225 },
+  },
+  7: {
+    productImagePath: '/cardfrontsite7.png',
+    qr: { leftPct: 58.7890625, topPct: 53.369140625, sizeXPct: 19.986979166666668, sizeYPct: 29.1015625 },
+    // Detected from `/public/cardfrontsite7.png` at threshold ~80.
+    original: { imgW: 1536, qrW: 307, qrH: 298 },
+  },
+};
+
+function normalizeBaseUrl(baseUrl: string) {
+  return baseUrl.replace(/\/$/, '');
+}
+
+export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryType }: BuildArgs): { html: string } {
+  const safeBaseUrl = normalizeBaseUrl(baseUrl ?? 'https://yourdomain.com');
+  const uploadUrl = `${safeBaseUrl}/upload?code=${encodeURIComponent(codes[0] || '')}`;
+  const unlockBaseUrl = `${safeBaseUrl}/unlock`;
+
+  const firstCode = codes[0] || '';
+  const unlockUrlForFirstCode = `${unlockBaseUrl}?code=${encodeURIComponent(firstCode)}`;
+  // QR server size can be higher; we set exact overlay size in email CSS.
+  const qrUrlForFirstCode = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+    unlockUrlForFirstCode
+  )}`;
+
+  const count = codes.length as Quantity | number;
+  const tierCount = (count === 7 || count === 4 || count === 1 ? count : 1) as 1 | 4 | 7;
+  const tier = TIER_BY_COUNT[tierCount];
+
+  // Email markup renders product image with width="520" and max-width 520.
+  // Use that fixed width as the scaling target to compute QR overlay px sizes.
+  const productRenderWidthPx = 520;
+  const scale = productRenderWidthPx / tier.original.imgW;
+  const qrWp = Math.round(tier.original.qrW * scale);
+  const qrHp = Math.round(tier.original.qrH * scale);
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          line-height: 1.6; color: #2D2926; background: #F7F1EA;
+          padding: 40px 20px; min-height: 100vh;
+        }
+        .email-container { max-width: 600px; margin: 0 auto; background: #FDF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(45, 41, 38, 0.08); }
+        .header { background: #EFE8E5; padding: 36px 30px; text-align: center; }
+        .logo { font-size: 28px; font-weight: 700; color: #2D2926; margin-bottom: 8px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.02em; }
+        .header-subtitle { color: #2D2926; font-size: 15px; opacity: 0.85; }
+        .content { padding: 36px 30px; }
+        .greeting { font-size: 22px; font-weight: 600; color: #2D2926; margin-bottom: 16px; font-family: Georgia, 'Times New Roman', serif; }
+        .message { color: #2D2926; font-size: 15px; margin-bottom: 28px; line-height: 1.7; opacity: 0.9; }
+        .order-info { background: #EFE8E5; border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; }
+        .order-label { color: #b08d57; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; font-weight: 600; }
+        .order-number { color: #2D2926; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; }
+        .codes-section { margin: 28px 0; }
+        .codes-title { color: #2D2926; font-size: 17px; font-weight: 600; margin-bottom: 16px; text-align: center; font-family: Georgia, 'Times New Roman', serif; }
+        .code-item { background: #FBF7F2; border: 1px solid rgba(45, 41, 38, 0.08); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; box-shadow: 0 4px 16px rgba(45, 41, 38, 0.04); }
+        .code-label { color: #b08d57; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; font-weight: 600; }
+        .code-value { color: #2D2926; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: 2px; }
+        .actions { margin: 32px 0; text-align: center; }
+        .button { display: inline-block; padding: 14px 28px; margin: 8px; background: #2D2926; color: #FDF9F5; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .button:hover { background: #1E1B18; }
+        .button-secondary { background: #FDF9F5; color: #2D2926; border: 1px solid #D3C7BB; padding: 14px 28px; }
+        .button-secondary:hover { background: #EFE8E5; }
+        .info-box { background: #EFE8E5; border-radius: 12px; padding: 18px 20px; margin: 28px 0; }
+        .info-title { color: #2D2926; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+        .info-text { color: #2D2926; font-size: 14px; line-height: 1.65; opacity: 0.85; }
+        .footer { margin-top: 36px; padding-top: 24px; border-top: 1px solid rgba(45, 41, 38, 0.1); text-align: center; }
+        .footer-text { color: #2D2926; font-size: 13px; line-height: 1.75; opacity: 0.75; }
+        .footer-brand { color: #2D2926; font-weight: 600; margin-top: 12px; font-family: Georgia, 'Times New Roman', serif; }
+        .divider { height: 1px; background: rgba(45, 41, 38, 0.1); margin: 28px 0; }
+        @media only screen and (max-width: 600px) {
+          .content { padding: 28px 20px; }
+          .header { padding: 28px 20px; }
+          .button { display: block; margin: 8px 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <div class="logo">UNIKMO</div>
+          <div class="header-subtitle">Your Moment Codes Are Ready! 🎁</div>
+        </div>
+        
+        <div class="content">
+          <div class="greeting">Thank You for Your Purchase!</div>
+          
+          <div class="message">
+            Your order has been confirmed and your unique Moment Code${codes.length > 1 ? 's are' : ' is'} ready to use.
+          </div>
+          
+          <div class="order-info">
+            <div class="order-label">Order Number</div>
+            <div class="order-number">#${orderId}</div>
+          </div>
+          
+          <div class="codes-section">
+            <div class="codes-title">Your Digital Card</div>
+
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 18px auto 0; max-width: 520px; width: 100%;">
+              <tr>
+                <td align="center" style="position: relative; padding: 0; line-height: 0;">
+                  <img
+                    src="${safeBaseUrl}${tier.productImagePath}"
+                    width="520"
+                    alt="UNIKMO product"
+                    style="width: 100%; max-width: 520px; height: auto; display: block; border-radius: 14px; border: 0;"
+                  />
+                  
+                  <!-- QR overlay -->
+                  <div style="position: absolute; left: ${tier.qr.leftPct}%; top: ${tier.qr.topPct}%; width: ${qrWp}px; height: ${qrHp}px; margin-left: -${qrWp / 2}px; margin-top: -${qrHp / 2}px; line-height: 0;">
+                    <img
+                      src="${qrUrlForFirstCode}"
+                      width="${qrWp}"
+                      height="${qrHp}"
+                      alt="Scan to unlock your moment"
+                      style="width: ${qrWp}px; height: ${qrHp}px; display: block; border-radius: 10px; border: 0; background: #ffffff;"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Moment code(s) — separate block BELOW the image -->
+            <div class="code-item" style="margin-top: 22px;">
+              <div class="code-label" style="margin-bottom: 14px;">Your moment code${codes.length > 1 ? 's' : ''}</div>
+              ${codes
+                .map((code, index) => {
+                  return `
+                    <div style="margin: 14px 0 0 0;">
+                      ${
+                        codes.length > 1
+                          ? `<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b08d57; font-weight: 600; margin-bottom: 8px;">Card ${index + 1}</div>`
+                          : ''
+                      }
+                      <div class="code-value" style="font-size: 20px;">${code}</div>
+                    </div>
+                  `;
+                })
+                .join('')}
+              
+              <div style="margin-top: 12px; font-size: 12px; color: #2D2926; opacity: 0.65; line-height: 1.5;">
+                Scan the QR on the card above — it opens your unlock page. Your code is listed here only (not printed on the card image).
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          
+          <div class="actions">
+            <a
+              href="${uploadUrl}"
+              class="button"
+              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #2D2926; color: #FDF9F5 !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #2D2926; -webkit-text-fill-color: #FDF9F5;"
+            >Upload your media</a>
+            <a
+              href="${unlockBaseUrl}"
+              class="button button-secondary"
+              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #FDF9F5 !important; color: #2D2926 !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #D3C7BB; -webkit-text-fill-color: #2D2926;"
+            >Unlock moment</a>
+          </div>
+          
+          <div class="info-box">
+            <div class="info-title"><span>💡 Important Information</span></div>
+            <div class="info-text">
+              <strong>Upload your media:</strong> Visit ${uploadUrl}<br>
+              <strong>Share with recipient:</strong> Give them the code above and they can unlock at ${unlockBaseUrl}<br>
+              <strong>Remember:</strong> Keep your code safe - it's the only way to access your moment!
+            </div>
+          </div>
+          
+          <div class="footer">
+            <div class="footer-text">
+              If you have any questions, please don't hesitate to contact us.<br>
+              We're here to help make your moment special!
+            </div>
+            <div class="footer-brand">Best regards,<br>The UNIKMO Team</div>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
+  `;
+
+  return { html };
+}
+

@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin/buyers', label: 'Buyers', icon: BuyersIcon },
   { href: '/admin/orders', label: 'Orders', icon: OrdersIcon },
   { href: '/admin/codes', label: 'Codes', icon: CodesIcon },
+  { href: '/admin/template-viewer', label: 'Templates', icon: TemplatesIcon },
   { href: '/admin/shopify', label: 'Shopify', icon: ShopifyIcon },
 ];
 
@@ -16,6 +17,7 @@ const TITLES: Record<string, string> = {
   '/admin/buyers': 'Buyers',
   '/admin/orders': 'Orders',
   '/admin/codes': 'Codes',
+  '/admin/template-viewer': 'Templates',
   '/admin/shopify': 'Shopify',
 };
 
@@ -53,6 +55,19 @@ function CodesIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+    </svg>
+  );
+}
+
+function TemplatesIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 19.5A2.5 2.5 0 016.5 17H20v2H6.5A.5.5 0 006 19.5c0 .276.224.5.5.5H20v2H6.5A2.5 2.5 0 014 19.5zM7 3h13a2 2 0 012 2v9a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+      />
     </svg>
   );
 }
