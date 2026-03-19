@@ -61,6 +61,8 @@ function UnlockPageContent() {
   const [unlockMedia, setUnlockMedia] = useState<MediaItem[]>([]);
   const [unlocked, setUnlocked] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const parseResponseSafely = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -308,8 +310,32 @@ function UnlockPageContent() {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedMedia, unlockMedia.length]);
 
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowWelcomeAnimation(false), 1800);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!unlocked) return;
+    setShowCelebration(true);
+    const t = window.setTimeout(() => setShowCelebration(false), 12000);
+    return () => window.clearTimeout(t);
+  }, [unlocked]);
+
   return (
-    <div className="min-h-screen bg-[#FDF9F5] text-[#2D2926]">
+    <motion.div
+      className="min-h-screen bg-[#FDF9F5] text-[#2D2926]"
+      animate={
+        showCelebration
+          ? { x: [0, -2, 2, -1, 1, 0], y: [0, 1, -1, 1, -1, 0] }
+          : { x: 0, y: 0 }
+      }
+      transition={{
+        duration: 0.45,
+        repeat: showCelebration ? 20 : 0,
+        ease: 'easeInOut',
+      }}
+    >
       <header className="border-b border-[#2D2926]/10 bg-[#FDF9F5]/95 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="font-serif text-lg tracking-wide text-[#2D2926]/80 hover:text-[#2D2926]">
@@ -322,114 +348,37 @@ function UnlockPageContent() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* How It Works card - same as landing image */}
-        <div className="rounded-xl sm:rounded-2xl bg-[#FBF7F2]/90 px-4 sm:px-8 py-6 sm:py-8 text-center ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)] mb-10 sm:mb-14">
-          <p className="font-serif text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/70 uppercase tracking-wide">
-            How It Works
-          </p>
-          <div className="mt-5 grid grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
-            {[
-              { title: 'Buy a Moment Key', icon: <IconKey /> },
-              { title: 'Add your video, photo, or message', icon: <IconUpload /> },
-              { title: 'They unlock it anytime', icon: <IconHeart /> },
-            ].map((step) => (
-              <div key={step.title} className="flex flex-col items-center text-[#2D2926]/70">
-                <div className="text-[#2D2926]/55 mb-2">{step.icon}</div>
-                <p className="text-[9px] sm:text-[10px] lg:text-[11px] leading-tight">{step.title}</p>
-              </div>
-            ))}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl bg-[#FBF7F2]/95 px-5 sm:px-8 py-8 sm:py-10 ring-1 ring-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.06)] mb-10 text-center relative overflow-hidden"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0.4 }}
+            animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#D9C8B4]"
+          />
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0.4 }}
+            animate={{ scale: [0.95, 1.08, 1], opacity: [0.35, 0.2, 0.12] }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+            className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#E9DCCF]"
+          />
+
+          <div className="relative z-10">
+            <p className="font-serif text-[11px] sm:text-[12px] text-[#2D2926]/70 uppercase tracking-wide">
+              Unlock Your Moment
+            </p>
+            <h1 className="font-serif text-2xl sm:text-4xl text-[#2D2926] mt-2">
+              A private memory is waiting for you
+            </h1>
+            <p className="text-sm sm:text-base text-[#2D2926]/65 mt-3 max-w-2xl mx-auto">
+              Enter your Moment Code to unlock the memory. Designed to feel warm, timeless and special.
+            </p>
           </div>
-        </div>
-
-        {/* Upload your moment */}
-        <section className="mb-12 sm:mb-16">
-          <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926] mb-4">Upload your moment</h2>
-          <p className="text-sm text-[#2D2926]/60 mb-6">Enter your Moment Code and add your video, photo, or audio.</p>
-          <div className="rounded-xl bg-white/60 border border-[#2D2926]/10 p-4 sm:p-6 shadow-sm">
-            <label className="block text-sm font-medium text-[#2D2926] mb-2">Moment Code</label>
-            <input
-              type="text"
-              value={uploadCode}
-              onChange={(e) => setUploadCode(e.target.value.toUpperCase())}
-              placeholder="UNIKMO-XXXX-XXXX-XXX"
-              className="w-full px-4 py-3 rounded-lg border border-[#2D2926]/20 bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
-            />
-            {uploadValidating && <p className="mt-2 text-sm text-[#2D2926]/50">Validating...</p>}
-            {uploadValid === false && !uploadValidating && <p className="mt-2 text-sm text-red-600">{uploadError || 'Invalid code'}</p>}
-            {uploadValid === true && !uploadValidating && (
-              <p className="mt-2 text-sm text-green-700 flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center text-xs">✓</span>
-                Code validated
-              </p>
-            )}
-
-            {uploadValid && (
-              <div className="mt-6">
-                <div
-                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                  onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
-                  onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${isDragging ? 'border-[#2D2926]/40 bg-[#2D2926]/5' : 'border-[#2D2926]/20 bg-[#2D2926]/[0.02]'} ${uploading ? 'opacity-60 pointer-events-none' : 'cursor-pointer'}`}
-                >
-                  <input
-                    type="file"
-                    id="unlock-page-upload"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    accept="image/*,video/*,audio/*"
-                    disabled={uploading || !uploadValid}
-                  />
-                  <label htmlFor="unlock-page-upload" className="cursor-pointer">
-                    <div className="text-[#2D2926]/50 mb-2">
-                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <p className="font-medium text-[#2D2926]">Drag and drop or click to upload</p>
-                    <p className="text-xs text-[#2D2926]/50 mt-1">Video: max 350 MB, 3 min · Audio/Photo: max 40 MB</p>
-                  </label>
-                  {uploading && (
-                    <div className="mt-4">
-                      <div className="w-full h-1.5 bg-[#2D2926]/10 rounded-full overflow-hidden">
-                        <motion.div className="h-full bg-[#2D2926]/60 rounded-full" initial={{ width: 0 }} animate={{ width: `${uploadProgress}%` }} transition={{ duration: 0.2 }} />
-                      </div>
-                      <p className="text-xs text-[#2D2926]/50 mt-2">Uploading… {uploadProgress}%</p>
-                    </div>
-                  )}
-                </div>
-
-                {loadingMedia && <p className="text-center text-[#2D2926]/50 py-6">Loading media…</p>}
-                {!loadingMedia && media && (
-                  <div className="mt-6 relative group rounded-xl overflow-hidden border border-[#2D2926]/10">
-                    <button
-                      type="button"
-                      onClick={handleDeleteMedia}
-                      disabled={deletingMedia}
-                      className="absolute top-2 right-2 z-10 w-8 h-8 bg-red-500/90 hover:bg-red-600 rounded-full flex items-center justify-center text-white disabled:opacity-50"
-                    >
-                      {deletingMedia ? (
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      )}
-                    </button>
-                    {media.type === 'image' && <img src={media.url} alt="Uploaded" className="w-full h-56 object-cover" />}
-                    {media.type === 'video' && <video src={media.url} className="w-full h-56 object-cover" controls />}
-                    {media.type === 'audio' && (
-                      <div className="p-6 bg-[#2D2926]/5 flex items-center justify-center">
-                        <audio src={media.url} controls className="w-full max-w-md" />
-                      </div>
-                    )}
-                    <div className="p-3 text-sm text-[#2D2926]/60 capitalize">{media.type}</div>
-                  </div>
-                )}
-                {!loadingMedia && !media && uploadValid && (
-                  <p className="text-center text-[#2D2926]/40 py-6 text-sm">No media yet. Upload above.</p>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
+        </motion.div>
 
         {/* Unlock a moment */}
         <section>
@@ -509,6 +458,141 @@ function UnlockPageContent() {
         </section>
       </main>
 
+      <AnimatePresence>
+        {showWelcomeAnimation && (
+          <motion.div
+            initial={{ opacity: 0.45 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8 }}
+            className="pointer-events-none fixed inset-0 z-40 bg-[#F5ECE3]"
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
+          >
+            {/* Soft glow backdrop */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: [0.95, 1.08, 1.02], opacity: [0, 0.2, 0.12] }}
+              transition={{ duration: 2.8, repeat: 3, ease: 'easeOut' }}
+              className="absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(circle at 50% 58%, rgba(191,162,128,0.32) 0%, rgba(233,220,207,0.15) 28%, rgba(253,249,245,0) 68%)',
+              }}
+            />
+
+            {/* Burst rings */}
+            {Array.from({ length: 10 }).map((_, i) => (
+              <motion.span
+                key={`ring-${i}`}
+                initial={{ scale: 0.2, opacity: 0.5 }}
+                animate={{ scale: [0.3, 1.8, 2.5], opacity: [0.35, 0.22, 0] }}
+                transition={{
+                  duration: 1.8,
+                  delay: i * 0.14,
+                  repeat: 3,
+                  repeatDelay: 0.25,
+                  ease: 'easeOut',
+                }}
+                className="absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border"
+                style={{
+                  width: 120 + i * 10,
+                  height: 120 + i * 10,
+                  borderColor: i % 2 ? 'rgba(191,162,128,0.48)' : 'rgba(45,41,38,0.26)',
+                }}
+              />
+            ))}
+
+            {/* Firework sparks */}
+            {Array.from({ length: 84 }).map((_, i) => {
+              const angle = ((i * 137.5) % 360) * (Math.PI / 180);
+              const radius = 16 + (i % 12) * 7;
+              const dx = Math.cos(angle) * radius;
+              const dy = Math.sin(angle) * radius;
+              return (
+                <motion.span
+                  key={`spark-${i}`}
+                  initial={{ x: '50vw', y: '58vh', scale: 0.2, opacity: 0 }}
+                  animate={{
+                    x: [`50vw`, `calc(50vw + ${dx}vw)`],
+                    y: [`58vh`, `calc(58vh + ${dy}vh)`],
+                    scale: [0.35, 1, 0.7],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.25 + (i % 7) * 0.22,
+                    delay: (i % 14) * 0.06,
+                    repeat: 4,
+                    repeatType: 'loop',
+                    ease: 'easeOut',
+                  }}
+                  style={{
+                    position: 'absolute',
+                    width: i % 3 === 0 ? 9 : 7,
+                    height: i % 3 === 0 ? 9 : 7,
+                    borderRadius: 9999,
+                    background:
+                      i % 3 === 0 ? '#2D2926' : i % 3 === 1 ? '#BFA280' : '#E9DCCF',
+                    boxShadow: '0 0 16px rgba(191,162,128,0.72)',
+                  }}
+                />
+              );
+            })}
+
+            {/* Streak particles */}
+            {Array.from({ length: 30 }).map((_, i) => {
+              const angle = ((i * 29) % 360) * (Math.PI / 180);
+              const dx = Math.cos(angle) * (24 + (i % 8) * 6);
+              const dy = Math.sin(angle) * (16 + (i % 9) * 5);
+              return (
+                <motion.span
+                  key={`streak-${i}`}
+                  initial={{ x: '50vw', y: '58vh', opacity: 0, rotate: `${(angle * 180) / Math.PI}deg` }}
+                  animate={{
+                    x: [`50vw`, `calc(50vw + ${dx}vw)`],
+                    y: [`58vh`, `calc(58vh + ${dy}vh)`],
+                    opacity: [0, 0.9, 0],
+                  }}
+                  transition={{
+                    duration: 1.7,
+                    delay: (i % 10) * 0.1,
+                    repeat: 3,
+                    ease: 'easeOut',
+                  }}
+                  className="absolute block"
+                  style={{
+                    width: 2,
+                    height: 24 + (i % 4) * 7,
+                    borderRadius: 9999,
+                    background:
+                      i % 2 ? 'linear-gradient(to bottom, #BFA280, rgba(191,162,128,0))' : 'linear-gradient(to bottom, #2D2926, rgba(45,41,38,0))',
+                  }}
+                />
+              );
+            })}
+
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -8], scale: [0.95, 1, 1.02, 1] }}
+              transition={{ duration: 2.8, ease: 'easeOut' }}
+              className="absolute left-1/2 top-[27%] -translate-x-1/2 text-center"
+            >
+              <p className="font-serif text-2xl sm:text-4xl text-[#2D2926] tracking-wide">Moment Unlocked</p>
+              <p className="text-sm sm:text-base text-[#2D2926]/65 mt-2">A memory worth celebrating</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Media viewer modal */}
       <AnimatePresence>
         {selectedMedia !== null && unlockMedia[selectedMedia] && (
@@ -548,7 +632,7 @@ function UnlockPageContent() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 

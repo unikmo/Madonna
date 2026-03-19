@@ -422,7 +422,7 @@ function UploadPageContent() {
                   isDragging
                     ? 'border-[#2D2926]/50 bg-[#F5ECE3]'
                     : 'border-[#D3C7BB] bg-[#FDF9F5]'
-                } ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
+                } ${uploading ? 'opacity-50' : 'cursor-pointer'}`}
               >
                 <input
                   type="file"
