@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -21,10 +21,12 @@ function UploadPageContent() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [media, setMedia] = useState<MediaItem | null>(null);
+  const [media, setMedia] = useState<MediaItem[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(false);
-  const [deletingMedia, setDeletingMedia] = useState(false);
+  const [deletingMediaUrl, setDeletingMediaUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const cancelRequestedRef = useRef(false);
 
   const parseResponseSafely = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -60,15 +62,10 @@ function UploadPageContent() {
       const response = await fetch(`/api/media/list?code=${encodeURIComponent(code.toUpperCase())}`);
       const data = await parseResponseSafely(response);
 
-      if (response.ok && data.media && data.media.length > 0) {
-        // Only show the first (main) media file
-        setMedia(data.media[0]);
-      } else {
-        setMedia(null);
-      }
+      setMedia(response.ok && Array.isArray(data.media) ? data.media : []);
     } catch (err) {
       console.error('Failed to load media:', err);
-      setMedia(null);
+      setMedia([]);
     } finally {
       setLoadingMedia(false);
     }
@@ -123,7 +120,12 @@ function UploadPageContent() {
 
       const files = Array.from(e.dataTransfer.files);
       if (files.length > 0) {
-        await uploadFile(files[0]);
+        cancelRequestedRef.current = false;
+        for (const file of files) {
+          if (cancelRequestedRef.current) break;
+          // eslint-disable-next-line no-await-in-loop
+          await uploadFile(file);
+        }
       }
     },
     [isValid, uploading]
@@ -132,9 +134,14 @@ function UploadPageContent() {
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.files || !isValid || uploading) return;
-      const file = e.target.files[0];
-      if (file) {
-        await uploadFile(file);
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        cancelRequestedRef.current = false;
+        for (const file of files) {
+          if (cancelRequestedRef.current) break;
+          // eslint-disable-next-line no-await-in-loop
+          await uploadFile(file);
+        }
       }
       // Reset input
       e.target.value = '';
@@ -214,22 +221,70 @@ function UploadPageContent() {
     setUploading(true);
     setUploadProgress(0);
 
+    let progressInterval: ReturnType<typeof setInterval> | null = null;
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('code', code.toUpperCase());
-
       // Simulate progress
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadProgress((prev) => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/api/media/upload', {
+      const abortController = new AbortController();
+      uploadAbortRef.current = abortController;
+
+      // 1) Get signed upload params from our API
+      const signResponse = await fetch('/api/media/cloudinary-signature', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.toUpperCase() }),
+        signal: abortController.signal,
+      });
+      const signData = await parseResponseSafely(signResponse);
+      if (!signResponse.ok) {
+        throw new Error(signData.error || 'Failed to initialize upload');
+      }
+
+      // 2) Upload directly to Cloudinary (bypasses Vercel request body limits)
+      const cloudinaryFormData = new FormData();
+      cloudinaryFormData.append('file', file);
+      cloudinaryFormData.append('api_key', signData.apiKey);
+      cloudinaryFormData.append('timestamp', String(signData.timestamp));
+      cloudinaryFormData.append('signature', signData.signature);
+      cloudinaryFormData.append('folder', signData.folder);
+
+      const cloudinaryUploadResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`,
+        {
+          method: 'POST',
+          body: cloudinaryFormData,
+          signal: abortController.signal,
+        }
+      );
+
+      if (!cloudinaryUploadResponse.ok) {
+        const cloudinaryText = await cloudinaryUploadResponse.text();
+        throw new Error(
+          `Cloudinary upload failed (${cloudinaryUploadResponse.status}): ${cloudinaryText.slice(0, 140)}`
+        );
+      }
+
+      const cloudinaryData = await cloudinaryUploadResponse.json();
+
+      // 3) Save upload metadata to DB
+      const mediaType: MediaItem['type'] =
+        isImage ? 'image' : isVideo ? 'video' : isAudio ? 'audio' : 'text';
+      const response = await fetch('/api/media/complete-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: code.toUpperCase(),
+          mediaType,
+          url: cloudinaryData.secure_url,
+          publicId: cloudinaryData.public_id,
+        }),
+        signal: abortController.signal,
       });
 
-      clearInterval(progressInterval);
+      if (progressInterval) clearInterval(progressInterval);
       setUploadProgress(100);
 
       if (!response.ok) {
@@ -239,31 +294,37 @@ function UploadPageContent() {
 
       const data = await parseResponseSafely(response);
       
-      // Replace existing media (only one file allowed)
       const newMedia: MediaItem = {
         type: data.media.type,
         url: data.media.url,
         createdAt: new Date().toISOString(),
       };
-      
-      setMedia(newMedia);
+
+      setMedia((prev) => [newMedia, ...prev]);
       toast.success('Your moment is now complete.');
 
       // Reset progress after a moment
       setTimeout(() => setUploadProgress(0), 1000);
     } catch (err: any) {
+      if (err?.name === 'AbortError') {
+        setError('Upload cancelled');
+        toast('Upload cancelled');
+        return;
+      }
       const errorMsg = err.message || 'Upload failed';
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
+      if (progressInterval) clearInterval(progressInterval);
+      uploadAbortRef.current = null;
       setUploading(false);
     }
   };
 
-  const handleDeleteMedia = async () => {
-    if (!code || !media || deletingMedia) return;
+  const handleDeleteMedia = async (mediaUrl: string) => {
+    if (!code || !mediaUrl || deletingMediaUrl) return;
 
-    setDeletingMedia(true);
+    setDeletingMediaUrl(mediaUrl);
     try {
       const response = await fetch('/api/media/delete', {
         method: 'DELETE',
@@ -272,7 +333,7 @@ function UploadPageContent() {
         },
         body: JSON.stringify({
           code: code.toUpperCase(),
-          mediaUrl: media.url,
+          mediaUrl,
         }),
       });
 
@@ -281,15 +342,21 @@ function UploadPageContent() {
         throw new Error(data.error || 'Delete failed');
       }
 
-      // Clear media
-      setMedia(null);
+      // Remove only deleted item
+      setMedia((prev) => prev.filter((m) => m.url !== mediaUrl));
       toast.success('Media deleted successfully');
     } catch (err: any) {
       const errorMsg = err.message || 'Delete failed';
       toast.error(errorMsg);
     } finally {
-      setDeletingMedia(false);
+      setDeletingMediaUrl(null);
     }
+  };
+
+  const handleCancelUpload = () => {
+    cancelRequestedRef.current = true;
+    uploadAbortRef.current?.abort();
+    uploadAbortRef.current = null;
   };
 
   return (
@@ -364,6 +431,7 @@ function UploadPageContent() {
                   className="hidden"
                   disabled={uploading || !isValid}
                   accept="image/*,video/*,audio/*"
+                  multiple
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <motion.div
@@ -415,7 +483,14 @@ function UploadPageContent() {
                           transition={{ duration: 0.3 }}
                         />
                       </div>
-                      <p className="text-sm text-[#2D2926]/65">Uploading... {uploadProgress}%</p>
+                      <p className="text-sm text-[#2D2926]/65 mb-3">Uploading... {uploadProgress}%</p>
+                      <button
+                        type="button"
+                        onClick={handleCancelUpload}
+                        className="px-4 py-2 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
+                      >
+                        Cancel upload
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -435,7 +510,7 @@ function UploadPageContent() {
               {/* Uploaded Media */}
               {loadingMedia ? (
                 <div className="text-center py-12 text-[#2D2926]/55">Loading media...</div>
-              ) : media ? (
+              ) : media.length > 0 ? (
                 <div className="mt-8">
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -451,101 +526,85 @@ function UploadPageContent() {
                     <p className="mt-2">The Unikmo Team</p>
                   </motion.div>
 
-                  <h3 className="text-lg font-semibold text-[#2D2926] mb-4">Uploaded Media</h3>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="relative group rounded-xl overflow-hidden border border-[#E3DAD0] bg-[#FDF9F5] hover:border-[#2D2926]/30 transition-all"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={handleDeleteMedia}
-                      disabled={deletingMedia}
-                      className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#2D2926] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
-                    >
-                      {deletingMedia ? (
-                        <svg
-                          className="animate-spin h-4 w-4 text-[#FDF9F5]"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
+                  <h3 className="text-lg font-semibold text-[#2D2926] mb-4">Uploaded Media ({media.length})</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {media.map((item, index) => (
+                      <motion.div
+                        key={`${item.url}-${index}`}
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative group rounded-xl overflow-hidden border border-[#E3DAD0] bg-[#FDF9F5] hover:border-[#2D2926]/30 transition-all"
+                      >
+                        {/* Delete Button */}
+                        <button
+                          onClick={() => handleDeleteMedia(item.url)}
+                          disabled={deletingMediaUrl === item.url}
+                          className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#2D2926] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                         >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-4 h-4 text-[#FDF9F5]"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      )}
-                    </button>
+                          {deletingMediaUrl === item.url ? (
+                            <svg
+                              className="animate-spin h-4 w-4 text-[#FDF9F5]"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-[#FDF9F5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )}
+                        </button>
 
-                    {/* Media Preview */}
-                    {media.type === 'image' && (
-                      <img
-                        src={media.url}
-                        alt="Uploaded media"
-                        className="w-full h-64 object-cover"
-                      />
-                    )}
-                    {media.type === 'video' && (
-                      <video
-                        src={media.url}
-                        className="w-full h-64 object-cover"
-                        controls
-                      />
-                    )}
-                    {media.type === 'audio' && (
-                      <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
-                        <div className="text-center">
-                          <svg className="w-16 h-16 text-[#2D2926]/55 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
-                          </svg>
-                          <audio src={media.url} controls className="w-full max-w-md" />
+                        {/* Media Preview */}
+                        {item.type === 'image' && (
+                          <img
+                            src={item.url}
+                            alt="Uploaded media"
+                            className="w-full h-64 object-cover"
+                          />
+                        )}
+                        {item.type === 'video' && (
+                          <video
+                            src={item.url}
+                            className="w-full h-64 object-cover"
+                            controls
+                          />
+                        )}
+                        {item.type === 'audio' && (
+                          <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
+                            <div className="text-center">
+                              <svg className="w-16 h-16 text-[#2D2926]/55 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                              </svg>
+                              <audio src={item.url} controls className="w-full max-w-md" />
+                            </div>
+                          </div>
+                        )}
+                        {item.type === 'text' && (
+                          <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
+                            <svg className="w-16 h-16 text-[#2D2926]/55" fill="currentColor" viewBox="0 0 20 20">
+                              <path
+                                fillRule="evenodd"
+                                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Media Info */}
+                        <div className="p-4">
+                          <p className="text-[#2D2926] font-medium capitalize text-sm">{item.type}</p>
+                          <p className="text-[#2D2926]/55 text-xs mt-1">
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </p>
                         </div>
-                      </div>
-                    )}
-                    {media.type === 'text' && (
-                      <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
-                        <svg className="w-16 h-16 text-[#2D2926]/55" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
-
-                    {/* Media Info */}
-                    <div className="p-4">
-                      <p className="text-[#2D2926] font-medium capitalize text-sm">{media.type}</p>
-                      <p className="text-[#2D2926]/55 text-xs mt-1">
-                        {new Date(media.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </motion.div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-12 text-[#2D2926]/55">

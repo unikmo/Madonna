@@ -62,13 +62,25 @@ function UnlockPageContent() {
   const [unlocked, setUnlocked] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
 
+  const parseResponseSafely = async (response: Response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+    const text = await response.text();
+    const preview = text.slice(0, 120).replace(/\s+/g, ' ').trim();
+    throw new Error(
+      `Server returned non-JSON response (status ${response.status}). If this works locally but fails live, the upload body is likely too large for hosted API limits. Response starts with: ${preview}`
+    );
+  };
+
   // Upload: validate code when it changes
   useEffect(() => {
     if (uploadCode && uploadCode.length >= 10) {
       setUploadValidating(true);
       setUploadError(null);
       fetch(`/api/media/validate-code?code=${encodeURIComponent(uploadCode.toUpperCase())}`)
-        .then((r) => r.json())
+        .then((r) => parseResponseSafely(r))
         .then((data) => {
           setUploadValid(!!data.valid);
           if (!data.valid) setUploadError(data.error || 'Invalid code');
@@ -89,7 +101,7 @@ function UnlockPageContent() {
     if (!uploadValid || !uploadCode || uploadCode.length < 10) return;
     setLoadingMedia(true);
     fetch(`/api/media/list?code=${encodeURIComponent(uploadCode.toUpperCase())}`)
-      .then((r) => r.json())
+      .then((r) => parseResponseSafely(r))
       .then((data) => {
         if (data.media && data.media.length > 0) setMedia(data.media[0]);
         else setMedia(null);
@@ -144,17 +156,60 @@ function UnlockPageContent() {
       setUploadProgress(0);
       const progressInterval = setInterval(() => setUploadProgress((p) => Math.min(p + 10, 90)), 200);
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('code', uploadCode.toUpperCase());
-        const res = await fetch('/api/media/upload', { method: 'POST', body: formData });
+        // 1) Get signed upload params from our API
+        const signRes = await fetch('/api/media/cloudinary-signature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: uploadCode.toUpperCase() }),
+        });
+        const signData = await parseResponseSafely(signRes);
+        if (!signRes.ok) {
+          throw new Error(signData.error || 'Failed to initialize upload');
+        }
+
+        // 2) Upload directly to Cloudinary
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append('file', file);
+        cloudinaryFormData.append('api_key', signData.apiKey);
+        cloudinaryFormData.append('timestamp', String(signData.timestamp));
+        cloudinaryFormData.append('signature', signData.signature);
+        cloudinaryFormData.append('folder', signData.folder);
+
+        const cloudinaryUploadRes = await fetch(
+          `https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`,
+          {
+            method: 'POST',
+            body: cloudinaryFormData,
+          }
+        );
+        if (!cloudinaryUploadRes.ok) {
+          const cloudinaryText = await cloudinaryUploadRes.text();
+          throw new Error(
+            `Cloudinary upload failed (${cloudinaryUploadRes.status}): ${cloudinaryText.slice(0, 140)}`
+          );
+        }
+        const cloudinaryData = await cloudinaryUploadRes.json();
+
+        // 3) Save upload metadata to DB
+        const mediaType: MediaItem['type'] =
+          isImage ? 'image' : isVideo ? 'video' : isAudio ? 'audio' : 'text';
+        const res = await fetch('/api/media/complete-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: uploadCode.toUpperCase(),
+            mediaType,
+            url: cloudinaryData.secure_url,
+            publicId: cloudinaryData.public_id,
+          }),
+        });
         clearInterval(progressInterval);
         setUploadProgress(100);
         if (!res.ok) {
-          const data = await res.json();
+          const data = await parseResponseSafely(res);
           throw new Error(data.error || 'Upload failed');
         }
-        const data = await res.json();
+        const data = await parseResponseSafely(res);
         setMedia({ type: data.media.type, url: data.media.url, createdAt: new Date().toISOString() });
         toast.success('Uploaded successfully');
       } catch (err: any) {
@@ -219,7 +274,7 @@ function UnlockPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: unlockCode.toUpperCase().trim() }),
       });
-      const data = await res.json();
+      const data = await parseResponseSafely(res);
       if (!res.ok) {
         setUnlockError(data.error || 'Failed to unlock');
         toast.error(data.error || 'Failed to unlock');

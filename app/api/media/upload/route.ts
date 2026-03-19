@@ -8,6 +8,21 @@ export const maxDuration = 300; // 5 minutes for large uploads
 
 export async function POST(request: NextRequest) {
   try {
+    if (
+      !process.env.CLOUDINARY_CLOUD_NAME ||
+      !process.env.CLOUDINARY_API_KEY ||
+      !process.env.CLOUDINARY_API_SECRET
+    ) {
+      return NextResponse.json(
+        {
+          error: 'Upload failed',
+          message:
+            'Cloudinary is not configured on this deployment. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET.',
+        },
+        { status: 500 }
+      );
+    }
+
     const formData = await request.formData();
     const code = formData.get('code')?.toString()?.toUpperCase().trim();
     const file = formData.get('file') as File | null;
