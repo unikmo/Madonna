@@ -18,12 +18,39 @@ export async function GET(request: NextRequest) {
     const momentCode = await MomentCode.findOne({ code }).select('status');
 
     if (!momentCode) {
-      return NextResponse.json({ valid: false, error: 'Invalid code' }, { status: 200 });
+      return NextResponse.json(
+        {
+          valid: false,
+          reason: 'invalid',
+          error: 'Invalid code',
+          message: 'We could not find this Moment Code. Please check the key and try again.',
+        },
+        { status: 200 }
+      );
+    }
+
+    if (momentCode.status === 'revoked') {
+      return NextResponse.json(
+        {
+          valid: false,
+          reason: 'revoked',
+          error: 'This code is unavailable.',
+          message:
+            'This code is not available from UNIKMO. Please contact the UNIKMO team — we will be happy to help.',
+        },
+        { status: 200 }
+      );
     }
 
     if (momentCode.status !== 'new') {
       return NextResponse.json(
-        { valid: false, error: 'Code has already been claimed' },
+        {
+          valid: false,
+          reason: 'claimed',
+          error: 'This moment has already been unlocked.',
+          message:
+            'This code has already been used. If you need help, please contact the UNIKMO team.',
+        },
         { status: 200 }
       );
     }

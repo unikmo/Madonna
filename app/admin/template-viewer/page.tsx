@@ -171,7 +171,6 @@ export default function TemplateViewerPage() {
               >
                 <option value="digital">Digital</option>
                 <option value="physical">Physical</option>
-                <option value="split">Split</option>
               </select>
             </div>
           </div>
@@ -194,9 +193,7 @@ export default function TemplateViewerPage() {
                   <p className="text-xs text-[#2D2926]/60 mt-1">
                     {deliveryType === 'digital'
                       ? 'Digital card layout preview'
-                      : deliveryType === 'physical'
-                        ? 'Physical card layout preview'
-                        : 'Split delivery preview'}
+                      : 'Physical card layout preview'}
                   </p>
                 </div>
               </div>

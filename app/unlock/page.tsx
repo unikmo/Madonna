@@ -5,6 +5,10 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import {
+  AnimatedMomentModal,
+  type AnimatedMomentModalVariant,
+} from '@/components/AnimatedMomentModal';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -58,9 +62,20 @@ function UnlockPageContent() {
   const [unlockCode, setUnlockCode] = useState('');
   const [unlockLoading, setUnlockLoading] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
-  const [unlockBlockedMessage, setUnlockBlockedMessage] = useState<string | null>(null);
-  const [unlockBlockedTitle, setUnlockBlockedTitle] = useState('Moment Not Ready Yet');
-  const [unlockBlockedEmoji, setUnlockBlockedEmoji] = useState('🔒😔');
+  const [unlockMomentModal, setUnlockMomentModal] = useState<{
+    open: boolean;
+    variant: AnimatedMomentModalVariant;
+    title: string;
+    message: string;
+    emoji: string;
+    confirmLabel?: string;
+  }>({
+    open: false,
+    variant: 'gentle',
+    title: '',
+    message: '',
+    emoji: '',
+  });
   const [unlockMedia, setUnlockMedia] = useState<MediaItem[]>([]);
   const [unlocked, setUnlocked] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
@@ -338,7 +353,13 @@ function UnlockPageContent() {
   const handleUnlock = async () => {
     if (!unlockCode || unlockCode.length < 10) {
       setUnlockError('Please enter a valid code');
-      toast.error('Please enter a valid code');
+      setUnlockMomentModal({
+        open: true,
+        variant: 'gentle',
+        title: 'Almost there',
+        message: 'Please enter your full Moment Key in the format UNIKMO-XXXX-XXXX-XXX.',
+        emoji: '🔑✨',
+      });
       return;
     }
     setUnlockLoading(true);
@@ -355,32 +376,54 @@ function UnlockPageContent() {
           const blockedMessage =
             data.message ||
             'This moment cannot be unlocked because the owner has not uploaded media yet.';
-          setUnlockBlockedTitle('Moment Not Ready Yet');
-          setUnlockBlockedEmoji('🔒😔');
           setUnlockError(data.error || 'This moment cannot be unlocked yet.');
-          setUnlockBlockedMessage(blockedMessage);
-          toast.error('This moment is not unlockable yet');
+          setUnlockMomentModal({
+            open: true,
+            variant: 'gentle',
+            title: 'Moment Not Ready Yet',
+            message: blockedMessage,
+            emoji: '🔒✨',
+          });
         } else if (data.reason === 'revoked') {
           const blockedMessage =
-            data.message || 'This code is unavailable. Please contact the UNIKMO team.';
-          setUnlockBlockedTitle('Code Unavailable');
-          setUnlockBlockedEmoji('🚫🔐');
+            data.message ||
+            'This code is not available from UNIKMO. Please contact the UNIKMO team — we will be happy to help.';
           setUnlockError(data.error || 'This code is unavailable.');
-          setUnlockBlockedMessage(blockedMessage);
-          toast.error('This code is unavailable');
+          setUnlockMomentModal({
+            open: true,
+            variant: 'alert',
+            title: 'Code Unavailable',
+            message: blockedMessage,
+            emoji: '🚫✨',
+          });
         } else {
-          setUnlockError(data.error || 'Failed to unlock');
-          toast.error(data.error || 'Failed to unlock');
+          const errMsg = data.error || data.message || 'Failed to unlock';
+          setUnlockError(errMsg);
+          setUnlockMomentModal({
+            open: true,
+            variant: 'alert',
+            title: 'Could not unlock',
+            message:
+              data.message ||
+              errMsg ||
+              'Something went wrong. Please contact the UNIKMO team if this keeps happening.',
+            emoji: '🔑✨',
+          });
         }
         return;
       }
       setUnlockMedia(data.media || []);
       setUnlocked(true);
-      setUnlockBlockedMessage(null);
-      toast.success('Moment unlocked!');
+      setUnlockMomentModal((m) => ({ ...m, open: false }));
     } catch {
       setUnlockError('Failed to unlock');
-      toast.error('Failed to unlock');
+      setUnlockMomentModal({
+        open: true,
+        variant: 'alert',
+        title: 'Connection issue',
+        message: 'We could not reach the server. Check your connection and try again.',
+        emoji: '📡✨',
+      });
     } finally {
       setUnlockLoading(false);
     }
@@ -565,7 +608,13 @@ function UnlockPageContent() {
                 )}
                 <button
                   type="button"
-                  onClick={() => { setUnlocked(false); setUnlockMedia([]); setUnlockCode(''); setUnlockError(null); }}
+                  onClick={() => {
+                    setUnlocked(false);
+                    setUnlockMedia([]);
+                    setUnlockCode('');
+                    setUnlockError(null);
+                    setUnlockMomentModal((m) => ({ ...m, open: false }));
+                  }}
                   className="mt-6 text-sm text-[#2D2926]/60 hover:text-[#2D2926] underline"
                 >
                   Unlock another code
@@ -576,44 +625,15 @@ function UnlockPageContent() {
         </section>
       </main>
 
-      <AnimatePresence>
-        {unlockBlockedMessage && !unlocked && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4"
-            onClick={() => setUnlockBlockedMessage(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-              className="w-full max-w-md rounded-2xl border border-[#D3C7BB] bg-[#FBF7F2] shadow-2xl p-5 sm:p-6 text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <motion.div
-                animate={{ rotate: [0, -7, 7, -5, 5, 0], scale: [1, 1.08, 1] }}
-                transition={{ duration: 0.65, ease: 'easeInOut' }}
-                className="text-4xl sm:text-5xl"
-              >
-                {unlockBlockedEmoji}
-              </motion.div>
-              <h3 className="mt-3 font-serif text-xl text-[#2D2926]">{unlockBlockedTitle}</h3>
-              <p className="mt-2 text-sm sm:text-base text-[#2D2926]/75">{unlockBlockedMessage}</p>
-              <button
-                type="button"
-                onClick={() => setUnlockBlockedMessage(null)}
-                className="mt-5 px-5 py-2.5 rounded-full bg-[#2D2926] text-white text-sm font-medium hover:bg-[#1E1B18] transition-colors"
-              >
-                Okay
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-
-      </AnimatePresence>
+      <AnimatedMomentModal
+        open={unlockMomentModal.open && !unlocked}
+        onClose={() => setUnlockMomentModal((m) => ({ ...m, open: false }))}
+        variant={unlockMomentModal.variant}
+        title={unlockMomentModal.title}
+        message={unlockMomentModal.message}
+        emoji={unlockMomentModal.emoji}
+        confirmLabel={unlockMomentModal.confirmLabel}
+      />
 
       <AnimatePresence>
         {showWelcomeAnimation && (

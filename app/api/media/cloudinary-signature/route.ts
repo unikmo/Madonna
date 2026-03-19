@@ -36,9 +36,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid code' }, { status: 404 });
     }
 
+    if (momentCode.status === 'revoked') {
+      return NextResponse.json(
+        {
+          error: 'This code is unavailable.',
+          reason: 'revoked',
+          message:
+            'This code is not available from UNIKMO. Please contact the UNIKMO team — we will be happy to help.',
+        },
+        { status: 403 }
+      );
+    }
+
     if (momentCode.status !== 'new') {
       return NextResponse.json(
-        { error: 'Code has already been claimed. Cannot upload media.' },
+        {
+          error: 'This moment has already been unlocked.',
+          reason: 'claimed',
+          message:
+            'This code has already been used. Upload is no longer available. Please contact the UNIKMO team if you need assistance.',
+        },
         { status: 400 }
       );
     }

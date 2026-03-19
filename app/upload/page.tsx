@@ -3,7 +3,10 @@
 import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
+import {
+  AnimatedMomentModal,
+  type AnimatedMomentModalVariant,
+} from '@/components/AnimatedMomentModal';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -25,8 +28,36 @@ function UploadPageContent() {
   const [loadingMedia, setLoadingMedia] = useState(false);
   const [deletingMediaUrl, setDeletingMediaUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [momentModal, setMomentModal] = useState<{
+    open: boolean;
+    variant: AnimatedMomentModalVariant;
+    title: string;
+    message: string;
+    emoji: string;
+    confirmLabel?: string;
+  }>({
+    open: false,
+    variant: 'gentle',
+    title: '',
+    message: '',
+    emoji: '',
+  });
   const uploadAbortRef = useRef<AbortController | null>(null);
   const cancelRequestedRef = useRef(false);
+
+  const showMomentModal = (opts: {
+    variant: AnimatedMomentModalVariant;
+    title: string;
+    message: string;
+    emoji: string;
+    confirmLabel?: string;
+  }) => {
+    setMomentModal({ open: true, ...opts });
+  };
+
+  const closeMomentModal = () => {
+    setMomentModal((m) => ({ ...m, open: false }));
+  };
 
   const parseResponseSafely = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -93,6 +124,12 @@ function UploadPageContent() {
     } catch (err: any) {
       setIsValid(false);
       setError('Failed to validate code');
+      showMomentModal({
+        variant: 'alert',
+        title: 'Something went wrong',
+        message: 'We could not validate your code. Please try again in a moment.',
+        emoji: '⚠️✨',
+      });
     } finally {
       setIsValidating(false);
     }
@@ -184,21 +221,36 @@ function UploadPageContent() {
     if (isVideo && file.size > maxVideoSize) {
       const errorMsg = `Video file exceeds 350 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
-      toast.error(errorMsg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'File too large',
+        message: errorMsg,
+        emoji: '📹✨',
+      });
       return;
     }
 
     if (isAudio && file.size > maxAudioSize) {
       const errorMsg = `Audio file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
-      toast.error(errorMsg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'File too large',
+        message: errorMsg,
+        emoji: '🎵✨',
+      });
       return;
     }
 
     if (isImage && file.size > maxImageSize) {
       const errorMsg = `Image file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
-      toast.error(errorMsg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'File too large',
+        message: errorMsg,
+        emoji: '🖼️✨',
+      });
       return;
     }
 
@@ -209,7 +261,12 @@ function UploadPageContent() {
         if (duration > 180) {
           const errorMsg = `Video duration exceeds 3 minutes limit. Current duration: ${Math.ceil(duration)} seconds`;
           setError(errorMsg);
-          toast.error(errorMsg);
+          showMomentModal({
+            variant: 'alert',
+            title: 'Video too long',
+            message: errorMsg,
+            emoji: '⏱️✨',
+          });
           return;
         }
       } catch (err: any) {
@@ -240,6 +297,28 @@ function UploadPageContent() {
       });
       const signData = await parseResponseSafely(signResponse);
       if (!signResponse.ok) {
+        if (signData.reason === 'revoked') {
+          showMomentModal({
+            variant: 'alert',
+            title: 'Code unavailable',
+            message:
+              signData.message ||
+              'This code is not available from UNIKMO. Please contact the UNIKMO team.',
+            emoji: '🚫✨',
+          });
+          throw new Error(signData.error || 'Code unavailable');
+        }
+        if (signData.reason === 'claimed') {
+          showMomentModal({
+            variant: 'gentle',
+            title: 'Already unlocked',
+            message:
+              signData.message ||
+              'This code has already been used. Please contact the UNIKMO team if you need help.',
+            emoji: '🔓💫',
+          });
+          throw new Error(signData.error || 'Already unlocked');
+        }
         throw new Error(signData.error || 'Failed to initialize upload');
       }
 
@@ -289,6 +368,25 @@ function UploadPageContent() {
 
       if (!response.ok) {
         const data = await parseResponseSafely(response);
+        if (data.reason === 'revoked') {
+          showMomentModal({
+            variant: 'alert',
+            title: 'Code unavailable',
+            message:
+              data.message ||
+              'This code is not available from UNIKMO. Please contact the UNIKMO team.',
+            emoji: '🚫✨',
+          });
+        } else if (data.reason === 'claimed') {
+          showMomentModal({
+            variant: 'gentle',
+            title: 'Already unlocked',
+            message:
+              data.message ||
+              'This code has already been used. Please contact the UNIKMO team if you need help.',
+            emoji: '🔓💫',
+          });
+        }
         throw new Error(data.error || 'Upload failed');
       }
 
@@ -301,19 +399,36 @@ function UploadPageContent() {
       };
 
       setMedia((prev) => [newMedia, ...prev]);
-      toast.success('Your moment is now complete.');
+      showMomentModal({
+        variant: 'celebrate',
+        title: `Beautiful, ${recipientName}!`,
+        message:
+          'Your moment is safely uploaded. Share your Unik Key so someone special can unlock it at unikmo.com/unlock.',
+        emoji: '✨🎉',
+        confirmLabel: 'Wonderful',
+      });
 
       // Reset progress after a moment
       setTimeout(() => setUploadProgress(0), 1000);
     } catch (err: any) {
       if (err?.name === 'AbortError') {
         setError('Upload cancelled');
-        toast('Upload cancelled');
+        showMomentModal({
+          variant: 'gentle',
+          title: 'Upload cancelled',
+          message: 'No worries — you can try again whenever you are ready.',
+          emoji: '☁️✨',
+        });
         return;
       }
       const errorMsg = err.message || 'Upload failed';
       setError(errorMsg);
-      toast.error(errorMsg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'Upload did not finish',
+        message: errorMsg,
+        emoji: '📤✨',
+      });
     } finally {
       if (progressInterval) clearInterval(progressInterval);
       uploadAbortRef.current = null;
@@ -344,10 +459,20 @@ function UploadPageContent() {
 
       // Remove only deleted item
       setMedia((prev) => prev.filter((m) => m.url !== mediaUrl));
-      toast.success('Media deleted successfully');
+      showMomentModal({
+        variant: 'gentle',
+        title: 'Removed',
+        message: 'That file has been removed from your moment.',
+        emoji: '🗑️✨',
+      });
     } catch (err: any) {
       const errorMsg = err.message || 'Delete failed';
-      toast.error(errorMsg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'Could not delete',
+        message: errorMsg,
+        emoji: '⚠️✨',
+      });
     } finally {
       setDeletingMediaUrl(null);
     }
@@ -361,6 +486,15 @@ function UploadPageContent() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F5] p-6 sm:p-8">
+      <AnimatedMomentModal
+        open={momentModal.open}
+        onClose={closeMomentModal}
+        variant={momentModal.variant}
+        title={momentModal.title}
+        message={momentModal.message}
+        emoji={momentModal.emoji}
+        confirmLabel={momentModal.confirmLabel}
+      />
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -386,8 +520,8 @@ function UploadPageContent() {
             {isValidating && (
               <p className="mt-2 text-sm text-[#2D2926]/55">Validating...</p>
             )}
-            {isValid === false && !isValidating && (
-              <p className="mt-2 text-sm text-red-600">{error || 'Invalid code'}</p>
+            {isValid === false && !isValidating && error && (
+              <p className="mt-2 text-sm text-[#2D2926]/55">{error}</p>
             )}
             {isValid === true && !isValidating && (
               <motion.p
@@ -495,17 +629,6 @@ function UploadPageContent() {
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"
-                >
-                  {error}
-                </motion.div>
-              )}
 
               {/* Uploaded Media */}
               {loadingMedia ? (
