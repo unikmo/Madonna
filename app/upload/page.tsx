@@ -26,6 +26,18 @@ function UploadPageContent() {
   const [deletingMedia, setDeletingMedia] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const parseResponseSafely = async (response: Response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+    const text = await response.text();
+    const preview = text.slice(0, 120).replace(/\s+/g, ' ').trim();
+    throw new Error(
+      `Server returned non-JSON response (status ${response.status}). Make sure you are using this app URL (usually http://localhost:3001). Response starts with: ${preview}`
+    );
+  };
+
   // Load existing media when code is validated
   useEffect(() => {
     if (code && code.length > 0) {
@@ -46,7 +58,7 @@ function UploadPageContent() {
     setLoadingMedia(true);
     try {
       const response = await fetch(`/api/media/list?code=${encodeURIComponent(code.toUpperCase())}`);
-      const data = await response.json();
+      const data = await parseResponseSafely(response);
 
       if (response.ok && data.media && data.media.length > 0) {
         // Only show the first (main) media file
@@ -73,7 +85,7 @@ function UploadPageContent() {
 
     try {
       const response = await fetch(`/api/media/validate-code?code=${encodeURIComponent(codeToValidate.toUpperCase())}`);
-      const data = await response.json();
+      const data = await parseResponseSafely(response);
 
       if (data.valid) {
         setIsValid(true);
@@ -221,11 +233,11 @@ function UploadPageContent() {
       setUploadProgress(100);
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await parseResponseSafely(response);
         throw new Error(data.error || 'Upload failed');
       }
 
-      const data = await response.json();
+      const data = await parseResponseSafely(response);
       
       // Replace existing media (only one file allowed)
       const newMedia: MediaItem = {
@@ -265,7 +277,7 @@ function UploadPageContent() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await parseResponseSafely(response);
         throw new Error(data.error || 'Delete failed');
       }
 
@@ -281,40 +293,40 @@ function UploadPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-[#FDF9F5] p-6 sm:p-8">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="backdrop-blur-xl bg-white/10 rounded-2xl p-8 shadow-2xl border border-white/20"
+          className="rounded-2xl p-6 sm:p-8 border border-[#E3DAD0] bg-white shadow-sm"
         >
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-[#2D2926] mb-2 font-serif">
             Upload Your Moment
           </h1>
-          <p className="text-gray-300 mb-8">Share your special moment with a secure code</p>
+          <p className="text-[#2D2926]/65 mb-8">Share your special moment with a secure code</p>
 
           {/* Code Input */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Moment Code</label>
+            <label className="block text-sm font-medium text-[#2D2926] mb-2">Moment Code</label>
             <input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="UNIKMO-XXXX-XXXX-XXX"
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white border border-[#D3C7BB] rounded-xl text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20 focus:border-transparent"
             />
             {isValidating && (
-              <p className="mt-2 text-sm text-gray-400">Validating...</p>
+              <p className="mt-2 text-sm text-[#2D2926]/55">Validating...</p>
             )}
             {isValid === false && !isValidating && (
-              <p className="mt-2 text-sm text-red-400">{error || 'Invalid code'}</p>
+              <p className="mt-2 text-sm text-red-600">{error || 'Invalid code'}</p>
             )}
             {isValid === true && !isValidating && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-2 text-sm text-green-400 flex items-center gap-2"
+                className="mt-2 text-sm text-emerald-700 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -341,8 +353,8 @@ function UploadPageContent() {
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all mb-8 ${
                   isDragging
-                    ? 'border-purple-400 bg-purple-500/20'
-                    : 'border-white/30 bg-white/5'
+                    ? 'border-[#2D2926]/50 bg-[#F5ECE3]'
+                    : 'border-[#D3C7BB] bg-[#FDF9F5]'
                 } ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
               >
                 <input
@@ -360,7 +372,7 @@ function UploadPageContent() {
                     className="space-y-4"
                   >
                     <svg
-                      className="w-16 h-16 mx-auto text-purple-400"
+                      className="w-16 h-16 mx-auto text-[#2D2926]/65"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -373,11 +385,11 @@ function UploadPageContent() {
                       />
                     </svg>
                     <div>
-                      <p className="text-xl font-semibold text-white mb-2">
+                      <p className="text-xl font-semibold text-[#2D2926] mb-2">
                         Drag and drop your file here
                       </p>
-                      <p className="text-gray-400">or click to browse</p>
-                      <div className="text-sm text-gray-500 mt-2 space-y-1">
+                      <p className="text-[#2D2926]/65">or click to browse</p>
+                      <div className="text-sm text-[#2D2926]/55 mt-2 space-y-1">
                         <p>Video: max 350 MB, 3 minutes</p>
                         <p>Audio: max 40 MB</p>
                         <p>Photo: max 40 MB</p>
@@ -395,15 +407,15 @@ function UploadPageContent() {
                       exit={{ opacity: 0 }}
                       className="mt-8"
                     >
-                      <div className="w-full bg-white/10 rounded-full h-2 mb-2">
+                      <div className="w-full bg-[#EFE3D8] rounded-full h-2 mb-2">
                         <motion.div
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                          className="bg-[#2D2926] h-2 rounded-full"
                           initial={{ width: 0 }}
                           animate={{ width: `${uploadProgress}%` }}
                           transition={{ duration: 0.3 }}
                         />
                       </div>
-                      <p className="text-sm text-gray-400">Uploading... {uploadProgress}%</p>
+                      <p className="text-sm text-[#2D2926]/65">Uploading... {uploadProgress}%</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -414,7 +426,7 @@ function UploadPageContent() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300"
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"
                 >
                   {error}
                 </motion.div>
@@ -422,7 +434,7 @@ function UploadPageContent() {
 
               {/* Uploaded Media */}
               {loadingMedia ? (
-                <div className="text-center py-12 text-gray-400">Loading media...</div>
+                <div className="text-center py-12 text-[#2D2926]/55">Loading media...</div>
               ) : media ? (
                 <div className="mt-8">
                   <motion.div
@@ -439,11 +451,11 @@ function UploadPageContent() {
                     <p className="mt-2">The Unikmo Team</p>
                   </motion.div>
 
-                  <h3 className="text-lg font-semibold text-white mb-4">Uploaded Media</h3>
+                  <h3 className="text-lg font-semibold text-[#2D2926] mb-4">Uploaded Media</h3>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="relative group backdrop-blur-xl bg-white/5 rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/50 transition-all"
+                    className="relative group rounded-xl overflow-hidden border border-[#E3DAD0] bg-[#FDF9F5] hover:border-[#2D2926]/30 transition-all"
                   >
                     {/* Delete Button */}
                     <button
@@ -536,7 +548,7 @@ function UploadPageContent() {
                   </motion.div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-[#2D2926]/55">
                   <p>No media uploaded yet. Upload your file above.</p>
                 </div>
               )}
