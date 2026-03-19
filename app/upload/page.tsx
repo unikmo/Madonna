@@ -14,6 +14,7 @@ interface MediaItem {
 function UploadPageContent() {
   const searchParams = useSearchParams();
   const codeParam = searchParams.get('code') || '';
+  const recipientName = searchParams.get('name') || 'there';
   const [code, setCode] = useState(codeParam);
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState<boolean | null>(null);
@@ -234,7 +235,7 @@ function UploadPageContent() {
       };
       
       setMedia(newMedia);
-      toast.success(`Successfully uploaded ${file.name}`);
+      toast.success('Your moment is now complete.');
 
       // Reset progress after a moment
       setTimeout(() => setUploadProgress(0), 1000);
@@ -424,6 +425,20 @@ function UploadPageContent() {
                 <div className="text-center py-12 text-gray-400">Loading media...</div>
               ) : media ? (
                 <div className="mt-8">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 rounded-xl border border-emerald-400/35 bg-emerald-500/10 p-5 text-emerald-100"
+                  >
+                    <p className="font-semibold text-base">Thank you, {recipientName}. ✨</p>
+                    <p className="mt-2">Your moment is now complete.</p>
+                    <p className="mt-2">Share the card or your Unik Key with someone dear.</p>
+                    <p className="mt-2">
+                      They will open it at <a href="https://unikmo.com/unlock" className="underline">unikmo.com/unlock</a>.
+                    </p>
+                    <p className="mt-2">The Unikmo Team</p>
+                  </motion.div>
+
                   <h3 className="text-lg font-semibold text-white mb-4">Uploaded Media</h3>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}

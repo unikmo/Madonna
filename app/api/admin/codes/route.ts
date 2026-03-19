@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     const codes = await MomentCode.find(query)
       .populate('user', 'email')
-      .populate('order', 'shopifyOrderId email totalPrice')
+      .populate('order', 'shopifyOrderId email totalPrice source tags')
       .sort({ createdAt: -1 })
       .limit(100);
 

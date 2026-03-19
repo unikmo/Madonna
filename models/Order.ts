@@ -9,13 +9,17 @@ export interface ILineItem {
 
 export interface IOrder extends Document {
   shopifyOrderId: string;
+  shopifyOrderName?: string;
   shopifyProductId: string;
   orderQuantity: number;
   user: Types.ObjectId;
   email: string;
+  customerName?: string;
   totalPrice: number;
   currency: string;
   paymentStatus: 'paid';
+  source: 'webhook' | 'admin';
+  tags: string[];
   lineItems: ILineItem[];
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +37,10 @@ const OrderSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    shopifyOrderName: {
+      type: String,
+      required: false,
+    },
     orderQuantity: {
       type: Number,
       required: true,
@@ -48,6 +56,12 @@ const OrderSchema: Schema = new Schema(
       lowercase: true,
       trim: true,
     },
+    customerName: {
+      type: String,
+      required: false,
+      trim: true,
+      default: '',
+    },
     totalPrice: {
       type: Number,
       required: true,
@@ -62,6 +76,17 @@ const OrderSchema: Schema = new Schema(
       enum: ['paid'],
       default: 'paid',
       required: true,
+    },
+    source: {
+      type: String,
+      enum: ['webhook', 'admin'],
+      default: 'webhook',
+      required: true,
+      index: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
     },
     lineItems: [
       {

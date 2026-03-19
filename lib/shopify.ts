@@ -340,4 +340,85 @@ export class ShopifyGraphQLClient {
 
     return this.query(mutation, { id: webhookId });
   }
+
+  async createDraftOrder(input: {
+    email: string;
+    lineItems: Array<{ variantId: string; quantity: number }>;
+    tags?: string[];
+    note?: string;
+  }): Promise<any> {
+    const mutation = `
+      mutation draftOrderCreate($input: DraftOrderInput!) {
+        draftOrderCreate(input: $input) {
+          draftOrder {
+            id
+            email
+            invoiceUrl
+            tags
+            lineItems(first: 10) {
+              edges {
+                node {
+                  quantity
+                  variant {
+                    id
+                    product {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    return this.query(mutation, { input });
+  }
+
+  async completeDraftOrder(draftOrderId: string, paymentPending = false): Promise<any> {
+    const mutation = `
+      mutation draftOrderComplete($id: ID!, $paymentPending: Boolean) {
+        draftOrderComplete(id: $id, paymentPending: $paymentPending) {
+          draftOrder {
+            order {
+              id
+              name
+              email
+              tags
+              totalPriceSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              lineItems(first: 20) {
+                edges {
+                  node {
+                    quantity
+                    variant {
+                      id
+                      product {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    return this.query(mutation, { id: draftOrderId, paymentPending });
+  }
 }

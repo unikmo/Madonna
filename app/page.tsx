@@ -7,6 +7,9 @@ export default function LandingPage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showImprintModal, setShowImprintModal] = useState(false);
 
   useEffect(() => {
     const openIfHash = () => {
@@ -37,10 +40,17 @@ export default function LandingPage() {
         <RootedInReality />
       </main>
 
-      <SiteFooter onContactClick={() => setShowContactModal(true)} />
+      <SiteFooter
+        onPrivacyClick={() => setShowPrivacyModal(true)}
+        onTermsClick={() => setShowTermsModal(true)}
+        onImprintClick={() => setShowImprintModal(true)}
+      />
 
       {showContactModal && <ContactModal onClose={() => setShowContactModal(false)} />}
       {showHowItWorksModal && <HowItWorksModal onClose={() => setShowHowItWorksModal(false)} />}
+      {showPrivacyModal && <PrivacyModal onClose={() => setShowPrivacyModal(false)} />}
+      {showTermsModal && <TermsModal onClose={() => setShowTermsModal(false)} />}
+      {showImprintModal && <ImprintModal onClose={() => setShowImprintModal(false)} />}
     </div>
   );
 }
@@ -1419,7 +1429,15 @@ function ContactModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function SiteFooter({ onContactClick }: { onContactClick: () => void }) {
+function SiteFooter({
+  onPrivacyClick,
+  onTermsClick,
+  onImprintClick,
+}: {
+  onPrivacyClick: () => void;
+  onTermsClick: () => void;
+  onImprintClick: () => void;
+}) {
   return (
     <footer className="bg-[#FDF9F5] py-6 sm:py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1428,7 +1446,7 @@ function SiteFooter({ onContactClick }: { onContactClick: () => void }) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
           
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
-            <span className="font-semibold text-[#2D2926]/80">UNIKMO © 2024</span>
+            <span className="font-semibold text-[#2D2926]/80">UNIKMO © {new Date().getFullYear()}</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
             <span>A physical key to a private memory.</span>
           </div>
@@ -1474,18 +1492,262 @@ function SiteFooter({ onContactClick }: { onContactClick: () => void }) {
         </div>
 
         <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/30">
-          <a href="#privacy" className="hover:text-[#2D2926]/60 transition-colors">Privacy</a>
-          <a href="#legal" className="hover:text-[#2D2926]/60 transition-colors">Legal</a>
           <button
             type="button"
-            onClick={onContactClick}
+            onClick={onPrivacyClick}
             className="hover:text-[#2D2926]/60 transition-colors"
           >
-            Contact
+            Privacy
+          </button>
+          <button
+            type="button"
+            onClick={onTermsClick}
+            className="hover:text-[#2D2926]/60 transition-colors"
+          >
+            Terms
+          </button>
+          <button
+            type="button"
+            onClick={onImprintClick}
+            className="hover:text-[#2D2926]/60 transition-colors"
+          >
+            Imprint
           </button>
         </div>
       </div>
     </footer>
+  );
+}
+
+function ImprintModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E3DAD0]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-serif text-[20px] sm:text-[26px] text-[#2D2926]">Imprint</h3>
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-4 text-[#2D2926]/90 text-[14px] sm:text-[15px] leading-relaxed">
+            <h4 className="font-semibold text-[#2D2926]">Operator Information</h4>
+            <p><span className="font-medium text-[#2D2926]">Company Name:</span> PlanetHike OÜ</p>
+            <p><span className="font-medium text-[#2D2926]">Product:</span> unikmo</p>
+            <p><span className="font-medium text-[#2D2926]">Registered Office Address:</span> Järvevana tee 9, Tallinn, 11314, Estonia</p>
+            <p><span className="font-medium text-[#2D2926]">Registration Number:</span> 80656111</p>
+            <p><span className="font-medium text-[#2D2926]">Legal Representative / Founder:</span> Tichi Mbanwie</p>
+            <p>
+              <span className="font-medium text-[#2D2926]">Email:</span>{' '}
+              <a href="mailto:hello@planethike.org" className="underline hover:text-[#2D2926]">hello@planethike.org</a>
+            </p>
+            <p>
+              <span className="font-medium text-[#2D2926]">Phone:</span>{' '}
+              <a href="tel:+491634668380" className="underline hover:text-[#2D2926]">+49 (0)1634668380</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PrivacyModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E3DAD0]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-serif text-[20px] sm:text-[26px] text-[#2D2926]">Privacy Policy</h3>
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-5 text-[#2D2926]/90 text-[14px] sm:text-[15px] leading-relaxed">
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">1. Data We Collect</h4>
+              <p>We collect only what is necessary:</p>
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>Email (for purchase and delivery).</li>
+                <li>Order data.</li>
+                <li>Uploaded content (Moment media).</li>
+              </ul>
+              <p className="mt-2">No accounts and no tracking profiles.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">2. How Data Is Used</h4>
+              <p>We use data to:</p>
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>Deliver keys.</li>
+                <li>Store Moments.</li>
+                <li>Provide support.</li>
+              </ul>
+              <p className="mt-2">We do not sell personal data.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">3. Content Privacy</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Moments are private by default.</li>
+                <li>Access is only possible via the unique key.</li>
+              </ul>
+              <p className="mt-2">We do not view content unless required for support or required by law.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">4. Data Storage</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Media is stored via cloud providers (for example, Cloudinary).</li>
+                <li>Data is stored securely (for example, MongoDB).</li>
+              </ul>
+              <p className="mt-2">We take reasonable security measures, but no system is 100% secure.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">5. Data Retention</h4>
+              <p>Moments are stored until user deletion (future feature) or service changes.</p>
+              <p className="mt-2">We may remove inactive content after extended periods.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">6. Third Parties</h4>
+              <p>We use Shopify (payments and orders) and cloud providers (media storage).</p>
+              <p className="mt-2">These providers process data under their own policies.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">7. User Rights (GDPR)</h4>
+              <p>Users can request access, correction, and deletion.</p>
+              <p className="mt-2">Contact: your email</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">8. Cookies</h4>
+              <p>We use minimal cookies for website functionality and analytics (if enabled).</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TermsModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E3DAD0]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-serif text-[20px] sm:text-[26px] text-[#2D2926]">Legal - Terms & Conditions (Unikmo)</h3>
+            <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-5 text-[#2D2926]/90 text-[14px] sm:text-[15px] leading-relaxed">
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">1. Overview</h4>
+              <p>
+                Unikmo provides a service that enables users to create, store, and share digital Moments (video, audio, images, or text) via unique access keys.
+                By purchasing or using Unikmo, you agree to these Terms.
+              </p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">2. Product Nature</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Each purchase grants one or more Moment keys.</li>
+                <li>Each key allows creation of one (1) digital Moment.</li>
+                <li>Moments are private and accessible only via key.</li>
+                <li>No account/login required.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">3. User Responsibility (Very Important)</h4>
+              <p>The buyer is solely responsible for storing the key securely and sharing it with the intended recipient. Unikmo will never send keys to recipients.</p>
+              <p className="mt-2">If a key is lost, shared accidentally, or accessed by third parties, Unikmo is not liable.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">4. Key Usage Rules</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>One key = one Moment.</li>
+                <li>Once a Moment is created, it cannot be edited or reassigned.</li>
+                <li>Keys may not be resold or redistributed commercially.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">5. Content Responsibility</h4>
+              <p>Users are fully responsible for all uploaded content. You agree not to upload:</p>
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>Illegal content.</li>
+                <li>Copyrighted content you do not own.</li>
+                <li>Offensive, abusive, or harmful material.</li>
+              </ul>
+              <p className="mt-2">Unikmo reserves the right to remove content at any time.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">6. Storage & Availability</h4>
+              <p>Moments are stored digitally (cloud infrastructure). We aim for long-term storage but do not guarantee permanent availability.</p>
+              <p className="mt-2">Unikmo may modify, migrate, or discontinue storage services (with reasonable notice where possible).</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">7. Limitation of Liability (Critical)</h4>
+              <p>Unikmo is not liable for loss of content, unauthorized access, service interruptions, or emotional/indirect damages.</p>
+              <p className="mt-2">Maximum liability equals the amount paid by the customer.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">8. Delivery</h4>
+              <p>Delivery options include Physical + Digital, Digital only, and Split delivery. Shipping times are estimates only.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">9. Refunds</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Digital keys are non-refundable once issued.</li>
+                <li>Physical products follow the standard return policy (if unused).</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">10. Anti-Fraud Policy</h4>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Keys are only sent to buyers.</li>
+                <li>We will never ask recipients for payment or personal data.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">11. Changes</h4>
+              <p>We may update these Terms at any time.</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
