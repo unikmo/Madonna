@@ -440,7 +440,7 @@ function UploadPageContent() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 rounded-xl border border-emerald-400/35 bg-emerald-500/10 p-5 text-emerald-100"
+                    className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"
                   >
                     <p className="font-semibold text-base">Thank you, {recipientName}. ✨</p>
                     <p className="mt-2">Your moment is now complete.</p>
@@ -461,11 +461,11 @@ function UploadPageContent() {
                     <button
                       onClick={handleDeleteMedia}
                       disabled={deletingMedia}
-                      className="absolute top-2 right-2 z-10 w-8 h-8 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                      className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#2D2926] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                     >
                       {deletingMedia ? (
                         <svg
-                          className="animate-spin h-4 w-4 text-white"
+                          className="animate-spin h-4 w-4 text-[#FDF9F5]"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -486,7 +486,7 @@ function UploadPageContent() {
                         </svg>
                       ) : (
                         <svg
-                          className="w-4 h-4 text-white"
+                          className="w-4 h-4 text-[#FDF9F5]"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -517,9 +517,9 @@ function UploadPageContent() {
                       />
                     )}
                     {media.type === 'audio' && (
-                      <div className="p-8 bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center h-64">
+                      <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
                         <div className="text-center">
-                          <svg className="w-16 h-16 text-purple-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-16 h-16 text-[#2D2926]/55 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
                           </svg>
                           <audio src={media.url} controls className="w-full max-w-md" />
@@ -527,8 +527,8 @@ function UploadPageContent() {
                       </div>
                     )}
                     {media.type === 'text' && (
-                      <div className="p-8 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center h-64">
-                        <svg className="w-16 h-16 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
+                        <svg className="w-16 h-16 text-[#2D2926]/55" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
                             d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
@@ -540,8 +540,8 @@ function UploadPageContent() {
 
                     {/* Media Info */}
                     <div className="p-4">
-                      <p className="text-white font-medium capitalize text-sm">{media.type}</p>
-                      <p className="text-gray-400 text-xs mt-1">
+                      <p className="text-[#2D2926] font-medium capitalize text-sm">{media.type}</p>
+                      <p className="text-[#2D2926]/55 text-xs mt-1">
                         {new Date(media.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -563,8 +563,8 @@ function UploadPageContent() {
 export default function UploadPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-[#FDF9F5] flex items-center justify-center">
+        <div className="text-[#2D2926] text-xl">Loading...</div>
       </div>
     }>
       <UploadPageContent />
