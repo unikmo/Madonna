@@ -9,6 +9,7 @@ interface CredentialsStatus {
   hasCredentials: boolean;
   storeDomain: string;
   baseUrl: string;
+  webhookBaseUrl?: string;
   apiVersion: string;
   hasAccessToken: boolean;
   hasWebhookSecret: boolean;
@@ -367,8 +368,10 @@ export default function ShopifyCredentialsPage() {
           <div className="flex items-center justify-between">
             <span className="text-[#2D2926]/70 text-sm">Webhook URL</span>
             <span className="text-[#2D2926] font-mono text-sm break-all text-right max-w-[60%]">
-              {status?.baseUrl
-                ? `${status.baseUrl.replace(/\/$/, '')}/api/webhooks/shopify/orders-paid`
+              {status?.webhookBaseUrl
+                ? `${status.webhookBaseUrl.replace(/\/$/, '')}/api/webhooks/shopify/orders-paid`
+                : status?.baseUrl
+                  ? `${status.baseUrl.replace(/\/$/, '')}/api/webhooks/shopify/orders-paid`
                 : typeof window !== 'undefined'
                   ? `${window.location.origin}/api/webhooks/shopify/orders-paid`
                   : '/api/webhooks/shopify/orders-paid'}

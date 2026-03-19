@@ -24,11 +24,13 @@ export async function GET(request: NextRequest) {
 
     const credentials = await getShopifyCredentialsRaw();
     const isTestMode = await getEffectiveShopifyTestMode();
+    const webhookBaseUrl = process.env.SHOPIFY_WEBHOOK_BASE_URL || process.env.BASE_URL || '';
 
     return NextResponse.json({
       hasCredentials: credentials.hasCredentials,
       storeDomain: credentials.storeDomain,
       baseUrl: credentials.baseUrl,
+      webhookBaseUrl,
       apiVersion: credentials.apiVersion,
       effectiveTestMode: isTestMode,
       // Don't return encrypted values, just indicate they exist

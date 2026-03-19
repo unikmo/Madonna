@@ -15,11 +15,11 @@ export async function POST(request: NextRequest) {
     }
 
     await getShopifyCredentialsForAPI();
-    const webhookBaseUrl = (process.env.BASE_URL || '').replace(/\/$/, '');
+    const webhookBaseUrl = (process.env.SHOPIFY_WEBHOOK_BASE_URL || process.env.BASE_URL || '').replace(/\/$/, '');
 
     if (!webhookBaseUrl) {
       return NextResponse.json(
-        { error: 'BASE_URL is not configured.' },
+        { error: 'Webhook base URL is not configured. Set SHOPIFY_WEBHOOK_BASE_URL or BASE_URL.' },
         { status: 400 }
       );
     }
