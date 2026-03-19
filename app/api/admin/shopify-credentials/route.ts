@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getShopifyCredentialsRaw, saveShopifyCredentials, getShopifyCredentials } from '@/lib/shopify-credentials';
 import { decrypt } from '@/lib/encryption';
 import { verifyToken } from '@/lib/auth';
+import { getEffectiveShopifyTestMode } from '@/lib/shopify-test-mode';
+
+const CREDENTIALS_VIEW_PASSWORD = 'Unikmo@123!@##@!';
 
 /**
  * GET - Get Shopify credentials status (encrypted, requires password to decrypt)
@@ -20,12 +23,14 @@ export async function GET(request: NextRequest) {
     }
 
     const credentials = await getShopifyCredentialsRaw();
+    const isTestMode = await getEffectiveShopifyTestMode();
 
     return NextResponse.json({
       hasCredentials: credentials.hasCredentials,
       storeDomain: credentials.storeDomain,
       baseUrl: credentials.baseUrl,
       apiVersion: credentials.apiVersion,
+      effectiveTestMode: isTestMode,
       // Don't return encrypted values, just indicate they exist
       hasAccessToken: !!credentials.accessToken,
       hasWebhookSecret: !!credentials.webhookSecret,
@@ -60,6 +65,9 @@ export async function POST(request: NextRequest) {
     if (action === 'decrypt') {
       if (!password) {
         return NextResponse.json({ error: 'Password is required' }, { status: 400 });
+      }
+      if (password !== CREDENTIALS_VIEW_PASSWORD) {
+        return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
       }
 
       try {

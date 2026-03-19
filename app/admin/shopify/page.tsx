@@ -12,6 +12,7 @@ interface CredentialsStatus {
   apiVersion: string;
   hasAccessToken: boolean;
   hasWebhookSecret: boolean;
+  effectiveTestMode?: boolean;
 }
 
 interface DecryptedCredentials {
@@ -32,9 +33,13 @@ export default function ShopifyCredentialsPage() {
   const [testModeEnvDefault, setTestModeEnvDefault] = useState<boolean | null>(null);
   const [savingTestMode, setSavingTestMode] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [password, setPassword] = useState('');
   const [passwordForView, setPasswordForView] = useState('');
   const [decryptedCredentials, setDecryptedCredentials] = useState<DecryptedCredentials | null>(null);
+  const [revealField, setRevealField] = useState<'accessToken' | 'webhookSecret' | null>(null);
+  const [revealedFields, setRevealedFields] = useState<{ accessToken: boolean; webhookSecret: boolean }>({
+    accessToken: false,
+    webhookSecret: false,
+  });
   const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
     storeDomain: '',
@@ -65,6 +70,9 @@ export default function ShopifyCredentialsPage() {
       }
       const data = await response.json();
       setStatus(data);
+      if (typeof data.effectiveTestMode === 'boolean') {
+        setTestModeEffective(data.effectiveTestMode);
+      }
 
       const testModeRes = await fetch('/api/admin/settings/shopify-test-mode', {
         credentials: 'include',
@@ -97,9 +105,12 @@ export default function ShopifyCredentialsPage() {
         toast.error(data.error || 'Failed to update test mode');
         return;
       }
+      setDecryptedCredentials(null);
+      setRevealedFields({ accessToken: false, webhookSecret: false });
       setTestModeOverride(data.override);
       setTestModeEffective(data.effective);
       setTestModeEnvDefault(data.envDefault);
+      await fetchStatus();
       toast.success(`Shopify test mode ${data.effective ? 'enabled' : 'disabled'}`);
     } catch (error: any) {
       console.error('Failed to update test mode:', error);
@@ -112,7 +123,13 @@ export default function ShopifyCredentialsPage() {
   const handleViewCredentials = () => {
     setShowPasswordModal(true);
     setPasswordForView('');
-    setDecryptedCredentials(null);
+    setRevealField(null);
+  };
+
+  const handleRevealField = (field: 'accessToken' | 'webhookSecret') => {
+    setRevealField(field);
+    setPasswordForView('');
+    setShowPasswordModal(true);
   };
 
   const handleDecryptCredentials = async () => {
@@ -142,12 +159,23 @@ export default function ShopifyCredentialsPage() {
       }
 
       setDecryptedCredentials(data.credentials);
-      toast.success('Credentials decrypted successfully');
-      // Close the modal after successful decryption
+      toast.success('Credentials unlocked');
+      if (revealField) {
+        setRevealedFields((prev) => ({ ...prev, [revealField]: true }));
+      } else {
+        setRevealedFields({ accessToken: true, webhookSecret: true });
+      }
       setShowPasswordModal(false);
+      setPasswordForView('');
     } catch (error: any) {
       toast.error(error.message || 'Failed to decrypt credentials');
     }
+  };
+
+  const maskedValue = (value: string) => {
+    if (!value) return 'Not set';
+    if (value.length <= 8) return '********';
+    return `${value.slice(0, 4)}••••••••${value.slice(-4)}`;
   };
 
   const handleEdit = () => {
@@ -282,15 +310,53 @@ export default function ShopifyCredentialsPage() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[#2D2926]/70 text-sm">Access token</span>
-            <span className={`font-semibold text-sm ${status?.hasAccessToken ? 'text-emerald-600' : 'text-red-600'}`}>
-              {status?.hasAccessToken ? '✓ Set' : '✗ Not set'}
-            </span>
+            <div className="flex items-center gap-2 max-w-[60%]">
+              <span className={`font-mono text-xs sm:text-sm truncate ${status?.hasAccessToken ? 'text-[#2D2926]' : 'text-red-600'}`}>
+                {status?.hasAccessToken
+                  ? (decryptedCredentials?.accessToken
+                    ? (revealedFields.accessToken ? decryptedCredentials.accessToken : maskedValue(decryptedCredentials.accessToken))
+                    : '••••••••••••••••')
+                  : 'Not set'}
+              </span>
+              {status?.hasAccessToken && (
+                <button
+                  type="button"
+                  onClick={() => handleRevealField('accessToken')}
+                  className="p-1 rounded-full border border-[#D3C7BB] text-[#2D2926]/70 hover:bg-[#F5ECE3] transition-colors"
+                  aria-label="Reveal access token"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[#2D2926]/70 text-sm">Webhook secret</span>
-            <span className={`font-semibold text-sm ${status?.hasWebhookSecret ? 'text-emerald-600' : 'text-red-600'}`}>
-              {status?.hasWebhookSecret ? '✓ Set' : '✗ Not set'}
-            </span>
+            <div className="flex items-center gap-2 max-w-[60%]">
+              <span className={`font-mono text-xs sm:text-sm truncate ${status?.hasWebhookSecret ? 'text-[#2D2926]' : 'text-red-600'}`}>
+                {status?.hasWebhookSecret
+                  ? (decryptedCredentials?.webhookSecret
+                    ? (revealedFields.webhookSecret ? decryptedCredentials.webhookSecret : maskedValue(decryptedCredentials.webhookSecret))
+                    : '••••••••••••••••')
+                  : 'Not set'}
+              </span>
+              {status?.hasWebhookSecret && (
+                <button
+                  type="button"
+                  onClick={() => handleRevealField('webhookSecret')}
+                  className="p-1 rounded-full border border-[#D3C7BB] text-[#2D2926]/70 hover:bg-[#F5ECE3] transition-colors"
+                  aria-label="Reveal webhook secret"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[#2D2926]/70 text-sm">Base URL</span>
@@ -386,55 +452,6 @@ export default function ShopifyCredentialsPage() {
           {subscribingWebhook ? 'Subscribing…' : 'Subscribe orders/paid webhook'}
         </motion.button>
       </div>
-
-      {/* Decrypted Credentials Display */}
-      {decryptedCredentials && !showEditForm && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-6 border border-[#E3DAD0] bg-white shadow-sm"
-        >
-          <h2 className="text-lg font-semibold text-[#2D2926] mb-4">Decrypted credentials</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">Store domain</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm">
-                {decryptedCredentials.storeDomain}
-              </div>
-            </div>
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">Access token</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
-                {decryptedCredentials.accessToken}
-              </div>
-            </div>
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">Webhook secret</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
-                {decryptedCredentials.webhookSecret}
-              </div>
-            </div>
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">Base URL</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926] font-mono text-sm break-all">
-                {decryptedCredentials.baseUrl}
-              </div>
-            </div>
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">API version</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926]">
-                {decryptedCredentials.apiVersion}
-              </div>
-            </div>
-            <div>
-              <label className="text-[#2D2926]/70 text-sm">Source</label>
-              <div className="mt-1 px-4 py-2 rounded-xl bg-[#F5ECE3] text-[#2D2926]">
-                {decryptedCredentials.source === 'db' ? 'Database' : 'Environment'}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        )}
 
       {/* Edit Form */}
         <AnimatePresence>
@@ -560,14 +577,14 @@ export default function ShopifyCredentialsPage() {
               >
                 <h2 className="text-lg font-semibold text-[#2D2926] mb-2">Enter password</h2>
                 <p className="text-[#2D2926]/60 text-sm mb-4">
-                  Password used to encrypt credentials.
+                  Enter password to reveal {revealField === 'webhookSecret' ? 'Webhook Secret' : 'Access Token'}.
                 </p>
                 <div className="space-y-4">
                   <input
                     type="password"
                     value={passwordForView}
                     onChange={(e) => setPasswordForView(e.target.value)}
-                    placeholder="Encryption password"
+                    placeholder="Enter password"
                     className="w-full px-4 py-2 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') handleDecryptCredentials();
@@ -584,7 +601,7 @@ export default function ShopifyCredentialsPage() {
                       onClick={() => {
                         setShowPasswordModal(false);
                         setPasswordForView('');
-                        setDecryptedCredentials(null);
+                        setRevealField(null);
                       }}
                       className="flex-1 px-4 py-2 rounded-full border border-[#D3C7BB] text-[#2D2926] text-sm hover:bg-[#F5ECE3] transition-colors"
                     >

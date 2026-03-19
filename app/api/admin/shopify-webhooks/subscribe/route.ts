@@ -14,17 +14,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const credentials = await getShopifyCredentialsForAPI();
-    const baseUrl = (process.env.BASE_URL || '').replace(/\/$/, '');
+    await getShopifyCredentialsForAPI();
+    const webhookBaseUrl = (process.env.BASE_URL || '').replace(/\/$/, '');
 
-    if (!baseUrl) {
+    if (!webhookBaseUrl) {
       return NextResponse.json(
-        { error: 'BASE_URL is not configured. Set it in env or Shopify credentials.' },
+        { error: 'BASE_URL is not configured.' },
         { status: 400 }
       );
     }
 
-    const callbackUrl = `${baseUrl}/api/webhooks/shopify/orders-paid`;
+    let callbackUrl = '';
+    try {
+      const parsed = new URL(webhookBaseUrl);
+      if (parsed.protocol !== 'https:') {
+        return NextResponse.json(
+          { error: 'BASE_URL must use https in production', callbackBaseUrl: webhookBaseUrl },
+          { status: 400 }
+        );
+      }
+      callbackUrl = `${parsed.origin}/api/webhooks/shopify/orders-paid`;
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid webhook base URL', callbackBaseUrl: webhookBaseUrl },
+        { status: 400 }
+      );
+    }
     const topic = 'ORDERS_PAID';
 
     const client = await createShopifyClient();
@@ -79,10 +94,13 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        return NextResponse.json(
-          { error: 'Shopify API errors', details: errors },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          error: 'Shopify API errors',
+          details: errors,
+          callbackUrl,
+          hint:
+            'Shopify rejected this callback domain. Use a different public domain (not blocked by Shopify) and set SHOPIFY_WEBHOOK_BASE_URL to it.',
+        }, { status: 400 });
       }
 
       const webhook = result.webhookSubscriptionCreate?.webhookSubscription;
@@ -96,6 +114,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         alreadySubscribed: false,
+        callbackUrl,
         webhook,
       });
     } catch (error: any) {
