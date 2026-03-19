@@ -493,24 +493,13 @@ function UnlockPageContent() {
               A private memory is waiting for you
             </h1>
             <p className="text-sm sm:text-base text-[#2D2926]/65 mt-3 max-w-2xl mx-auto">
-              Enter your Moment Code to unlock the memory. Designed to feel warm, timeless and special.
+              Enter your Moment Key to unlock the memory.
             </p>
           </div>
         </motion.div>
 
         {/* Unlock a moment */}
         <section>
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926]">Unlock a moment</h2>
-            <button
-              type="button"
-              onClick={() => setSoundEnabled((v) => !v)}
-              className="px-3 py-1.5 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
-            >
-              {soundEnabled ? 'Sound: On' : 'Sound: Off'}
-            </button>
-          </div>
-          <p className="text-sm text-[#2D2926]/60 mb-6">Enter a Moment Code to view the private content.</p>
           <div className="rounded-xl bg-white/60 border border-[#2D2926]/10 p-4 sm:p-6 shadow-sm">
             {!unlocked ? (
               <>

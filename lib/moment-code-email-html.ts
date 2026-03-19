@@ -67,22 +67,10 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
   const unlockBaseUrl = `${safeBaseUrl}/unlock`;
 
   const firstCode = codes[0] || '';
-  const unlockUrlForFirstCode = `${unlockBaseUrl}?code=${encodeURIComponent(firstCode)}`;
-  // QR server size can be higher; we set exact overlay size in email CSS.
-  const qrUrlForFirstCode = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-    unlockUrlForFirstCode
-  )}`;
 
   const count = codes.length as Quantity | number;
   const tierCount = (count === 7 || count === 4 || count === 1 ? count : 1) as 1 | 4 | 7;
   const tier = TIER_BY_COUNT[tierCount];
-
-  // Email markup renders product image with width="520" and max-width 520.
-  // Use that fixed width as the scaling target to compute QR overlay px sizes.
-  const productRenderWidthPx = 520;
-  const scale = productRenderWidthPx / tier.original.imgW;
-  const qrWp = Math.round(tier.original.qrW * scale);
-  const qrHp = Math.round(tier.original.qrH * scale);
 
   const html = `
   <!DOCTYPE html>
@@ -162,17 +150,6 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
                     alt="UNIKMO product"
                     style="width: 100%; max-width: 520px; height: auto; display: block; border-radius: 14px; border: 0;"
                   />
-                  
-                  <!-- QR overlay -->
-                  <div style="position: absolute; left: ${tier.qr.leftPct}%; top: ${tier.qr.topPct}%; width: ${qrWp}px; height: ${qrHp}px; margin-left: -${qrWp / 2}px; margin-top: -${qrHp / 2}px; line-height: 0;">
-                    <img
-                      src="${qrUrlForFirstCode}"
-                      width="${qrWp}"
-                      height="${qrHp}"
-                      alt="Scan to unlock your moment"
-                      style="width: ${qrWp}px; height: ${qrHp}px; display: block; border-radius: 10px; border: 0; background: #ffffff;"
-                    />
-                  </div>
                 </td>
               </tr>
             </table>
