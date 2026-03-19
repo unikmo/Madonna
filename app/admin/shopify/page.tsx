@@ -87,7 +87,7 @@ export default function ShopifyCredentialsPage() {
     try {
       setSavingTestMode(true);
       const response = await fetch('/api/admin/settings/shopify-test-mode', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ override: value }),
