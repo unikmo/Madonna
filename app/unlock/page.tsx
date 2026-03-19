@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -63,6 +63,106 @@ function UnlockPageContent() {
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  const getAudioContext = async () => {
+    if (typeof window === 'undefined') return null;
+    if (!audioContextRef.current) {
+      const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!Ctx) return null;
+      audioContextRef.current = new Ctx();
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+    }
+    return audioContextRef.current;
+  };
+
+  const playCelebrationSound = async () => {
+    if (!soundEnabled) return;
+    try {
+      const ctx = await getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const playTone = (freq: number, start: number, duration: number, volume: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, start);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.start(start);
+        osc.stop(start + duration + 0.03);
+      };
+
+      const playPop = (start: number, volume: number) => {
+        const size = Math.floor(ctx.sampleRate * 0.12);
+        const buffer = ctx.createBuffer(1, size, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < size; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / size, 2.2);
+        }
+        const source = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        source.buffer = buffer;
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(520, start);
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
+        source.start(start);
+      };
+
+      [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => {
+        playTone(n, now + i * 0.11, 0.32, 0.055);
+      });
+      for (let i = 0; i < 14; i++) {
+        playPop(now + 0.35 + i * 0.13, 0.03 + (i % 3) * 0.01);
+      }
+    } catch {
+      // Ignore audio failures; visual celebration still runs.
+    }
+  };
+
+  const handleDownloadMedia = async (
+    url: string,
+    type: MediaItem['type'],
+    index: number
+  ) => {
+    const extensionByType: Record<MediaItem['type'], string> = {
+      image: 'jpg',
+      video: 'mp4',
+      audio: 'mp3',
+      text: 'txt',
+    };
+    const filename = `unikmo-moment-${index + 1}.${extensionByType[type]}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch file');
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(objectUrl);
+    } catch {
+      // Fallback for cross-origin restrictions.
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const parseResponseSafely = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -322,6 +422,24 @@ function UnlockPageContent() {
     return () => window.clearTimeout(t);
   }, [unlocked]);
 
+  useEffect(() => {
+    if (!showCelebration || !soundEnabled) return;
+    // Keep playing gentle celebration sound while visual animation is active.
+    playCelebrationSound();
+    const interval = window.setInterval(() => {
+      playCelebrationSound();
+    }, 2800);
+    return () => window.clearInterval(interval);
+  }, [showCelebration, soundEnabled]);
+
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => undefined);
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       className="min-h-screen bg-[#FDF9F5] text-[#2D2926]"
@@ -382,7 +500,16 @@ function UnlockPageContent() {
 
         {/* Unlock a moment */}
         <section>
-          <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926] mb-4">Unlock a moment</h2>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h2 className="font-serif text-xl sm:text-2xl text-[#2D2926]">Unlock a moment</h2>
+            <button
+              type="button"
+              onClick={() => setSoundEnabled((v) => !v)}
+              className="px-3 py-1.5 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
+            >
+              {soundEnabled ? 'Sound: On' : 'Sound: Off'}
+            </button>
+          </div>
           <p className="text-sm text-[#2D2926]/60 mb-6">Enter a Moment Code to view the private content.</p>
           <div className="rounded-xl bg-white/60 border border-[#2D2926]/10 p-4 sm:p-6 shadow-sm">
             {!unlocked ? (
@@ -418,30 +545,44 @@ function UnlockPageContent() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {unlockMedia.map((item, index) => (
-                      <button
-                        type="button"
+                      <div
                         key={index}
-                        onClick={() => setSelectedMedia(index)}
-                        className="rounded-xl overflow-hidden border border-[#2D2926]/10 hover:border-[#2D2926]/30 transition-colors text-left"
+                        className="rounded-xl overflow-hidden border border-[#2D2926]/10 hover:border-[#2D2926]/30 transition-colors"
                       >
-                        {item.type === 'image' && <img src={item.url} alt="" className="w-full h-48 object-cover" />}
-                        {item.type === 'video' && (
-                          <div className="relative w-full h-48 bg-black/10">
-                            <video src={item.url} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center text-[#2D2926]">▶</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMedia(index)}
+                          className="w-full text-left"
+                        >
+                          {item.type === 'image' && <img src={item.url} alt="" className="w-full h-48 object-cover" />}
+                          {item.type === 'video' && (
+                            <div className="relative w-full h-48 bg-black/10">
+                              <video src={item.url} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center text-[#2D2926]">▶</span>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {item.type === 'audio' && (
-                          <div className="p-6 bg-[#2D2926]/5 flex items-center justify-center h-48">
-                            <audio src={item.url} controls className="w-full max-w-xs" />
-                          </div>
-                        )}
-                        {item.type === 'text' && (
-                          <div className="p-6 bg-[#2D2926]/5 h-48 flex items-center justify-center text-[#2D2926]/60">Text content</div>
-                        )}
-                      </button>
+                          )}
+                          {item.type === 'audio' && (
+                            <div className="p-6 bg-[#2D2926]/5 flex items-center justify-center h-48">
+                              <audio src={item.url} controls className="w-full max-w-xs" />
+                            </div>
+                          )}
+                          {item.type === 'text' && (
+                            <div className="p-6 bg-[#2D2926]/5 h-48 flex items-center justify-center text-[#2D2926]/60">Text content</div>
+                          )}
+                        </button>
+                        <div className="p-3 border-t border-[#2D2926]/10 flex justify-between items-center">
+                          <p className="text-xs text-[#2D2926]/60 capitalize">{item.type}</p>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadMedia(item.url, item.type, index)}
+                            className="px-3 py-1 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
+                          >
+                            Download
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -616,6 +757,22 @@ function UnlockPageContent() {
                 <button type="button" onClick={(e) => { e.stopPropagation(); navigateMedia('next'); }} className="absolute right-4 z-[60] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">→</button>
               </>
             )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (selectedMedia !== null && unlockMedia[selectedMedia]) {
+                  handleDownloadMedia(
+                    unlockMedia[selectedMedia].url,
+                    unlockMedia[selectedMedia].type,
+                    selectedMedia
+                  );
+                }
+              }}
+              className="absolute top-4 left-4 z-[60] px-3 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs"
+            >
+              Download
+            </button>
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} onClick={(e) => e.stopPropagation()} className="relative max-w-4xl w-full">
               {unlockMedia[selectedMedia].type === 'image' && (
                 <img src={unlockMedia[selectedMedia].url} alt="" className="max-w-full max-h-[85vh] object-contain rounded-lg mx-auto" />
