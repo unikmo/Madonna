@@ -60,6 +60,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (Array.isArray(momentCode.media) && momentCode.media.length > 0) {
+      return NextResponse.json(
+        {
+          error: 'Only one moment can be uploaded per key.',
+          reason: 'media_exists',
+          message:
+            'You can upload one moment at a time. Delete the existing file first to replace it.',
+        },
+        { status: 409 }
+      );
+    }
+
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
+import { deleteFromCloudinary } from '@/lib/cloudinary';
 
 export const runtime = 'nodejs';
 
@@ -51,6 +52,25 @@ export async function POST(request: NextRequest) {
             'This code has already been used. Please contact the UNIKMO team if you need assistance.',
         },
         { status: 400 }
+      );
+    }
+
+    if (Array.isArray(momentCode.media) && momentCode.media.length > 0) {
+      // Prevent orphan file if client already uploaded to Cloudinary.
+      try {
+        await deleteFromCloudinary(String(publicId));
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup extra Cloudinary file:', cleanupError);
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Only one moment can be uploaded per key.',
+          reason: 'media_exists',
+          message:
+            'You can upload one moment at a time. Delete the existing file first to replace it.',
+        },
+        { status: 409 }
       );
     }
 

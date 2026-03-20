@@ -25,6 +25,7 @@ type TierConfig = {
     sizeXPct: number;
     sizeYPct: number;
   };
+  qrBgColor: string; // hex without '#'
   // For converting bbox pixels (detected from original assets) into rendered px.
   // Email HTML sets the product image width to 520px on desktop.
   // These are used to compute QR px size that matches scaling.
@@ -34,24 +35,22 @@ type TierConfig = {
 const TIER_BY_COUNT: Record<1 | 4 | 7, TierConfig> = {
   1: {
     productImagePath: '/cardfrontunikmo.jpg',
-    qr: { leftPct: 47.239583333333336, topPct: 33.28703703703704, sizeXPct: 16.71875, sizeYPct: 30.0 },
+    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
+    qrBgColor: 'F6F4EA',
     // Detected from `/public/cardfrontunikmo.jpg` at threshold ~80.
     original: { imgW: 1920, qrW: 321, qrH: 324 },
   },
   4: {
-    productImagePath: '/cardfrontsite_staged.jpg',
-    qr: {
-      leftPct: 47.97794117647059,
-      topPct: 47.6063829787234,
-      sizeXPct: 16.470588235294116,
-      sizeYPct: 29.920212765957448,
-    },
+    productImagePath: '/cardfrontunikmo.jpg',
+    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
+    qrBgColor: 'F6F4EA',
     // Detected from `/public/cardfrontsite_staged.jpg` at threshold ~80.
     original: { imgW: 1360, qrW: 224, qrH: 225 },
   },
   7: {
-    productImagePath: '/cardfrontsite7.png',
-    qr: { leftPct: 58.7890625, topPct: 53.369140625, sizeXPct: 19.986979166666668, sizeYPct: 29.1015625 },
+    productImagePath: '/cardfrontunikmo.jpg',
+    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
+    qrBgColor: 'F6F4EA',
     // Detected from `/public/cardfrontsite7.png` at threshold ~80.
     original: { imgW: 1536, qrW: 307, qrH: 298 },
   },
@@ -71,6 +70,68 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
   const count = codes.length as Quantity | number;
   const tierCount = (count === 7 || count === 4 || count === 1 ? count : 1) as 1 | 4 | 7;
   const tier = TIER_BY_COUNT[tierCount];
+  const cardBlocksHtml = codes
+    .map((code, index) => {
+      const unlockUrlForCode = `${unlockBaseUrl}?code=${encodeURIComponent(code)}`;
+      const qrUrlForCode = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+        unlockUrlForCode
+      )}&bgcolor=${tier.qrBgColor}&color=2D2926`;
+
+      return `
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 16px auto 0; max-width: 520px; width: 100%;">
+          <tr>
+            <td style="padding: 0;">
+              ${
+                codes.length > 1
+                  ? `<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b08d57; font-weight: 600; margin: 0 0 8px 2px;">Card ${index + 1}</div>`
+                  : ''
+              }
+              <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid rgba(45,41,38,0.12);">
+                <img
+                  src="${safeBaseUrl}${tier.productImagePath}"
+                  width="520"
+                  alt="UNIKMO card"
+                  style="width: 100%; max-width: 520px; height: auto; display: block; border: 0;"
+                />
+                <img
+                  src="${qrUrlForCode}"
+                  width="92"
+                  alt="QR for ${code}"
+                  style="
+                    position: absolute;
+                    left: ${tier.qr.leftPct}%;
+                    top: ${tier.qr.topPct}%;
+                    width: ${tier.qr.sizeXPct}%;
+                    height: ${tier.qr.sizeYPct}%;
+                    transform: translate(-50%, -50%);
+                    border: 0;
+                    background: #${tier.qrBgColor};
+                  "
+                />
+                <div
+                  style="
+                    position: absolute;
+                    left: 49%;
+                    bottom: 14px;
+                    transform: translateX(-50%);
+                    background: rgba(253,249,245,0.9);
+                    border: 1px solid rgba(45,41,38,0.2);
+                    border-radius: 999px;
+                    padding: 7px 12px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 13px;
+                    letter-spacing: 1.1px;
+                    color: #2D2926;
+                    white-space: nowrap;
+                  "
+                >${code}</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      `;
+    })
+    .join('');
 
   const html = `
   <!DOCTYPE html>
@@ -140,42 +201,7 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
           
           <div class="codes-section">
             <div class="codes-title">Your Digital Card</div>
-
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 18px auto 0; max-width: 520px; width: 100%;">
-              <tr>
-                <td align="center" style="position: relative; padding: 0; line-height: 0;">
-                  <img
-                    src="${safeBaseUrl}${tier.productImagePath}"
-                    width="520"
-                    alt="UNIKMO product"
-                    style="width: 100%; max-width: 520px; height: auto; display: block; border-radius: 14px; border: 0;"
-                  />
-                </td>
-              </tr>
-            </table>
-
-            <!-- Moment code(s) — separate block BELOW the image -->
-            <div class="code-item" style="margin-top: 22px;">
-              <div class="code-label" style="margin-bottom: 14px;">Your moment code${codes.length > 1 ? 's' : ''}</div>
-              ${codes
-                .map((code, index) => {
-                  return `
-                    <div style="margin: 14px 0 0 0;">
-                      ${
-                        codes.length > 1
-                          ? `<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b08d57; font-weight: 600; margin-bottom: 8px;">Card ${index + 1}</div>`
-                          : ''
-                      }
-                      <div class="code-value" style="font-size: 20px;">${code}</div>
-                    </div>
-                  `;
-                })
-                .join('')}
-              
-              <div style="margin-top: 12px; font-size: 12px; color: #2D2926; opacity: 0.65; line-height: 1.5;">
-                Scan the QR on the card above — it opens your unlock page. Your code is listed here only (not printed on the card image).
-              </div>
-            </div>
+            ${cardBlocksHtml}
           </div>
 
           <div class="divider"></div>

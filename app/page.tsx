@@ -35,7 +35,6 @@ export default function LandingPage() {
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
         <SocialProof />
-        <BrandStory />
         <FinalCta onCreateMomentClick={() => setShowCreateMomentModal(true)} />
         <RootedInReality />
       </main>
@@ -211,7 +210,7 @@ const heroTrustItems = [
   { label: 'No app required', icon: <IconSpark /> },
   { label: 'No login', icon: <IconLock /> },
   { label: 'Private & secure', icon: <IconShield /> },
-  { label: 'One code = one memory', icon: <IconCode /> },
+  { label: 'One key = one memory', icon: <IconKey /> },
   { label: 'A tree planted', icon: <IconLeaf /> },
 ];
 
@@ -1105,54 +1104,6 @@ function SocialProof() {
   );
 }
 
-function BrandStory() {
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.animate-on-scroll').forEach((el) => {
-              el.classList.add('opacity-100', 'translate-y-0');
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={sectionRef} className="py-16 sm:py-20 lg:py-24 xl:py-28 bg-[#F7F1EA]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <p className="text-[10px] sm:text-[11px] lg:text-[12px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[#2D2926]/40 font-medium animate-on-scroll opacity-0 translate-y-4 transition-all duration-1000">
-          Brand Story
-        </p>
-
-        <div className="mt-6 sm:mt-7 lg:mt-8 space-y-3 sm:space-y-4 animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-300">
-          <p className="font-serif text-[18px] sm:text-[22px] lg:text-[26px] xl:text-[30px] text-[#2D2926] leading-[1.4] font-light">
-            In a world of instant messages and disappearing content,
-            Unikmo was created to preserve what truly matters.
-          </p>
-          
-          <p className="text-[16px] sm:text-[18px] lg:text-[20px] xl:text-[22px] text-[#2D2926]/70 font-serif italic pt-2 sm:pt-3 lg:pt-4">
-            A voice. A memory. A moment.
-          </p>
-        </div>
-
-        <div className="mt-10 sm:mt-11 lg:mt-12 animate-on-scroll opacity-0 transition-all duration-1000 delay-700" />
-      </div>
-    </section>
-  );
-}
-
 function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) {
   const sectionRef = useRef(null);
 
@@ -1178,10 +1129,12 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
   }, []);
 
   return (
-    <section ref={sectionRef} id="final-cta" className="py-10 sm:py-12 lg:py-14 xl:py-16 bg-[#FDF9F5]">
+    <section ref={sectionRef} id="final-cta" className="py-10 sm:py-12 lg:py-14 xl:py-16 bg-[#F7F1EA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center pt-6 sm:pt-8 lg:pt-10">
         <h2 className="font-serif text-[20px] sm:text-[24px] lg:text-[30px] xl:text-[36px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-          Give something they will keep forever.
+          A moment they&apos;ll never forget
+          <br />
+          and something that lasts beyond it.
         </h2>
 
         <div className="mt-6 sm:mt-7 lg:mt-8 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-300">
@@ -1203,21 +1156,9 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
 
 function RootedInReality() {
   return (
-    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-gradient-to-b from-[#FDF9F5] to-[#F7F1EA] text-center">
-      {/* Plant image — sticks to section bottom edge (no gap); text keeps normal padding */}
+    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-[#F7F1EA] text-center">
       <div className="pointer-events-none absolute -bottom-12 sm:-bottom-14 lg:-bottom-16 right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
         <Image src="/plant3.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto">
-          <h3 className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] text-[#2D2926] leading-[1.12] mb-4">
-            Rooted in Reality
-          </h3>
-          <div className="space-y-3 text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed text-[#2D2926]/75 font-light">
-            <p>For every key you hold, we plant a tree.</p>
-            <p>Preserving your memories — and the world they were made in.</p>
-          </div>
-        </div>
       </div>
     </section>
   );

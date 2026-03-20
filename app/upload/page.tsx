@@ -155,15 +155,10 @@ function UploadPageContent() {
 
       if (!isValid || uploading) return;
 
-      const files = Array.from(e.dataTransfer.files);
-      if (files.length > 0) {
-        cancelRequestedRef.current = false;
-        for (const file of files) {
-          if (cancelRequestedRef.current) break;
-          // eslint-disable-next-line no-await-in-loop
-          await uploadFile(file);
-        }
-      }
+      const file = e.dataTransfer.files?.[0];
+      if (!file) return;
+      cancelRequestedRef.current = false;
+      await uploadFile(file);
     },
     [isValid, uploading]
   );
@@ -171,15 +166,10 @@ function UploadPageContent() {
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.files || !isValid || uploading) return;
-      const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        cancelRequestedRef.current = false;
-        for (const file of files) {
-          if (cancelRequestedRef.current) break;
-          // eslint-disable-next-line no-await-in-loop
-          await uploadFile(file);
-        }
-      }
+      const file = e.target.files[0];
+      if (!file) return;
+      cancelRequestedRef.current = false;
+      await uploadFile(file);
       // Reset input
       e.target.value = '';
     },
@@ -204,6 +194,16 @@ function UploadPageContent() {
 
   const uploadFile = async (file: File) => {
     if (!code || !isValid) return;
+    if (media.length > 0) {
+      showMomentModal({
+        variant: 'gentle',
+        title: 'One key. One moment.',
+        message:
+          'You can upload one moment at a time. Delete the current file first if you want to replace it.',
+        emoji: '1️⃣✨',
+      });
+      return;
+    }
 
     setError(null);
 
@@ -319,6 +319,17 @@ function UploadPageContent() {
           });
           throw new Error(signData.error || 'Already unlocked');
         }
+        if (signData.reason === 'media_exists') {
+          showMomentModal({
+            variant: 'gentle',
+            title: 'One key. One moment.',
+            message:
+              signData.message ||
+              'You can upload one moment at a time. Delete the current file first to replace it.',
+            emoji: '1️⃣✨',
+          });
+          throw new Error(signData.error || 'One moment already exists');
+        }
         throw new Error(signData.error || 'Failed to initialize upload');
       }
 
@@ -386,6 +397,15 @@ function UploadPageContent() {
               'This code has already been used. Please contact the UNIKMO team if you need help.',
             emoji: '🔓💫',
           });
+        } else if (data.reason === 'media_exists') {
+          showMomentModal({
+            variant: 'gentle',
+            title: 'One key. One moment.',
+            message:
+              data.message ||
+              'You can upload one moment at a time. Delete the current file first to replace it.',
+            emoji: '1️⃣✨',
+          });
         }
         throw new Error(data.error || 'Upload failed');
       }
@@ -398,7 +418,7 @@ function UploadPageContent() {
         createdAt: new Date().toISOString(),
       };
 
-      setMedia((prev) => [newMedia, ...prev]);
+      setMedia([newMedia]);
       showMomentModal({
         variant: 'celebrate',
         title: `Beautiful, ${recipientName}!`,
@@ -503,7 +523,7 @@ function UploadPageContent() {
           className="rounded-2xl p-6 sm:p-8 border border-[#E3DAD0] bg-white shadow-sm"
         >
           <h1 className="text-3xl sm:text-4xl font-semibold text-[#2D2926] mb-2 font-serif">
-            Upload Your Moment
+            Upload your moment
           </h1>
           <p className="text-[#2D2926]/65 mb-8">Share your special moment with a secure code</p>
 
@@ -565,7 +585,6 @@ function UploadPageContent() {
                   className="hidden"
                   disabled={uploading || !isValid}
                   accept="image/*,video/*,audio/*"
-                  multiple
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <motion.div
@@ -588,13 +607,11 @@ function UploadPageContent() {
                     </svg>
                     <div>
                       <p className="text-xl font-semibold text-[#2D2926] mb-2">
-                        Drag and drop your file here
+                        Drag your moment here
                       </p>
-                      <p className="text-[#2D2926]/65">or click to browse</p>
+                      <p className="text-[#2D2926]/65">or click to upload</p>
                       <div className="text-sm text-[#2D2926]/55 mt-2 space-y-1">
-                        <p>Video: max 350 MB, 3 minutes</p>
-                        <p>Audio: max 40 MB</p>
-                        <p>Photo: max 40 MB</p>
+                        <p>Video, audio, or photo</p>
                       </div>
                     </div>
                   </motion.div>
@@ -641,7 +658,7 @@ function UploadPageContent() {
                     className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"
                   >
                     <p className="font-semibold text-base">Thank you, {recipientName}. ✨</p>
-                    <p className="mt-2">Your moment is now complete.</p>
+                    <p className="mt-2">One key. One moment.</p>
                     <p className="mt-2">Share the card or your Unik Key with someone dear.</p>
                     <p className="mt-2">
                       They will open it at <a href="https://unikmo.com/unlock" className="underline">unikmo.com/unlock</a>.
@@ -731,7 +748,7 @@ function UploadPageContent() {
                 </div>
               ) : (
                 <div className="text-center py-12 text-[#2D2926]/55">
-                  <p>No media uploaded yet. Upload your file above.</p>
+                  <p>Nothing here yet. This is where your moment begins.</p>
                 </div>
               )}
             </motion.div>
