@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     const source = (searchParams.get('source') || '').trim();
 
     const query: Record<string, any> = {};
-    if (source === 'admin' || source === 'webhook') {
+    if (source === 'admin' || source === 'webhook' || source === 'waitlist') {
       query.source = source;
     }
     if (search) {

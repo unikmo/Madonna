@@ -2,10 +2,27 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { WAITLIST_COPY_DEFAULTS } from '@/lib/waitlist-copy-defaults';
+import {
+  AnimatedMomentModal,
+  type AnimatedMomentModalVariant,
+} from '@/components/AnimatedMomentModal';
+
+type PublicSiteConfig = {
+  sellingEnabled: boolean;
+  waitlistHeadline: string;
+  waitlistSubline1: string;
+  waitlistSubline2: string;
+  waitlistSupportingLine: string;
+  waitlistEmailPlaceholder: string;
+  waitlistNamePlaceholder: string;
+  waitlistCtaLabel: string;
+};
 
 export default function LandingPage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
+  const [siteConfig, setSiteConfig] = useState<PublicSiteConfig | null>(null);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -22,20 +39,39 @@ export default function LandingPage() {
     return () => window.removeEventListener('hashchange', openIfHash);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/public/site-config')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => (d ? setSiteConfig(d as PublicSiteConfig) : setSiteConfig(null)))
+      .catch(() => setSiteConfig(null));
+  }, []);
+
+  const waitlistMode = Boolean(siteConfig && siteConfig.sellingEnabled === false);
+
+  const handleCreateMomentClick = () => {
+    setShowCreateMomentModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#FDF9F5] text-[#1E1B18]">
       <SiteHeader onContactClick={() => setShowContactModal(true)} onHowItWorksClick={() => setShowHowItWorksModal(true)} />
 
       <main>
         <Hero />
-        <TrustBullets />
+        <HeroTrustStrip />
+        <WhenToUseUnikmo />
         <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
       {/*  <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
-        <StoryIn showCreateMomentModal={showCreateMomentModal} setShowCreateMomentModal={setShowCreateMomentModal} />
+        <StoryIn
+          showCreateMomentModal={showCreateMomentModal}
+          setShowCreateMomentModal={setShowCreateMomentModal}
+          waitlistMode={waitlistMode}
+          siteConfig={siteConfig}
+        />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
         <SocialProof />
-        <FinalCta onCreateMomentClick={() => setShowCreateMomentModal(true)} />
+        <FinalCta onCreateMomentClick={handleCreateMomentClick} />
         <RootedInReality />
       </main>
 
@@ -138,6 +174,15 @@ function SiteHeader({
     </header>
   );
 }
+
+const heroTrustItems = [
+  { label: 'No app required', icon: <IconSpark /> },
+  { label: 'No login', icon: <IconLock /> },
+  { label: 'Private & secure', icon: <IconShield /> },
+  { label: 'One key = one memory', icon: <IconKey /> },
+  { label: 'A tree planted', icon: <IconLeaf /> },
+];
+
 function Hero() {
   const heroRef = useRef(null);
 
@@ -161,44 +206,58 @@ function Hero() {
   }, []);
 
   return (
-    /* 1. min-h remove kar di hai taake section image ke mutabiq shrink ho sake */
-    <section 
+    <section
+      id="top"
       ref={heroRef}
-      className="relative flex items-center overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#FDF9F5]"
+      className="relative overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#F5EEED]"
     >
-      {/* Background: same as How it works section (no image) */}
-      <div className="absolute inset-0 z-0 bg-[#EFE8E5]" />
-
-      <div className="relative z-10 w-full">
+      {/* Main hero: image + copy — balanced columns, image fills frame */}
+      <div className="relative z-10 w-full pt-8 pb-2 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-6">
         <Container>
-          {/* 2. items-stretch use kiya hai taake columns ki height barabar rahe */}
-          <div className="flex flex-col lg:grid lg:grid-cols-2 items-stretch">
-            
-            {/* Left Side: Image Container */}
-            <div className="flex justify-center lg:justify-start items-end">
-              <div className="relative w-[90%] sm:w-[80%] lg:w-[115%] xl:w-[125%] aspect-[16/11] lg:-ml-4 xl:-ml-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 xl:gap-16 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
+            <div className="flex justify-center lg:justify-start w-full">
+              <div className="relative w-full max-w-[540px] lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
                 <Image
-                  src="/heroimage.png"
-                  alt="Unikmo Card in Hand"
+                  src="/bannerImageLanding.jpeg"
+                  alt="A meaningful moment on her phone"
                   fill
                   priority
-                  className="!max-w-none !w-[110%] !left-1/2 !-translate-x-1/2 object-contain"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover object-[center_25%]"
                 />
               </div>
             </div>
 
-            {/* Right Side: Text Content */}
-            {/* 4. py-12 ya py-16 ko adjust kar ke aap top/bottom spacing control kar sakte hain */}
-            <div className="flex flex-col justify-center py-10 lg:py-16 px-4 lg:px-8 xl:px-12 text-center lg:text-left">
+            <div className="flex flex-col justify-center text-center lg:text-left px-1 sm:px-2 lg:px-4 xl:pr-8">
+              {/* 1. Headline */}
               <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
-                Not Just a gift. A Moment.
+                You can&apos;t be there when it matters most.
               </h1>
-              
-              <div className="mt-4 sm:mt-6 lg:mt-8 space-y-1 text-[14px] sm:text-[16px] lg:text-[18px] xl:text-[19px] text-[#2D2926]/85 font-light leading-relaxed tracking-wide">
-                <p>A card that opens a private video, voice message, or memory — anytime, anywhere.</p>
+
+              {/* 2. Subline */}
+              <p className="mt-4 sm:mt-6 lg:mt-8 text-[15px] sm:text-[17px] lg:text-[19px] xl:text-[20px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
+                But you can still give them something they&apos;ll never forget.
+              </p>
+
+              {/* 3. Supporting text */}
+              <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[14px] sm:text-[16px] lg:text-[18px] xl:text-[19px] text-[#2D2926]/85 font-light leading-relaxed tracking-wide">
+                <p>He couldn&apos;t be there.</p>
+                <p>So he sent something she&apos;d never forget.</p>
+              </div>
+
+              {/* 4. CTA + 5. subtext */}
+              <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-2.5">
+                <a
+                  href="#shop"
+                  className="inline-flex items-center justify-center rounded-full bg-[#E9DCCF] hover:bg-[#DDD0C4] active:bg-[#D3C7BB] text-[#2D2926] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
+                >
+                  Create a moment they&apos;ll never forget
+                </a>
+                <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
+                  Limited first release — first 500 people
+                </p>
               </div>
             </div>
-
           </div>
         </Container>
       </div>
@@ -206,60 +265,67 @@ function Hero() {
   );
 }
 
-const heroTrustItems = [
-  { label: 'No app required', icon: <IconSpark /> },
-  { label: 'No login', icon: <IconLock /> },
-  { label: 'Private & secure', icon: <IconShield /> },
-  { label: 'One key = one memory', icon: <IconKey /> },
-  { label: 'A tree planted', icon: <IconLeaf /> },
-];
-
-const storyInEveryCardItems = [
-  { label: 'The', name: 'Spark', desc: '1 Card', sub: 'A small moment' },
-  { label: 'The', name: 'Journey', desc: '4 cards', sub: 'A collection of memories' },
-  { label: 'The', name: 'History', desc: '7 cards', sub: 'A story told over time' },
-];
-
-function TrustBullets() {
+/** Trust row — same blush as hero for one continuous top block */
+function HeroTrustStrip() {
   return (
-    <section className="py-8 sm:py-10 lg:py-12 bg-[#EFE8E5]">
+    <section
+      aria-label="Why Unikmo is simple"
+      className="border-t border-[#2D2926]/8 bg-[#F5EEED] py-10 sm:py-12 lg:py-14"
+    >
       <Container>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10">
           {heroTrustItems.map((item) => (
-            <div
-              key={item.label}
-              className="flex flex-col items-center text-center"
-            >
-              <div className="text-[#2D2926]/40 mb-2 sm:mb-3">
-                {item.icon}
-              </div>
+            <div key={item.label} className="flex flex-col items-center text-center">
+              <div className="text-[#2D2926]/40 mb-2 sm:mb-3">{item.icon}</div>
               <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
                 {item.label}
               </p>
             </div>
           ))}
         </div>
+      </Container>
+    </section>
+  );
+}
 
-        {/* A Story in every card — merged under trust bullets */}
-        {/* <div className="mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 lg:pt-14 border-t border-[#2D2926]/10">
-          <h2 className="text-center font-serif text-[22px] sm:text-[28px] lg:text-[34px] xl:text-[38px] text-[#2D2926] tracking-tight mb-8 sm:mb-10 lg:mb-12">
-            A Story in every card
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 xl:gap-8">
-            {storyInEveryCardItems.map((p, index) => (
-              <div
-                key={p.name}
-                className="rounded-xl sm:rounded-2xl bg-white/70 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 text-center shadow-[0_10px_40px_rgba(0,0,0,0.04)] group hover:bg-white/90 hover:shadow-xl transition-all duration-300"
-              >
-                <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 font-medium mb-1">{p.label}</p>
-                <p className="font-serif text-[20px] sm:text-[24px] lg:text-[28px] xl:text-[30px] text-[#2D2926] leading-none mb-2">{p.name}</p>
-                <p className="text-[11px] sm:text-[12px] lg:text-[13px] text-[#2D2926]/50 mb-4 sm:mb-5 lg:mb-6">{p.desc}</p>
-                <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-[#2D2926]/60 font-light italic">{p.sub}</p>
-                <span className="inline-block mt-4 text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 font-medium group-hover:text-[#2D2926]/60 transition-colors">Discover →</span>
-              </div>
-            ))}
-          </div>
-        </div> */}
+const whenToUseUnikmoLines = [
+  "When you can't be there",
+  'When it really matters',
+  'When you have something to say',
+  "When a message isn't enough",
+  'When you want them to feel it',
+  'When it should last',
+] as const;
+
+function WhenToUseUnikmo() {
+  return (
+    <section
+      aria-labelledby="when-to-use-unikmo-heading"
+      className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6"
+    >
+      <Container>
+        <h2
+          id="when-to-use-unikmo-heading"
+          className="font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14"
+        >
+          Moments that words can&apos;t hold
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 lg:gap-x-20 gap-y-5 sm:gap-y-6 max-w-4xl mx-auto">
+          {whenToUseUnikmoLines.map((line) => (
+            <div
+              key={line}
+              className="flex items-start gap-3 sm:gap-4 text-left border-b border-[#2D2926]/10 pb-4 sm:pb-5 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
+            >
+              <span
+                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D2926]/35"
+                aria-hidden
+              />
+              <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
+                {line}
+              </p>
+            </div>
+          ))}
+        </div>
       </Container>
     </section>
   );
@@ -280,9 +346,16 @@ type Product = {
 type StoryInProps = {
   showCreateMomentModal: boolean;
   setShowCreateMomentModal: (v: boolean) => void;
+  waitlistMode: boolean;
+  siteConfig: PublicSiteConfig | null;
 };
 
-function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInProps) {
+function StoryIn({
+  showCreateMomentModal,
+  setShowCreateMomentModal,
+  waitlistMode,
+  siteConfig,
+}: StoryInProps) {
   const sectionRef = useRef(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [storeDomain, setStoreDomain] = useState('');
@@ -374,7 +447,7 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
   });
 
   return (
-    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#EFE8E5]">
+    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#FEF9F5]">
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
@@ -398,7 +471,16 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
                   <button
                     type="button"
                     key={i.product.id}
-                    onClick={() => setSelectedProduct({ product: i.product, subtitle: i.subtitle, img: i.img, imageAlt: i.imageAlt, displayTitle: i.displayTitle, isFirstImage: idx === 0 })}
+                    onClick={() =>
+                      setSelectedProduct({
+                        product: i.product,
+                        subtitle: i.subtitle,
+                        img: i.img,
+                        imageAlt: i.imageAlt,
+                        displayTitle: i.displayTitle,
+                        isFirstImage: idx === 0,
+                      })
+                    }
                     className={`text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 ${
                       productsRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                     }`}
@@ -463,6 +545,8 @@ function StoryIn({ showCreateMomentModal, setShowCreateMomentModal }: StoryInPro
         <ProductModal
           selected={selectedProduct}
           storeDomain={storeDomain}
+          waitlistMode={waitlistMode}
+          waitlistConfig={siteConfig}
           onClose={() => setSelectedProduct(null)}
         />
       )}
@@ -549,18 +633,243 @@ function CreateMomentModal({
   );
 }
 
+function WaitlistModal({
+  config,
+  onClose,
+}: {
+  config: PublicSiteConfig;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [done, setDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmedName) {
+      setError('Please enter your name');
+      return;
+    }
+    if (!trimmedEmail || !emailRe.test(trimmedEmail)) {
+      setError('Please enter a valid email');
+      return;
+    }
+    setError('');
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/public/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Something went wrong');
+        return;
+      }
+      setDone(true);
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="waitlist-modal-title"
+    >
+      <div
+        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-end mb-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors"
+              aria-label="Close"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {done ? (
+            <div className="text-center py-6">
+              <p className="font-serif text-[22px] text-[#2D2926] mb-3">You&apos;re on the list</p>
+              <p className="text-sm text-[#2D2926]/65 mb-6">
+                We&apos;ll be in touch when it&apos;s your turn.
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full bg-[#2D2926] text-white px-8 py-3 text-xs font-semibold tracking-[0.15em] uppercase"
+              >
+                Close
+              </button>
+            </div>
+          ) : (
+            <>
+              <h2
+                id="waitlist-modal-title"
+                className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center leading-snug mb-3"
+              >
+                {config.waitlistHeadline}
+              </h2>
+              <p className="text-center text-[15px] sm:text-[16px] text-[#2D2926]/75 leading-relaxed mb-1">
+                {config.waitlistSubline1}
+              </p>
+              <p className="text-center text-[15px] sm:text-[16px] text-[#2D2926]/75 leading-relaxed mb-4">
+                {config.waitlistSubline2}
+              </p>
+              <p className="text-center text-xs sm:text-sm text-[#2D2926]/55 mb-8">
+                {config.waitlistSupportingLine}
+              </p>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label htmlFor="waitlist-name" className="block text-sm font-medium text-[#2D2926] mb-1">
+                    Name <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    id="waitlist-name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setError('');
+                    }}
+                    placeholder={config.waitlistNamePlaceholder}
+                    autoComplete="name"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#2D2926]/15 text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="waitlist-email" className="block text-sm font-medium text-[#2D2926] mb-1">
+                    Email <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    id="waitlist-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError('');
+                    }}
+                    placeholder={config.waitlistEmailPlaceholder}
+                    autoComplete="email"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#2D2926]/15 text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+                  />
+                </div>
+                {error && <p className="text-red-600 text-sm">{error}</p>}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50"
+              >
+                {submitting ? 'Please wait…' : config.waitlistCtaLabel}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProductModal({
   selected,
   storeDomain,
+  waitlistMode,
+  waitlistConfig,
   onClose,
 }: {
   selected: { product: Product; subtitle: string; img: string; imageAlt: string; displayTitle: string; isFirstImage?: boolean };
   storeDomain: string;
+  waitlistMode: boolean;
+  waitlistConfig: PublicSiteConfig | null;
   onClose: () => void;
 }) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [deliveryType, setDeliveryType] = useState<'physical' | 'digital'>('physical');
+  const [submitting, setSubmitting] = useState(false);
+  const [waitlistMomentModal, setWaitlistMomentModal] = useState<{
+    open: boolean;
+    variant: AnimatedMomentModalVariant;
+    title: string;
+    message: string;
+    emoji: string;
+    confirmLabel?: string;
+  }>({
+    open: false,
+    variant: 'celebrate',
+    title: '',
+    message: '',
+    emoji: '',
+  });
+  const [liveWaitlistCopy, setLiveWaitlistCopy] = useState<PublicSiteConfig | null>(null);
+
+  const wc = {
+    ...WAITLIST_COPY_DEFAULTS,
+    ...(waitlistConfig
+      ? {
+          waitlistHeadline: waitlistConfig.waitlistHeadline,
+          waitlistSubline1: waitlistConfig.waitlistSubline1,
+          waitlistSubline2: waitlistConfig.waitlistSubline2,
+          waitlistSupportingLine: waitlistConfig.waitlistSupportingLine,
+          waitlistEmailPlaceholder: waitlistConfig.waitlistEmailPlaceholder,
+          waitlistNamePlaceholder: waitlistConfig.waitlistNamePlaceholder,
+          waitlistCtaLabel: waitlistConfig.waitlistCtaLabel,
+        }
+      : {}),
+    ...(liveWaitlistCopy
+      ? {
+          waitlistHeadline: liveWaitlistCopy.waitlistHeadline,
+          waitlistSubline1: liveWaitlistCopy.waitlistSubline1,
+          waitlistSubline2: liveWaitlistCopy.waitlistSubline2,
+          waitlistSupportingLine: liveWaitlistCopy.waitlistSupportingLine,
+          waitlistEmailPlaceholder: liveWaitlistCopy.waitlistEmailPlaceholder,
+          waitlistNamePlaceholder: liveWaitlistCopy.waitlistNamePlaceholder,
+          waitlistCtaLabel: liveWaitlistCopy.waitlistCtaLabel,
+        }
+      : {}),
+  };
+
+  useEffect(() => {
+    if (!waitlistMode) {
+      setLiveWaitlistCopy(null);
+      return;
+    }
+    let cancelled = false;
+    fetch('/api/public/site-config')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && data.sellingEnabled === false) {
+          setLiveWaitlistCopy(data as PublicSiteConfig);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [waitlistMode]);
+
   const product = selected.product;
   const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
   const isFirstImage = selected.isFirstImage ?? false;
@@ -580,9 +889,14 @@ function ProductModal({
     return chosen?.id || product.variantId;
   };
 
-  const handleBuyNow = () => {
-    const trimmed = email.trim();
+  const handleBuyNow = async () => {
+    const trimmedName = name.trim();
+    const trimmed = email.trim().toLowerCase();
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (waitlistMode && !trimmedName) {
+      setEmailError('Name is required');
+      return;
+    }
     if (!trimmed) {
       setEmailError('Email is required');
       return;
@@ -592,6 +906,54 @@ function ProductModal({
       return;
     }
     setEmailError('');
+
+    if (waitlistMode) {
+      setSubmitting(true);
+      try {
+        const latestConfigRes = await fetch('/api/public/site-config');
+        const latestConfig = latestConfigRes.ok ? await latestConfigRes.json() : null;
+        if (!latestConfig || latestConfig.sellingEnabled !== false) {
+          setEmailError('Selling has been re-enabled. Please continue with checkout.');
+          setSubmitting(false);
+          return;
+        }
+
+        const res = await fetch('/api/public/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: trimmedName,
+            email: trimmed,
+            deliveryType,
+            productId: product.id,
+            productTitle: selected.displayTitle,
+            quantity: keyCount,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setEmailError(typeof data.error === 'string' ? data.error : 'Failed to save your request');
+          return;
+        }
+        setWaitlistMomentModal({
+          open: true,
+          variant: 'celebrate',
+          title: "You're on the list",
+          message:
+            data.emailSent === true
+              ? 'Your spot is saved. Check your inbox for a confirmation email.'
+              : 'Your spot is saved. We could not send the confirmation email this time — you are still on the list.',
+          emoji: '✨',
+          confirmLabel: 'Okay',
+        });
+      } catch {
+        setEmailError('Network error. Please try again.');
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     const chosenVariantId = getVariantIdForDelivery();
     if (storeDomain && chosenVariantId) {
       const params = new URLSearchParams();
@@ -606,6 +968,7 @@ function ProductModal({
   };
 
   return (
+    <>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
       onClick={onClose}
@@ -629,6 +992,21 @@ function ProductModal({
               </svg>
             </button>
           </div>
+          {waitlistMode && (
+            <div className="mb-6 rounded-2xl bg-[#F7F1EA] border border-[#2D2926]/10 px-4 py-5 sm:px-6 sm:py-6 text-center">
+              <h2 className="font-serif text-[20px] sm:text-[24px] text-[#2D2926] leading-snug mb-3">
+                {wc.waitlistHeadline}
+              </h2>
+              <p className="text-[15px] sm:text-[16px] text-[#2D2926]/80 leading-relaxed mb-1">
+                {wc.waitlistSubline1}
+              </p>
+              <p className="text-[15px] sm:text-[16px] text-[#2D2926]/80 leading-relaxed mb-3">
+                {wc.waitlistSubline2}
+              </p>
+              <p className="text-xs sm:text-sm text-[#2D2926]/60 leading-relaxed">{wc.waitlistSupportingLine}</p>
+            </div>
+          )}
+
           <div className="relative aspect-[3/2] w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] mx-auto rounded-xl overflow-hidden mb-6 bg-[#E8E4DF] shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
             <Image
               src={selected.img}
@@ -638,10 +1016,22 @@ function ProductModal({
               sizes="(max-width: 640px) 460px, (max-width: 1024px) 500px, 560px"
             />
           </div>
-          <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
-            {selected.displayTitle}
-          </h3>
-          <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
+          {waitlistMode ? (
+            <div className="mb-5 text-center">
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/45 font-medium mb-1">
+                Your selection
+              </p>
+              <h3 className="font-serif text-[20px] sm:text-[22px] text-[#2D2926]">{selected.displayTitle}</h3>
+              <p className="text-[#2D2926]/55 text-sm mt-1">{selected.subtitle}</p>
+            </div>
+          ) : (
+            <>
+              <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
+                {selected.displayTitle}
+              </h3>
+              <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
+            </>
+          )}
 
           <div className="mb-6">
             <p className="text-sm font-medium text-[#2D2926] mb-2">How do you want to receive it?</p>
@@ -680,6 +1070,21 @@ function ProductModal({
             </div>
           </div>
 
+          {waitlistMode && (
+            <div className="space-y-2 mb-4">
+              <label htmlFor="product-modal-name" className="block text-sm font-medium text-[#2D2926]">
+                Name <span className="text-red-600">*</span>
+              </label>
+              <input
+                id="product-modal-name"
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setEmailError(''); }}
+                placeholder={wc.waitlistNamePlaceholder}
+                className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
+              />
+            </div>
+          )}
 
           <div className="space-y-2 mb-6">
             <label htmlFor="product-modal-email" className="block text-sm font-medium text-[#2D2926]">
@@ -690,7 +1095,7 @@ function ProductModal({
               type="email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
-              placeholder="your@email.com"
+              placeholder={wc.waitlistEmailPlaceholder}
               className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
             />
             {emailError && <p className="text-red-600 text-xs">{emailError}</p>}
@@ -699,12 +1104,20 @@ function ProductModal({
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={!storeDomain || !getVariantIdForDelivery()}
+            disabled={
+              submitting ||
+              (waitlistMode && waitlistMomentModal.open) ||
+              (!waitlistMode && (!storeDomain || !getVariantIdForDelivery()))
+            }
             className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Buy now
+            {submitting
+              ? 'Please wait...'
+              : waitlistMode
+                ? wc.waitlistCtaLabel
+                : 'Buy now'}
           </button>
-          {(!storeDomain || !getVariantIdForDelivery()) && (
+          {!waitlistMode && (!storeDomain || !getVariantIdForDelivery()) && (
             <p className="text-center text-amber-700 text-xs mt-3">
               {!storeDomain ? 'Store not configured. Set Shopify credentials in admin.' : 'Product variant not available for this option.'}
             </p>
@@ -712,6 +1125,21 @@ function ProductModal({
         </div>
       </div>
     </div>
+    {waitlistMode && (
+      <AnimatedMomentModal
+        open={waitlistMomentModal.open}
+        onClose={() => {
+          setWaitlistMomentModal((m) => ({ ...m, open: false }));
+          onClose();
+        }}
+        variant={waitlistMomentModal.variant}
+        title={waitlistMomentModal.title}
+        message={waitlistMomentModal.message}
+        emoji={waitlistMomentModal.emoji}
+        confirmLabel={waitlistMomentModal.confirmLabel}
+      />
+    )}
+    </>
   );
 }
 
@@ -852,7 +1280,7 @@ function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   const sectionRef = useRef(null);
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-[#FEF9F5]">
+    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-[#EFE8E5] border-t border-[#2D2926]/6">
       <Container>
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
@@ -1048,6 +1476,25 @@ function StoryInEveryKey() {
   );
 }
 
+const TESTIMONIALS = [
+  {
+    quote:
+      'I gave this to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.',
+    name: 'Matt L., London',
+    imageSrc: '/testimonials/customer-london.jpg',
+    imageAlt: 'Matt, customer in London, smiling with his phone',
+    imagePosition: 'start' as const,
+  },
+  {
+    quote:
+      "Such a simple idea, yet incredibly powerful. The moment we unlocked the message together, it became something we'll remember forever.",
+    name: 'Sophie M., New York',
+    imageSrc: '/testimonials/customer-newyork.jpg',
+    imageAlt: 'Sophie, customer in New York',
+    imagePosition: 'end' as const,
+  },
+];
+
 function SocialProof() {
   const sectionRef = useRef(null);
 
@@ -1073,30 +1520,122 @@ function SocialProof() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#FDF9F5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center py-10 sm:py-12 lg:py-16">
-          <h2 className="font-serif text-[24px] sm:text-[30px] lg:text-[36px] xl:text-[42px] text-[#2D2926] leading-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000">
+    <section
+      ref={sectionRef}
+      aria-labelledby="testimonials-heading"
+      className="relative py-14 sm:py-16 lg:py-20 xl:py-24 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07] overflow-hidden"
+    >
+      {/* Soft vignette for depth */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,252,248,0.45)_0%,transparent_55%)]"
+        aria-hidden
+      />
+
+      <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10">
+        <header className="text-center max-w-2xl mx-auto mb-11 sm:mb-14 lg:mb-16">
+          <p className="animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#2D2926]/45 font-medium mb-4">
+            From people who&apos;ve sent a moment
+          </p>
+          <h2
+            id="testimonials-heading"
+            className="font-serif text-[26px] sm:text-[32px] lg:text-[38px] xl:text-[44px] text-[#2D2926] leading-[1.15] tracking-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-75"
+          >
             Moments people never forget
           </h2>
+          <div
+            className="mt-6 mx-auto h-px w-12 bg-[#2D2926]/20 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-200"
+            aria-hidden
+          />
+        </header>
 
-          <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 max-w-4xl mx-auto">
-            <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-600">
-              <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/80 font-light leading-relaxed italic">
-                &ldquo;I gave this to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.&rdquo;
-              </p>
-              <footer className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/50 font-medium not-italic">
-                Matt L., London
-              </footer>
-            </blockquote>
-            <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-700">
-              <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/80 font-light leading-relaxed italic">
-                &ldquo;Such a simple idea, yet incredibly powerful. The moment we unlocked the message together, it became something we&apos;ll remember forever.&rdquo;
-              </p>
-              <footer className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/50 font-medium not-italic">
-                Daniel R., New York
-              </footer>
-            </blockquote>
+        {/* Mobile / tablet: editorial cards */}
+        <div className="lg:hidden space-y-6 sm:space-y-8 max-w-lg mx-auto pb-4">
+          {TESTIMONIALS.map((t, idx) => (
+            <figure
+              key={t.name}
+              className={`rounded-2xl bg-[#FFFCFA]/75 backdrop-blur-sm border border-[#2D2926]/[0.06] shadow-[0_2px_24px_rgba(45,41,38,0.06)] p-6 sm:p-7 animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ${
+                idx === 0 ? 'delay-150' : 'delay-300'
+              }`}
+            >
+              <div
+                className={`flex flex-row gap-5 sm:gap-6 items-start ${
+                  t.imagePosition === 'end' ? 'flex-row-reverse' : ''
+                }`}
+              >
+                <div className="relative shrink-0 w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(45,41,38,0.12)] ring-1 ring-[#2D2926]/[0.05]">
+                  <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover object-center" sizes="120px" />
+                </div>
+                <blockquote className="min-w-0 flex-1 text-left m-0 border-0 p-0">
+                  <p className="text-[15px] sm:text-[16px] text-[#2D2926]/82 font-light leading-[1.65] italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <footer className="mt-4 pt-4 border-t border-[#2D2926]/[0.07]">
+                    <cite className="not-italic text-[11px] sm:text-[12px] uppercase tracking-[0.14em] text-[#2D2926]/50 font-semibold">
+                      — {t.name}
+                    </cite>
+                  </footer>
+                </blockquote>
+              </div>
+            </figure>
+          ))}
+        </div>
+
+        {/* Desktop: photo | quote | quote | photo */}
+        <div className="hidden lg:grid lg:grid-cols-[minmax(0,200px)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,200px)] xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,220px)] lg:gap-x-10 xl:gap-x-14 gap-y-8 items-stretch pb-4">
+          <div className="relative aspect-[4/5] w-full max-w-[220px] mx-auto lg:mx-0 self-center rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(45,41,38,0.11)] ring-1 ring-[#2D2926]/[0.06] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-150">
+            <Image
+              src={TESTIMONIALS[0].imageSrc}
+              alt={TESTIMONIALS[0].imageAlt}
+              fill
+              className="object-cover object-[center_20%]"
+              sizes="220px"
+            />
+          </div>
+
+          <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-200 text-left m-0 flex flex-col justify-center pr-6 xl:pr-10 border-0 max-w-[28rem]">
+            <p className="text-[16px] xl:text-[17px] text-[#2D2926]/82 font-light leading-[1.7] italic relative pl-5">
+              <span
+                className="absolute left-0 top-0 font-serif text-[3.25rem] xl:text-[3.5rem] text-[#2D2926]/[0.11] leading-[0.85] select-none pointer-events-none"
+                aria-hidden
+              >
+                &ldquo;
+              </span>
+              <span className="relative z-[1]">{TESTIMONIALS[0].quote}</span>
+              <span className="font-serif text-[#2D2926]/[0.11] not-italic">&rdquo;</span>
+            </p>
+            <footer className="mt-6">
+              <cite className="not-italic text-[11px] uppercase tracking-[0.16em] text-[#2D2926]/50 font-semibold">
+                — {TESTIMONIALS[0].name}
+              </cite>
+            </footer>
+          </blockquote>
+
+          <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-300 text-left m-0 flex flex-col justify-center pl-6 xl:pl-10 border-0 max-w-[28rem] relative before:absolute before:left-0 before:top-[0.15rem] before:bottom-[0.15rem] before:w-px before:bg-gradient-to-b before:from-transparent before:via-[#2D2926]/12 before:to-transparent">
+            <p className="text-[16px] xl:text-[17px] text-[#2D2926]/82 font-light leading-[1.7] italic relative pl-5">
+              <span
+                className="absolute left-0 top-0 font-serif text-[3.25rem] xl:text-[3.5rem] text-[#2D2926]/[0.11] leading-[0.85] select-none pointer-events-none"
+                aria-hidden
+              >
+                &ldquo;
+              </span>
+              <span className="relative z-[1]">{TESTIMONIALS[1].quote}</span>
+              <span className="font-serif text-[#2D2926]/[0.11] not-italic">&rdquo;</span>
+            </p>
+            <footer className="mt-6">
+              <cite className="not-italic text-[11px] uppercase tracking-[0.16em] text-[#2D2926]/50 font-semibold">
+                — {TESTIMONIALS[1].name}
+              </cite>
+            </footer>
+          </blockquote>
+
+          <div className="relative aspect-[4/5] w-full max-w-[220px] mx-auto lg:mx-0 lg:ml-auto self-center rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(45,41,38,0.11)] ring-1 ring-[#2D2926]/[0.06] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-350">
+            <Image
+              src={TESTIMONIALS[1].imageSrc}
+              alt={TESTIMONIALS[1].imageAlt}
+              fill
+              className="object-cover object-[center_25%]"
+              sizes="220px"
+            />
           </div>
         </div>
       </div>
@@ -1156,7 +1695,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
 
 function RootedInReality() {
   return (
-    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-[#F7F1EA] text-center">
+    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-[#FDF9F5] border-t border-[#2D2926]/6 text-center">
       <div className="pointer-events-none absolute -bottom-12 sm:-bottom-14 lg:-bottom-16 right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
         <Image src="/plant3.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
       </div>

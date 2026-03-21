@@ -1,5 +1,5 @@
 import connectDB from './db';
-import AdminSettings from '@/models/AdminSettings';
+import { getLatestAdminSettingsLean } from '@/lib/admin-settings-store';
 
 /**
  * Returns the effective Shopify test mode flag.
@@ -12,7 +12,7 @@ export async function getEffectiveShopifyTestMode(): Promise<boolean> {
 
   try {
     await connectDB();
-    const settings = await AdminSettings.findOne().lean();
+    const settings = await getLatestAdminSettingsLean();
     if (settings && typeof settings.shopifyTestModeOverride === 'boolean') {
       return settings.shopifyTestModeOverride;
     }

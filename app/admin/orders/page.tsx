@@ -21,7 +21,7 @@ interface AdminOrder {
   customerName: string;
   totalPrice: number;
   currency: string;
-  source: 'admin' | 'webhook';
+  source: 'admin' | 'webhook' | 'waitlist';
   tags: string[];
   createdAt: string;
   totalCodes: number;
@@ -38,7 +38,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'admin' | 'webhook'>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'admin' | 'webhook' | 'waitlist'>('all');
   const [form, setForm] = useState({
     email: '',
     customerName: '',
@@ -368,12 +368,15 @@ export default function AdminOrdersPage() {
           />
           <select
             value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value as 'all' | 'admin' | 'webhook')}
+            onChange={(e) =>
+              setSourceFilter(e.target.value as 'all' | 'admin' | 'webhook' | 'waitlist')
+            }
             className="px-4 py-2.5 rounded-xl border border-[#D3C7BB] bg-white text-[#2D2926] text-sm focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
           >
             <option value="all">All sources</option>
             <option value="admin">Admin-created</option>
             <option value="webhook">Webhook</option>
+            <option value="waitlist">Waitlist</option>
           </select>
           <button
             type="button"

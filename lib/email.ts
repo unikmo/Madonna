@@ -1,5 +1,10 @@
 import nodemailer from 'nodemailer';
 import { buildMomentCodesEmailHtml } from './moment-code-email-html';
+import type { WaitlistCopyFields } from './waitlist-copy-defaults';
+import {
+  buildWaitlistConfirmationEmailHtml,
+  type WaitlistConfirmationDetails,
+} from './waitlist-confirmation-email-html';
 
 /**
  * Creates and configures Nodemailer transporter for SMTP fallback
@@ -133,6 +138,19 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 /**
  * Sends Moment Code(s) to buyer via email
  */
+/**
+ * Sends waitlist confirmation with the same marketing copy as Admin → Configs.
+ * Does not throw — returns false if all providers fail (signup should still succeed).
+ */
+export async function sendWaitlistConfirmationEmail(
+  to: string,
+  copy: WaitlistCopyFields,
+  details: WaitlistConfirmationDetails
+): Promise<boolean> {
+  const { html, subject } = buildWaitlistConfirmationEmailHtml(copy, details);
+  return sendEmail(to, subject, html);
+}
+
 export async function sendMomentCodesEmail(
   to: string,
   codes: string[],

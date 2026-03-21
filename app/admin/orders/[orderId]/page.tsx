@@ -11,7 +11,7 @@ interface OrderDetail {
   shopifyOrderName: string;
   email: string;
   customerName: string;
-  source: 'admin' | 'webhook';
+  source: 'admin' | 'webhook' | 'waitlist';
   tags: string[];
   totalPrice: number;
   currency: string;

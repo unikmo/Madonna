@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import AdminSettings from '@/models/AdminSettings';
+import { applyAdminSettingsPatch, getLatestAdminSettingsLean } from '@/lib/admin-settings-store';
 import { verifyToken } from '@/lib/auth';
 import { getEffectiveShopifyTestMode } from '@/lib/shopify-test-mode';
 
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const settings = await AdminSettings.findOne().lean();
+    const settings = await getLatestAdminSettingsLean();
     const envDefault = process.env.SHOPIFY_TEST_MODE === 'true';
     const effective = await getEffectiveShopifyTestMode();
 
@@ -39,14 +39,7 @@ export async function PUT(request: NextRequest) {
     const { override } = body as { override: boolean | null };
 
     await connectDB();
-    const settings = await AdminSettings.findOne();
-
-    if (settings) {
-      settings.shopifyTestModeOverride = override;
-      await settings.save();
-    } else {
-      await AdminSettings.create({ shopifyTestModeOverride: override });
-    }
+    await applyAdminSettingsPatch({ shopifyTestModeOverride: override });
 
     const envDefault = process.env.SHOPIFY_TEST_MODE === 'true';
     const effective = await getEffectiveShopifyTestMode();

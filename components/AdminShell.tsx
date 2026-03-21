@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin/buyers', label: 'Buyers', icon: BuyersIcon },
   { href: '/admin/orders', label: 'Orders', icon: OrdersIcon },
   { href: '/admin/codes', label: 'Codes', icon: CodesIcon },
+  { href: '/admin/configs', label: 'Configs', icon: ConfigsIcon },
   { href: '/admin/template-viewer', label: 'Templates', icon: TemplatesIcon },
   { href: '/admin/shopify', label: 'Shopify', icon: ShopifyIcon },
 ];
@@ -17,6 +18,7 @@ const TITLES: Record<string, string> = {
   '/admin/buyers': 'Buyers',
   '/admin/orders': 'Orders',
   '/admin/codes': 'Codes',
+  '/admin/configs': 'Configs',
   '/admin/template-viewer': 'Templates',
   '/admin/shopify': 'Shopify',
 };
@@ -72,6 +74,20 @@ function TemplatesIcon({ className }: { className?: string }) {
   );
 }
 
+function ConfigsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
 function ShopifyIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +133,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
           {NAV.map((item) => {
-            const active = pathname === item.href || (item.href !== '/admin/codes' && pathname.startsWith(item.href + '/'));
+            const active =
+              pathname === item.href ||
+              (item.href !== '/admin/codes' &&
+                item.href !== '/admin/configs' &&
+                pathname.startsWith(item.href + '/'));
             return (
               <Link
                 key={item.href}
