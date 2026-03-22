@@ -60,7 +60,7 @@ export default function LandingPage() {
         <Hero />
         <WhenToUseUnikmo />
         <SocialProof />
-        <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
+        <HowItWorks2 />
         {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
@@ -1278,12 +1278,9 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   );
 }
 
-function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
-  const sectionRef = useRef(null);
-
+function HowItWorks2() {
   return (
     <section
-      ref={sectionRef}
       id="how-it-works"
       className="py-12 sm:py-16 lg:py-20 bg-[#FDF9F5] border-t border-[#2D2926]/6"
     >
@@ -1293,32 +1290,11 @@ function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
             Simple as a key
           </h2>
           <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
-            ① Choose Your Key &nbsp;→&nbsp; ② Receive Key &nbsp;→&nbsp; ③ Upload Moment &nbsp;→&nbsp; ④ Share &nbsp;→&nbsp; ⑤ They Unlock
-            {onLearnMoreClick && (
-              <>
-                {' '}
-                <button
-                  type="button"
-                  onClick={onLearnMoreClick}
-                  className="font-semibold text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
-                >
-                  more
-                </button>
-              </>
-            )}
+            ① Choose Your Key &nbsp;→&nbsp; ② Upload Moment &nbsp;→&nbsp; ③ They Unlock
           </p>
-          <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed mb-6">
-            We never send codes to recipients. You decide who receives your moment.
+          <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed">
+            We never send the Key to the recipient — you stay in control.
           </p>
-          {onLearnMoreClick && (
-            <button
-              type="button"
-              onClick={onLearnMoreClick}
-              className="font-semibold text-[15px] sm:text-[16px] text-[#2D2926] underline underline-offset-2 hover:text-[#1E1B18] transition-colors"
-            >
-              Learn more
-            </button>
-          )}
         </div>
       </Container>
     </section>
@@ -1536,10 +1512,10 @@ function SocialProof() {
             id="testimonials-heading"
             className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] text-[#2D2926] leading-snug font-normal animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000"
           >
-            The kind of thing you remember long after.
+            Something they remember long after.
           </h2>
           <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-            A few people who&apos;ve already sent a moment — in their own words.
+          Real moments from people who&apos;ve sent one.
           </p>
         </header>
 
