@@ -58,10 +58,10 @@ export default function LandingPage() {
 
       <main>
         <Hero />
-        <HeroTrustStrip />
         <WhenToUseUnikmo />
+        <SocialProof />
         <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
-      {/*  <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
+        {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
           setShowCreateMomentModal={setShowCreateMomentModal}
@@ -70,9 +70,8 @@ export default function LandingPage() {
         />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
-        <SocialProof />
         <FinalCta onCreateMomentClick={handleCreateMomentClick} />
-        <RootedInReality />
+        <PreFooterTrustStrip />
       </main>
 
       <SiteFooter
@@ -175,12 +174,11 @@ function SiteHeader({
   );
 }
 
-const heroTrustItems = [
+const preFooterTrustItems = [
   { label: 'No app required', icon: <IconSpark /> },
   { label: 'No login', icon: <IconLock /> },
   { label: 'Private & secure', icon: <IconShield /> },
   { label: 'One key = one memory', icon: <IconKey /> },
-  { label: 'A tree planted', icon: <IconLeaf /> },
 ];
 
 function Hero() {
@@ -265,16 +263,16 @@ function Hero() {
   );
 }
 
-/** Trust row — same blush as hero for one continuous top block */
-function HeroTrustStrip() {
+/** Trust bullets — blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
+function PreFooterTrustStrip() {
   return (
     <section
       aria-label="Why Unikmo is simple"
-      className="border-t border-[#2D2926]/8 bg-[#F5EEED] py-10 sm:py-12 lg:py-14"
+      className="bg-[#F5EEED] pt-8 sm:pt-10 pb-10 sm:pb-12 lg:pb-14 border-0"
     >
       <Container>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10">
-          {heroTrustItems.map((item) => (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 max-w-5xl mx-auto">
+          {preFooterTrustItems.map((item) => (
             <div key={item.label} className="flex flex-col items-center text-center">
               <div className="text-[#2D2926]/40 mb-2 sm:mb-3">{item.icon}</div>
               <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
@@ -308,7 +306,7 @@ function WhenToUseUnikmo() {
           id="when-to-use-unikmo-heading"
           className="font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14"
         >
-          Moments that words can&apos;t hold
+          When words aren&apos;t enough
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 lg:gap-x-20 gap-y-5 sm:gap-y-6 max-w-4xl mx-auto">
           {whenToUseUnikmoLines.map((line) => (
@@ -447,7 +445,11 @@ function StoryIn({
   });
 
   return (
-    <section ref={sectionRef} id="shop" className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#FEF9F5]">
+    <section
+      ref={sectionRef}
+      id="shop"
+      className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#FEF9F5] border-t border-[#2D2926]/6"
+    >
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
@@ -1280,14 +1282,18 @@ function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   const sectionRef = useRef(null);
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-12 sm:py-14 lg:py-16 xl:py-20 bg-[#EFE8E5] border-t border-[#2D2926]/6">
+    <section
+      ref={sectionRef}
+      id="how-it-works"
+      className="py-12 sm:py-16 lg:py-20 bg-[#FDF9F5] border-t border-[#2D2926]/6"
+    >
       <Container>
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
-            How It Works
+            Simple as a key
           </h2>
           <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
-            ① Choose Your Key &nbsp;→&nbsp; ② Receive Code &nbsp;→&nbsp; ③ Upload Moment &nbsp;→&nbsp; ④ Share &nbsp;→&nbsp; ⑤ They Unlock
+            ① Choose Your Key &nbsp;→&nbsp; ② Receive Key &nbsp;→&nbsp; ③ Upload Moment &nbsp;→&nbsp; ④ Share &nbsp;→&nbsp; ⑤ They Unlock
             {onLearnMoreClick && (
               <>
                 {' '}
@@ -1483,7 +1489,6 @@ const TESTIMONIALS = [
     name: 'Matt L., London',
     imageSrc: '/testimonials/customer-london.jpg',
     imageAlt: 'Matt, customer in London, smiling with his phone',
-    imagePosition: 'start' as const,
   },
   {
     quote:
@@ -1491,7 +1496,6 @@ const TESTIMONIALS = [
     name: 'Sophie M., New York',
     imageSrc: '/testimonials/customer-newyork.jpg',
     imageAlt: 'Sophie, customer in New York',
-    imagePosition: 'end' as const,
   },
 ];
 
@@ -1523,121 +1527,48 @@ function SocialProof() {
     <section
       ref={sectionRef}
       aria-labelledby="testimonials-heading"
-      className="relative py-14 sm:py-16 lg:py-20 xl:py-24 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07] overflow-hidden"
+      className="relative py-12 sm:py-16 lg:py-20 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
     >
-      {/* Soft vignette for depth */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,252,248,0.45)_0%,transparent_55%)]"
-        aria-hidden
-      />
-
-      <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10">
-        <header className="text-center max-w-2xl mx-auto mb-11 sm:mb-14 lg:mb-16">
-          <p className="animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#2D2926]/45 font-medium mb-4">
-            From people who&apos;ve sent a moment
-          </p>
+      <div className="relative mx-auto max-w-xl px-5 sm:px-6 lg:max-w-2xl">
+        {/* One loose heading block — reads like a note, not a deck title */}
+        <header className="mb-12 sm:mb-14 lg:mb-16">
           <h2
             id="testimonials-heading"
-            className="font-serif text-[26px] sm:text-[32px] lg:text-[38px] xl:text-[44px] text-[#2D2926] leading-[1.15] tracking-tight animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-75"
+            className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] text-[#2D2926] leading-snug font-normal animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000"
           >
-            Moments people never forget
+            The kind of thing you remember long after.
           </h2>
-          <div
-            className="mt-6 mx-auto h-px w-12 bg-[#2D2926]/20 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-200"
-            aria-hidden
-          />
+          <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
+            A few people who&apos;ve already sent a moment — in their own words.
+          </p>
         </header>
 
-        {/* Mobile / tablet: editorial cards */}
-        <div className="lg:hidden space-y-6 sm:space-y-8 max-w-lg mx-auto pb-4">
+        {/* Single column: stacked stories, circular faces, no cards or grid */}
+        <ul className="space-y-12 sm:space-y-14 lg:space-y-16 list-none m-0 p-0">
           {TESTIMONIALS.map((t, idx) => (
-            <figure
+            <li
               key={t.name}
-              className={`rounded-2xl bg-[#FFFCFA]/75 backdrop-blur-sm border border-[#2D2926]/[0.06] shadow-[0_2px_24px_rgba(45,41,38,0.06)] p-6 sm:p-7 animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ${
-                idx === 0 ? 'delay-150' : 'delay-300'
+              className={`animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ${
+                idx === 0 ? 'delay-100' : 'delay-200'
               }`}
             >
-              <div
-                className={`flex flex-row gap-5 sm:gap-6 items-start ${
-                  t.imagePosition === 'end' ? 'flex-row-reverse' : ''
-                }`}
-              >
-                <div className="relative shrink-0 w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(45,41,38,0.12)] ring-1 ring-[#2D2926]/[0.05]">
-                  <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover object-center" sizes="120px" />
+              <div className="flex gap-4 sm:gap-5">
+                <div className="relative h-[52px] w-[52px] sm:h-[60px] sm:w-[60px] shrink-0 overflow-hidden rounded-full ring-2 ring-[#FDF9F5] shadow-[0_2px_12px_rgba(45,41,38,0.08)]">
+                  <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover" sizes="60px" />
                 </div>
-                <blockquote className="min-w-0 flex-1 text-left m-0 border-0 p-0">
-                  <p className="text-[15px] sm:text-[16px] text-[#2D2926]/82 font-light leading-[1.65] italic">
-                    &ldquo;{t.quote}&rdquo;
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/88 font-light leading-[1.65]">
+                    {t.quote}
                   </p>
-                  <footer className="mt-4 pt-4 border-t border-[#2D2926]/[0.07]">
-                    <cite className="not-italic text-[11px] sm:text-[12px] uppercase tracking-[0.14em] text-[#2D2926]/50 font-semibold">
-                      — {t.name}
-                    </cite>
-                  </footer>
-                </blockquote>
+                  <p className="mt-3 text-[13px] sm:text-[14px] text-[#2D2926]/50">{t.name}</p>
+                </div>
               </div>
-            </figure>
+              {idx < TESTIMONIALS.length - 1 ? (
+                <div className="mt-12 sm:mt-14 lg:mt-16 h-px w-full bg-[#2D2926]/[0.08]" aria-hidden />
+              ) : null}
+            </li>
           ))}
-        </div>
-
-        {/* Desktop: photo | quote | quote | photo */}
-        <div className="hidden lg:grid lg:grid-cols-[minmax(0,200px)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,200px)] xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,220px)] lg:gap-x-10 xl:gap-x-14 gap-y-8 items-stretch pb-4">
-          <div className="relative aspect-[4/5] w-full max-w-[220px] mx-auto lg:mx-0 self-center rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(45,41,38,0.11)] ring-1 ring-[#2D2926]/[0.06] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-150">
-            <Image
-              src={TESTIMONIALS[0].imageSrc}
-              alt={TESTIMONIALS[0].imageAlt}
-              fill
-              className="object-cover object-[center_20%]"
-              sizes="220px"
-            />
-          </div>
-
-          <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-200 text-left m-0 flex flex-col justify-center pr-6 xl:pr-10 border-0 max-w-[28rem]">
-            <p className="text-[16px] xl:text-[17px] text-[#2D2926]/82 font-light leading-[1.7] italic relative pl-5">
-              <span
-                className="absolute left-0 top-0 font-serif text-[3.25rem] xl:text-[3.5rem] text-[#2D2926]/[0.11] leading-[0.85] select-none pointer-events-none"
-                aria-hidden
-              >
-                &ldquo;
-              </span>
-              <span className="relative z-[1]">{TESTIMONIALS[0].quote}</span>
-              <span className="font-serif text-[#2D2926]/[0.11] not-italic">&rdquo;</span>
-            </p>
-            <footer className="mt-6">
-              <cite className="not-italic text-[11px] uppercase tracking-[0.16em] text-[#2D2926]/50 font-semibold">
-                — {TESTIMONIALS[0].name}
-              </cite>
-            </footer>
-          </blockquote>
-
-          <blockquote className="animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-300 text-left m-0 flex flex-col justify-center pl-6 xl:pl-10 border-0 max-w-[28rem] relative before:absolute before:left-0 before:top-[0.15rem] before:bottom-[0.15rem] before:w-px before:bg-gradient-to-b before:from-transparent before:via-[#2D2926]/12 before:to-transparent">
-            <p className="text-[16px] xl:text-[17px] text-[#2D2926]/82 font-light leading-[1.7] italic relative pl-5">
-              <span
-                className="absolute left-0 top-0 font-serif text-[3.25rem] xl:text-[3.5rem] text-[#2D2926]/[0.11] leading-[0.85] select-none pointer-events-none"
-                aria-hidden
-              >
-                &ldquo;
-              </span>
-              <span className="relative z-[1]">{TESTIMONIALS[1].quote}</span>
-              <span className="font-serif text-[#2D2926]/[0.11] not-italic">&rdquo;</span>
-            </p>
-            <footer className="mt-6">
-              <cite className="not-italic text-[11px] uppercase tracking-[0.16em] text-[#2D2926]/50 font-semibold">
-                — {TESTIMONIALS[1].name}
-              </cite>
-            </footer>
-          </blockquote>
-
-          <div className="relative aspect-[4/5] w-full max-w-[220px] mx-auto lg:mx-0 lg:ml-auto self-center rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(45,41,38,0.11)] ring-1 ring-[#2D2926]/[0.06] animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-350">
-            <Image
-              src={TESTIMONIALS[1].imageSrc}
-              alt={TESTIMONIALS[1].imageAlt}
-              fill
-              className="object-cover object-[center_25%]"
-              sizes="220px"
-            />
-          </div>
-        </div>
+        </ul>
       </div>
     </section>
   );
@@ -1668,36 +1599,28 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
   }, []);
 
   return (
-    <section ref={sectionRef} id="final-cta" className="py-10 sm:py-12 lg:py-14 xl:py-16 bg-[#F7F1EA]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center pt-6 sm:pt-8 lg:pt-10">
-        <h2 className="font-serif text-[20px] sm:text-[24px] lg:text-[30px] xl:text-[36px] text-[#2D2926] animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-          A moment they&apos;ll never forget
-          <br />
-          and something that lasts beyond it.
+    <section
+      ref={sectionRef}
+      id="final-cta"
+      className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#F5EEED] border-t border-[#2D2926]/[0.06]"
+    >
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center pt-2 sm:pt-4">
+        <h2 className="font-serif text-[28px] sm:text-[36px] lg:text-[44px] xl:text-[52px] leading-[1.08] text-[#2D2926] font-normal tracking-tight animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
+          Already have someone in mind?
         </h2>
 
-        <div className="mt-6 sm:mt-7 lg:mt-8 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-300">
+        <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2.5 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-200">
           <button
             type="button"
             onClick={onCreateMomentClick}
-            className="inline-flex items-center justify-center bg-[#2D2926] hover:bg-[#1a1816] text-white text-[12px] sm:text-[13px] lg:text-[14px] tracking-[0.15em] uppercase px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full transition-all duration-500 hover:scale-[1.02] shadow-[0_10px_30px_rgba(0,0,0,0.15)] group"
+            className="inline-flex items-center justify-center rounded-full bg-[#E9DCCF] hover:bg-[#DDD0C4] active:bg-[#D3C7BB] text-[#2D2926] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
           >
-            Create Your Moment
-            <span className="ml-2 group-hover:translate-x-1 transition-transform duration-300">→</span>
+            Join the first release
           </button>
+          <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
+            Limited to the first 500 moments
+          </p>
         </div>
-
-        <div className="mt-8 sm:mt-10 lg:mt-12" />
-      </div>
-    </section>
-  );
-}
-
-function RootedInReality() {
-  return (
-    <section className="relative overflow-hidden py-12 sm:py-14 lg:py-16 bg-[#FDF9F5] border-t border-[#2D2926]/6 text-center">
-      <div className="pointer-events-none absolute -bottom-12 sm:-bottom-14 lg:-bottom-16 right-0 z-10 h-[280px] w-[180px] sm:h-[380px] sm:w-[230px] lg:h-[480px] lg:w-[330px] xl:h-[580px] xl:w-[430px] overflow-hidden opacity-60 lg:opacity-80">
-        <Image src="/plant3.png" alt="" fill className="object-contain object-right-bottom" sizes="500px" />
       </div>
     </section>
   );
@@ -1919,10 +1842,23 @@ function SiteFooter({
   onImprintClick: () => void;
 }) {
   return (
-    <footer className="bg-[#FDF9F5] py-6 sm:py-8 lg:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="mb-6 sm:mb-8" />
+    <footer className="bg-[#FDF9F5] border-t border-[#2D2926]/[0.07]">
+      {/* Tree = footer hero / accent — only this + links are footer; trust strip stays in <main> above */}
+      <div className="bg-[#FDF9F5] pt-0 pb-0 leading-[0]" aria-hidden>
+        <div className="max-w-7xl mx-auto flex justify-center sm:justify-end pr-0 sm:pr-4 md:pr-6">
+          <Image
+            src="/plant3.png"
+            width={720}
+            height={560}
+            alt=""
+            className="h-auto w-[min(92vw,360px)] sm:w-[min(46vw,420px)] md:w-[min(40vw,440px)] lg:w-[420px] max-h-[240px] sm:max-h-[280px] md:max-h-[300px] lg:max-h-[320px] object-contain object-bottom align-bottom [filter:brightness(1.05)_saturate(0.72)_contrast(0.88)]"
+            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 420px"
+          />
+        </div>
+      </div>
 
+      <div className="bg-[#FDF9F5] border-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
           
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
@@ -1993,6 +1929,7 @@ function SiteFooter({
           >
             Imprint
           </button>
+        </div>
         </div>
       </div>
     </footer>
@@ -2134,7 +2071,7 @@ function TermsModal({ onClose }: { onClose: () => void }) {
       >
         <div className="p-6 sm:p-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-serif text-[20px] sm:text-[26px] text-[#2D2926]">Legal - Terms & Conditions (Unikmo)</h3>
+            <h3 className="font-serif text-[20px] sm:text-[26px] text-[#2D2926]">Terms & Conditions (Unikmo)</h3>
             <button type="button" onClick={onClose} className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors" aria-label="Close">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

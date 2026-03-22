@@ -40,6 +40,10 @@ export default function AdminConfigsPage() {
   const [genQty, setGenQty] = useState<'1' | '4' | '7'>('1');
   const [genDelivery, setGenDelivery] = useState<'digital' | 'physical'>('digital');
   const [genBusy, setGenBusy] = useState(false);
+  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
+  const [notifyBusy, setNotifyBusy] = useState(false);
+  const [singleNotifyRow, setSingleNotifyRow] = useState<WaitlistRow | null>(null);
+  const [singleNotifyBusy, setSingleNotifyBusy] = useState(false);
 
   const loadConfig = useCallback(async () => {
     try {
@@ -138,6 +142,47 @@ export default function AdminConfigsPage() {
       loadWaitlist();
     } catch (e: any) {
       toast.error(e.message || 'Update failed');
+    }
+  };
+
+  const runNotifySellingOpen = async () => {
+    try {
+      setNotifyBusy(true);
+      const res = await fetch('/api/admin/waitlist/notify-selling-open', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send emails');
+      toast.success(
+        `Emails sent: ${data.sent ?? 0}${data.failed ? ` (${data.failed} failed)` : ''} (unique addresses: ${data.total ?? 0})`
+      );
+      setNotifyModalOpen(false);
+      await loadWaitlist();
+    } catch (e: any) {
+      toast.error(e.message || 'Notify failed');
+    } finally {
+      setNotifyBusy(false);
+    }
+  };
+
+  const runNotifySingleSellingOpen = async () => {
+    if (!singleNotifyRow) return;
+    try {
+      setSingleNotifyBusy(true);
+      const res = await fetch(`/api/admin/waitlist/${singleNotifyRow._id}/notify-selling-open`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send email');
+      toast.success(`Shop-open email sent to ${singleNotifyRow.email}`);
+      setSingleNotifyRow(null);
+      await loadWaitlist();
+    } catch (e: any) {
+      toast.error(e.message || 'Send failed');
+    } finally {
+      setSingleNotifyBusy(false);
     }
   };
 
@@ -259,18 +304,33 @@ export default function AdminConfigsPage() {
       </section>
 
       <section className="rounded-2xl border border-[#E3DAD0] bg-white p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div>
-            <h2 className="font-serif text-xl text-[#2D2926]">Waitlist signups</h2>
-            <p className="text-sm text-[#2D2926]/60 mt-1">
-              Status: <strong>Pending</strong> (new), <strong>Invited</strong> (contacted),{' '}
-              <strong>Code sent</strong> (moment codes emailed).
-            </p>
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <h2 className="font-serif text-xl text-[#2D2926]">Waitlist signups</h2>
+              <p className="text-sm text-[#2D2926]/60 mt-1">
+                Status: <strong>Pending</strong> (new), <strong>Invited</strong> (contacted),{' '}
+                <strong>Code sent</strong> (moment codes emailed).
+              </p>
+            </div>
+            <div className="flex flex-col sm:items-end gap-2">
+              <button
+                type="button"
+                onClick={() => setNotifyModalOpen(true)}
+                className="rounded-xl border border-[#2D2926] bg-[#2D2926] px-4 py-2.5 text-sm font-medium text-[#FDF9F5] hover:bg-[#1E1B18] transition-colors whitespace-nowrap"
+              >
+                Email waitlist — shop is open
+              </button>
+              <p className="text-xs text-[#2D2926]/50 max-w-xs sm:text-right">
+                Sends the “shop is open” email to every unique waitlist address (same template family as other Unikmo emails).
+              </p>
+            </div>
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="rounded-xl border border-[#E3DAD0] bg-white px-3 py-2 text-sm text-[#2D2926]"
+            className="rounded-xl border border-[#E3DAD0] bg-white px-3 py-2 text-sm text-[#2D2926] max-w-xs"
+            style={{ color: '#2D2926' }}
           >
             <option value="all">All statuses</option>
             <option value="pending">Pending</option>
@@ -315,11 +375,18 @@ export default function AdminConfigsPage() {
                         onChange={(e) =>
                           updateEntryStatus(row._id, e.target.value as WaitlistRow['status'])
                         }
-                        className="rounded-lg border border-[#E3DAD0] bg-[#FDF9F5] px-2 py-1 text-xs"
+                        className="min-w-[8.5rem] rounded-lg border border-[#E3DAD0] bg-white px-2 py-1.5 text-xs font-medium text-[#2D2926] shadow-sm"
+                        style={{ color: '#2D2926' }}
                       >
-                        <option value="pending">{STATUS_LABELS.pending}</option>
-                        <option value="invited">{STATUS_LABELS.invited}</option>
-                        <option value="code_sent">{STATUS_LABELS.code_sent}</option>
+                        <option value="pending" className="text-[#2D2926]">
+                          {STATUS_LABELS.pending}
+                        </option>
+                        <option value="invited" className="text-[#2D2926]">
+                          {STATUS_LABELS.invited}
+                        </option>
+                        <option value="code_sent" className="text-[#2D2926]">
+                          {STATUS_LABELS.code_sent}
+                        </option>
                       </select>
                     </td>
                     <td className="py-3 pr-4 text-xs text-[#2D2926]/70 max-w-[180px]">
@@ -336,17 +403,26 @@ export default function AdminConfigsPage() {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setGenQty('1');
-                          setGenDelivery('digital');
-                          setGenModal(row);
-                        }}
-                        className="text-xs font-medium text-[#2D2926] underline"
-                      >
-                        Generate code
-                      </button>
+                      <div className="flex flex-col gap-2 items-start">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setGenQty('1');
+                            setGenDelivery('digital');
+                            setGenModal(row);
+                          }}
+                          className="text-xs font-medium text-[#2D2926] underline hover:text-[#1E1B18]"
+                        >
+                          Generate code
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSingleNotifyRow(row)}
+                          className="text-xs font-medium text-[#2D2926] underline decoration-[#2D2926]/30 hover:text-[#1E1B18] hover:decoration-[#1E1B18]"
+                        >
+                          Email — shop open
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -355,6 +431,95 @@ export default function AdminConfigsPage() {
           </div>
         )}
       </section>
+
+      {singleNotifyRow && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40"
+          onClick={() => !singleNotifyBusy && setSingleNotifyRow(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="notify-single-title"
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-[#E3DAD0]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="notify-single-title" className="font-serif text-lg text-[#2D2926] mb-2">
+              Send shop-open email?
+            </h3>
+            <p className="text-sm text-[#2D2926]/80 leading-relaxed mb-1">
+              <strong className="text-[#2D2926]">{singleNotifyRow.name}</strong>
+            </p>
+            <p className="text-sm text-[#2D2926]/70 mb-4 break-all">{singleNotifyRow.email}</p>
+            <p className="text-xs text-[#2D2926]/55 mb-6">
+              Same “shop is open” email as the bulk action — one message only to this address.
+            </p>
+            <div className="flex gap-2 justify-end flex-wrap">
+              <button
+                type="button"
+                onClick={() => setSingleNotifyRow(null)}
+                disabled={singleNotifyBusy}
+                className="px-4 py-2.5 text-sm rounded-xl border border-[#E3DAD0] bg-white text-[#2D2926] font-medium hover:bg-[#F5ECE3] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={runNotifySingleSellingOpen}
+                disabled={singleNotifyBusy}
+                className="px-4 py-2.5 text-sm rounded-xl bg-[#2D2926] text-[#FDF9F5] font-medium disabled:opacity-50"
+              >
+                {singleNotifyBusy ? 'Sending…' : 'Send email'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {notifyModalOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40"
+          onClick={() => !notifyBusy && setNotifyModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="notify-selling-title"
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-[#E3DAD0]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="notify-selling-title" className="font-serif text-lg text-[#2D2926] mb-2">
+              Email everyone on the waitlist?
+            </h3>
+            <p className="text-sm text-[#2D2926]/80 leading-relaxed mb-4">
+              This sends <strong className="text-[#2D2926]">one email per unique address</strong> letting them know
+              purchasing is available again and they can open the shop. Make sure <strong>Selling enabled</strong> is on
+              above so the site matches what you&apos;re promising.
+            </p>
+            <p className="text-xs text-[#2D2926]/55 mb-6">
+              Uses the same UNIKMO email layout as waitlist confirmations (header, card, CTA button).
+            </p>
+            <div className="flex gap-2 justify-end flex-wrap">
+              <button
+                type="button"
+                onClick={() => setNotifyModalOpen(false)}
+                disabled={notifyBusy}
+                className="px-4 py-2.5 text-sm rounded-xl border border-[#E3DAD0] bg-white text-[#2D2926] font-medium hover:bg-[#F5ECE3] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={runNotifySellingOpen}
+                disabled={notifyBusy}
+                className="px-4 py-2.5 text-sm rounded-xl bg-[#2D2926] text-[#FDF9F5] font-medium disabled:opacity-50"
+              >
+                {notifyBusy ? 'Sending…' : 'Confirm & send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {genModal && (
         <div
@@ -373,38 +538,50 @@ export default function AdminConfigsPage() {
             </p>
             <div className="space-y-3 mb-6">
               <div>
-                <label className="block text-xs font-medium text-[#2D2926] mb-1">Key quantity</label>
+                <label className="block text-xs font-medium text-[#2D2926] mb-1.5">Key quantity</label>
                 <select
                   value={genQty}
                   onChange={(e) => setGenQty(e.target.value as '1' | '4' | '7')}
-                  className="w-full rounded-xl border border-[#E3DAD0] px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-[#E3DAD0] bg-white px-3 py-2.5 text-sm text-[#2D2926]"
+                  style={{ color: '#2D2926' }}
                 >
-                  <option value="1">1 key</option>
-                  <option value="4">4 keys</option>
-                  <option value="7">7 keys</option>
+                  <option value="1" className="text-[#2D2926] bg-white">
+                    1 key
+                  </option>
+                  <option value="4" className="text-[#2D2926] bg-white">
+                    4 keys
+                  </option>
+                  <option value="7" className="text-[#2D2926] bg-white">
+                    7 keys
+                  </option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#2D2926] mb-1">Delivery</label>
+                <label className="block text-xs font-medium text-[#2D2926] mb-1.5">Delivery</label>
                 <select
                   value={genDelivery}
                   onChange={(e) => setGenDelivery(e.target.value as 'digital' | 'physical')}
-                  className="w-full rounded-xl border border-[#E3DAD0] px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-[#E3DAD0] bg-white px-3 py-2.5 text-sm text-[#2D2926]"
+                  style={{ color: '#2D2926' }}
                 >
-                  <option value="digital">Digital</option>
-                  <option value="physical">Physical</option>
+                  <option value="digital" className="text-[#2D2926] bg-white">
+                    Digital
+                  </option>
+                  <option value="physical" className="text-[#2D2926] bg-white">
+                    Physical
+                  </option>
                 </select>
               </div>
             </div>
             <p className="text-xs text-[#2D2926]/55 mb-4">
               Creates an internal order and emails codes (same flow as admin orders, without Shopify checkout).
             </p>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-end flex-wrap">
               <button
                 type="button"
                 onClick={() => setGenModal(null)}
                 disabled={genBusy}
-                className="px-4 py-2 text-sm rounded-xl border border-[#E3DAD0]"
+                className="px-4 py-2.5 text-sm rounded-xl border border-[#E3DAD0] bg-white text-[#2D2926] font-medium hover:bg-[#F5ECE3] disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -412,7 +589,7 @@ export default function AdminConfigsPage() {
                 type="button"
                 onClick={runGenerate}
                 disabled={genBusy}
-                className="px-4 py-2 text-sm rounded-xl bg-[#2D2926] text-white disabled:opacity-50"
+                className="px-4 py-2.5 text-sm rounded-xl bg-[#2D2926] text-[#FDF9F5] font-medium disabled:opacity-50"
               >
                 {genBusy ? 'Working…' : 'Generate & email'}
               </button>

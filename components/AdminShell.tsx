@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -22,6 +23,8 @@ const TITLES: Record<string, string> = {
   '/admin/template-viewer': 'Templates',
   '/admin/shopify': 'Shopify',
 };
+
+const STORAGE_COLLAPSED = 'admin-sidebar-collapsed';
 
 function getTitle(pathname: string): string {
   if (pathname.startsWith('/admin/orders/') && pathname !== '/admin/orders') return 'Order details';
@@ -104,10 +107,84 @@ function LogoutIcon({ className }: { className?: string }) {
   );
 }
 
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
+
+function ChevronCollapseIcon({ className, expanded }: { className?: string; expanded: boolean }) {
+  return (
+    <svg
+      className={`${className ?? ''} transition-transform duration-200 ${expanded ? '' : 'rotate-180'}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+    </svg>
+  );
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isLogin = pathname === '/admin/login';
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_COLLAPSED);
+      if (stored === 'true') setCollapsed(true);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setCollapsedPersist = (next: boolean) => {
+    setCollapsed(next);
+    try {
+      localStorage.setItem(STORAGE_COLLAPSED, next ? 'true' : 'false');
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
 
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
@@ -121,17 +198,79 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   const title = getTitle(pathname);
 
+  const navLinkClass = (active: boolean, rail: boolean) =>
+    `flex items-center rounded-xl text-sm font-medium transition-colors ${
+      rail ? 'justify-center gap-0 px-2 py-2.5 lg:px-2' : 'gap-3 px-3 py-2.5'
+    } ${
+      active
+        ? 'bg-[#2D2926] text-[#FDF9F5]'
+        : 'text-[#2D2926]/75 hover:bg-[#F5ECE3] hover:text-[#2D2926]'
+    }`;
+
+  const desktopRail = collapsed;
+
   return (
     <div className="min-h-screen bg-[#FDF9F5] flex">
-      {/* Sidebar */}
-      <aside className="w-56 sm:w-64 flex-shrink-0 border-r border-[#E3DAD0] bg-white flex flex-col">
-        <div className="p-5 border-b border-[#E3DAD0]">
-          <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <span className="font-serif text-lg tracking-wide text-[#2D2926]">UNIKMO</span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/50">Admin</span>
+      {/* Mobile / tablet: overlay when drawer open */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        className={`fixed inset-0 z-40 bg-[#1E1B18]/40 backdrop-blur-[2px] transition-opacity lg:hidden ${
+          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#E3DAD0] bg-white shadow-xl transition-[transform,width] duration-300 ease-out lg:static lg:z-auto lg:shadow-none
+          w-64 max-w-[85vw]
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${desktopRail ? 'lg:w-[4.25rem] lg:min-w-[4.25rem] lg:max-w-[4.25rem]' : 'lg:w-64 lg:min-w-0'}
+        `}
+      >
+        <div
+          className={`flex flex-shrink-0 items-center gap-2 border-b border-[#E3DAD0] p-4 ${
+            desktopRail ? 'lg:flex-col lg:gap-3 lg:px-2 lg:py-4' : 'justify-between sm:p-5'
+          }`}
+        >
+          <Link
+            href="/admin/dashboard"
+            onClick={() => setMobileOpen(false)}
+            className={`flex min-w-0 items-center gap-2 ${desktopRail ? 'lg:justify-center' : ''}`}
+            title="UNIKMO Admin"
+          >
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#2D2926] font-serif text-sm text-[#FDF9F5]">
+              U
+            </span>
+            <span
+              className={`min-w-0 font-serif text-lg tracking-wide text-[#2D2926] ${
+                desktopRail ? 'lg:hidden' : ''
+              }`}
+            >
+              UNIKMO
+            </span>
+            <span
+              className={`text-[10px] tracking-[0.2em] text-[#2D2926]/50 ${desktopRail ? 'lg:hidden' : 'hidden sm:inline'}`}
+            >
+              Admin
+            </span>
           </Link>
+
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-expanded={!desktopRail}
+              aria-label={desktopRail ? 'Expand sidebar' : 'Collapse sidebar'}
+              title={desktopRail ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="hidden rounded-lg p-2 text-[#2D2926] hover:bg-[#F5ECE3] lg:flex"
+              onClick={() => setCollapsedPersist(!collapsed)}
+            >
+              <ChevronCollapseIcon className="h-5 w-5" expanded={!desktopRail} />
+            </button>
+          </div>
         </div>
-        <nav className="flex-1 p-3 space-y-0.5">
+
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
           {NAV.map((item) => {
             const active =
               pathname === item.href ||
@@ -142,38 +281,46 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-[#2D2926] text-[#FDF9F5]'
-                    : 'text-[#2D2926]/75 hover:bg-[#F5ECE3] hover:text-[#2D2926]'
-                }`}
+                title={item.label}
+                onClick={() => setMobileOpen(false)}
+                className={navLinkClass(active, desktopRail)}
               >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {item.label}
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <span className={desktopRail ? 'lg:sr-only' : ''}>{item.label}</span>
               </Link>
             );
           })}
         </nav>
-        <div className="p-3 border-t border-[#E3DAD0]">
+
+        <div className="border-t border-[#E3DAD0] p-3">
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#2D2926]/75 hover:bg-[#F5ECE3] hover:text-[#2D2926] transition-colors"
+            title="Logout"
+            className={`flex w-full items-center rounded-xl text-sm font-medium text-[#2D2926]/75 transition-colors hover:bg-[#F5ECE3] hover:text-[#2D2926] ${
+              desktopRail ? 'justify-center px-2 py-2.5 lg:px-2' : 'gap-3 px-3 py-2.5'
+            }`}
           >
-            <LogoutIcon className="w-5 h-5 flex-shrink-0" />
-            Logout
+            <LogoutIcon className="h-5 w-5 flex-shrink-0" />
+            <span className={desktopRail ? 'lg:sr-only' : ''}>Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex-shrink-0 h-14 sm:h-16 border-b border-[#E3DAD0] bg-white flex items-center justify-between px-4 sm:px-6">
-          <h1 className="font-serif text-xl sm:text-2xl text-[#2D2926]">{title}</h1>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-14 flex-shrink-0 items-center gap-3 border-b border-[#E3DAD0] bg-white px-3 sm:h-16 sm:px-6">
+          <button
+            type="button"
+            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileOpen}
+            className="flex-shrink-0 rounded-lg p-2 text-[#2D2926] hover:bg-[#F5ECE3] lg:hidden"
+            onClick={() => setMobileOpen((o) => !o)}
+          >
+            {mobileOpen ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
+          <h1 className="min-w-0 truncate font-serif text-lg text-[#2D2926] sm:text-xl lg:text-2xl">{title}</h1>
         </header>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
