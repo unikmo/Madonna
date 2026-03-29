@@ -240,8 +240,6 @@ function Hero() {
 
               {/* 3. Supporting text */}
               <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[14px] sm:text-[16px] lg:text-[18px] xl:text-[19px] text-[#2D2926]/85 font-light leading-relaxed tracking-wide">
-                <p>He couldn&apos;t be there.</p>
-                <p>So he sent something she&apos;d never forget.</p>
               </div>
 
               {/* 4. CTA + 5. subtext */}
