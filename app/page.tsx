@@ -212,16 +212,17 @@ function Hero() {
       {/* Main hero: image + copy — balanced columns, image fills frame */}
       <div className="relative z-10 w-full pt-8 pb-2 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-6">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 xl:gap-16 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
-            <div className="flex justify-center lg:justify-start w-full">
-              <div className="relative w-full max-w-[540px] lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.28fr)_minmax(0,0.72fr)] gap-10 lg:gap-8 xl:gap-12 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
+            {/* Wider image + bleed left into section padding so the banner uses horizontal space (text on photo stays in frame via object-left) */}
+            <div className="flex justify-center lg:justify-start w-full max-lg:max-w-[540px] max-lg:mx-auto lg:max-w-none lg:-ml-8 lg:w-[calc(100%+2rem)]">
+              <div className="relative w-full lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
                 <Image
-                  src="/bannerImageLanding.jpeg"
-                  alt="A meaningful moment on her phone"
+                  src="/nr1.jpg"
+                  alt="She thought it was just a card — a meaningful moment on her phone"
                   fill
                   priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover object-[center_25%]"
+                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  className="object-cover object-[28%_35%]"
                 />
               </div>
             </div>
