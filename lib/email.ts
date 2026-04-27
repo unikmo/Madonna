@@ -10,26 +10,26 @@ import {
  * Creates and configures Nodemailer transporter for SMTP fallback
  */
 function createEmailTransporter() {
-  if (
-    !process.env.SMTP_HOST ||
-    !process.env.SMTP_PORT ||
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS
-  ) {
+  const host = process.env.SMTP_HOST?.trim();
+  const portRaw = process.env.SMTP_PORT?.trim();
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_PASS?.trim();
+
+  if (!host || !portRaw || !user || !pass) {
     throw new Error('SMTP configuration is missing. Please set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS');
   }
 
+  const port = parseInt(portRaw, 10);
+  const secure = port === 465;
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT),
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+    host,
+    port,
+    secure,
     connectionTimeout: 12000,
     greetingTimeout: 12000,
     socketTimeout: 15000,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+    auth: { user, pass },
   });
 }
 

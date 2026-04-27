@@ -81,16 +81,18 @@ export async function POST(request: NextRequest) {
       console.log('📧 [Test Email] Secure:', process.env.SMTP_PORT === '465');
       console.log('📧 [Test Email] User:', process.env.SMTP_USER);
       
+      const host = process.env.SMTP_HOST?.trim();
+      const port = parseInt(process.env.SMTP_PORT?.trim() || '0', 10);
       transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT),
-        secure: process.env.SMTP_PORT === '465',
+        host,
+        port,
+        secure: port === 465,
         connectionTimeout: 12000,
         greetingTimeout: 12000,
         socketTimeout: 15000,
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: process.env.SMTP_USER?.trim(),
+          pass: process.env.SMTP_PASS?.trim(),
         },
       });
       console.log('📧 [Test Email] ✓ Transporter created successfully');

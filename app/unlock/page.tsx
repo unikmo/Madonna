@@ -9,6 +9,12 @@ import {
   AnimatedMomentModal,
   type AnimatedMomentModalVariant,
 } from '@/components/AnimatedMomentModal';
+import {
+  MAX_VIDEO_UPLOAD_BYTES,
+  MAX_AUDIO_UPLOAD_BYTES,
+  MAX_IMAGE_UPLOAD_BYTES,
+  MAX_VIDEO_UPLOAD_LABEL,
+} from '@/lib/media-upload-limits';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -220,14 +226,11 @@ function UnlockPageContent() {
       const isVideo = fileType.startsWith('video/');
       const isAudio = fileType.startsWith('audio/');
       const isImage = fileType.startsWith('image/');
-      const maxVideo = 350 * 1024 * 1024;
-      const maxAudio = 40 * 1024 * 1024;
-      const maxImage = 40 * 1024 * 1024;
-      if (isVideo && file.size > maxVideo) {
-        toast.error('Video max 350 MB');
+      if (isVideo && file.size > MAX_VIDEO_UPLOAD_BYTES) {
+        toast.error(`Video max ${MAX_VIDEO_UPLOAD_LABEL}`);
         return;
       }
-      if ((isAudio || isImage) && file.size > (isAudio ? maxAudio : maxImage)) {
+      if ((isAudio || isImage) && file.size > (isAudio ? MAX_AUDIO_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES)) {
         toast.error(isAudio ? 'Audio max 40 MB' : 'Photo max 40 MB');
         return;
       }

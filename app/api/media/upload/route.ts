@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import {
+  MAX_VIDEO_UPLOAD_BYTES,
+  MAX_AUDIO_UPLOAD_BYTES,
+  MAX_IMAGE_UPLOAD_BYTES,
+  MAX_VIDEO_UPLOAD_LABEL,
+} from '@/lib/media-upload-limits';
 
 export const runtime = 'nodejs';
-export const maxDuration = 300; // 5 minutes for large uploads
+export const maxDuration = 300; // 5 minutes for large uploads (raise on host if 1 GB uploads timeout)
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,25 +54,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size based on type
-    const maxVideoSize = 350 * 1024 * 1024; // 350 MB
-    const maxAudioSize = 40 * 1024 * 1024; // 40 MB
-    const maxImageSize = 40 * 1024 * 1024; // 40 MB
-
-    if (mediaType === 'video' && file.size > maxVideoSize) {
+    if (mediaType === 'video' && file.size > MAX_VIDEO_UPLOAD_BYTES) {
       return NextResponse.json(
-        { error: `Video file exceeds 350 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB` },
+        {
+          error: `Video file exceeds ${MAX_VIDEO_UPLOAD_LABEL} limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+        },
         { status: 400 }
       );
     }
 
-    if (mediaType === 'audio' && file.size > maxAudioSize) {
+    if (mediaType === 'audio' && file.size > MAX_AUDIO_UPLOAD_BYTES) {
       return NextResponse.json(
         { error: `Audio file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB` },
         { status: 400 }
       );
     }
 
-    if (mediaType === 'image' && file.size > maxImageSize) {
+    if (mediaType === 'image' && file.size > MAX_IMAGE_UPLOAD_BYTES) {
       return NextResponse.json(
         { error: `Image file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB` },
         { status: 400 }

@@ -7,6 +7,12 @@ import {
   AnimatedMomentModal,
   type AnimatedMomentModalVariant,
 } from '@/components/AnimatedMomentModal';
+import {
+  MAX_VIDEO_UPLOAD_BYTES,
+  MAX_AUDIO_UPLOAD_BYTES,
+  MAX_IMAGE_UPLOAD_BYTES,
+  MAX_VIDEO_UPLOAD_LABEL,
+} from '@/lib/media-upload-limits';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -214,12 +220,8 @@ function UploadPageContent() {
     const isAudio = fileType.startsWith('audio/');
 
     // Validate file size based on type
-    const maxVideoSize = 350 * 1024 * 1024; // 350 MB
-    const maxAudioSize = 40 * 1024 * 1024; // 40 MB
-    const maxImageSize = 40 * 1024 * 1024; // 40 MB
-
-    if (isVideo && file.size > maxVideoSize) {
-      const errorMsg = `Video file exceeds 350 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+    if (isVideo && file.size > MAX_VIDEO_UPLOAD_BYTES) {
+      const errorMsg = `Video file exceeds ${MAX_VIDEO_UPLOAD_LABEL} limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
       showMomentModal({
         variant: 'alert',
@@ -230,7 +232,7 @@ function UploadPageContent() {
       return;
     }
 
-    if (isAudio && file.size > maxAudioSize) {
+    if (isAudio && file.size > MAX_AUDIO_UPLOAD_BYTES) {
       const errorMsg = `Audio file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
       showMomentModal({
@@ -242,7 +244,7 @@ function UploadPageContent() {
       return;
     }
 
-    if (isImage && file.size > maxImageSize) {
+    if (isImage && file.size > MAX_IMAGE_UPLOAD_BYTES) {
       const errorMsg = `Image file exceeds 40 MB limit. Current size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       setError(errorMsg);
       showMomentModal({
