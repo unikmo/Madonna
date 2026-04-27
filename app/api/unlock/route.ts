@@ -25,6 +25,17 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+function isMongoConnectivityError(err: unknown): boolean {
+  const name = err && typeof err === 'object' && 'name' in err ? String((err as { name: string }).name) : '';
+  const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: string }).message) : '';
+  return (
+    name === 'MongoServerSelectionError' ||
+    name === 'MongoNetworkError' ||
+    name === 'MongoParseError' ||
+    /MONGODB_URI|ECONNREFUSED|ENOTFOUND|SSL|TLS|timed out|Server selection/i.test(msg)
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
@@ -36,9 +47,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { code } = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid request body', message: 'Expected JSON with a code field.' },
+        { status: 400 }
+      );
+    }
 
-    if (!code) {
+    const code =
+      body &&
+      typeof body === 'object' &&
+      'code' in body &&
+      typeof (body as { code: unknown }).code === 'string'
+        ? (body as { code: string }).code
+        : '';
+
+    if (!code || !code.trim()) {
       return NextResponse.json({ error: 'Code is required' }, { status: 400 });
     }
 
@@ -111,11 +138,33 @@ export async function POST(request: NextRequest) {
       quantity: momentCode.quantity,
       deliveryType: momentCode.deliveryType,
     });
-  } catch (error: any) {
-    console.error('Unlock error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string };
+    console.error('[unlock] POST error:', err?.name, err?.message, error);
+
+    if (err?.message?.includes('MONGODB_URI is not set')) {
+      return NextResponse.json(
+        {
+          error: 'Server misconfiguration',
+          code: 'missing_mongodb_uri',
+          message: 'Database URL is not configured on this deployment.',
+        },
+        { status: 503 }
+      );
+    }
+
+    if (isMongoConnectivityError(error)) {
+      return NextResponse.json(
+        {
+          error: 'Database unavailable',
+          code: 'db_connection',
+          message:
+            'Could not reach MongoDB from this server. On Atlas: Network Access → add 0.0.0.0/0 (or Vercel’s ranges). Confirm MONGODB_URI in Vercel matches your cluster.',
+        },
+        { status: 503 }
+      );
+    }
+
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

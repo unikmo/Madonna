@@ -15,6 +15,7 @@ import {
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_VIDEO_UPLOAD_LABEL,
 } from '@/lib/media-upload-limits';
+import { uploadToCloudinaryBrowser } from '@/lib/cloudinary-browser-upload';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -206,19 +207,6 @@ function UnlockPageContent() {
       .finally(() => setLoadingMedia(false));
   }, [uploadValid, uploadCode]);
 
-  const getVideoDuration = (file: File): Promise<number> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-      video.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(video.src);
-        resolve(video.duration);
-      };
-      video.onerror = () => reject(new Error('Failed to load'));
-      video.src = URL.createObjectURL(file);
-    });
-  };
-
   const uploadFile = useCallback(
     async (file: File) => {
       if (!uploadCode || !uploadValid || uploading) return;
@@ -233,17 +221,6 @@ function UnlockPageContent() {
       if ((isAudio || isImage) && file.size > (isAudio ? MAX_AUDIO_UPLOAD_BYTES : MAX_IMAGE_UPLOAD_BYTES)) {
         toast.error(isAudio ? 'Audio max 40 MB' : 'Photo max 40 MB');
         return;
-      }
-      if (isVideo) {
-        try {
-          const dur = await getVideoDuration(file);
-          if (dur > 180) {
-            toast.error('Video max 3 minutes');
-            return;
-          }
-        } catch {
-          /* continue */
-        }
       }
       setUploading(true);
       setUploadProgress(0);
@@ -260,28 +237,18 @@ function UnlockPageContent() {
           throw new Error(signData.error || 'Failed to initialize upload');
         }
 
-        // 2) Upload directly to Cloudinary
-        const cloudinaryFormData = new FormData();
-        cloudinaryFormData.append('file', file);
-        cloudinaryFormData.append('api_key', signData.apiKey);
-        cloudinaryFormData.append('timestamp', String(signData.timestamp));
-        cloudinaryFormData.append('signature', signData.signature);
-        cloudinaryFormData.append('folder', signData.folder);
-
-        const cloudinaryUploadRes = await fetch(
-          `https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`,
-          {
-            method: 'POST',
-            body: cloudinaryFormData,
-          }
-        );
-        if (!cloudinaryUploadRes.ok) {
-          const cloudinaryText = await cloudinaryUploadRes.text();
-          throw new Error(
-            `Cloudinary upload failed (${cloudinaryUploadRes.status}): ${cloudinaryText.slice(0, 140)}`
-          );
-        }
-        const cloudinaryData = await cloudinaryUploadRes.json();
+        // 2) Upload directly to Cloudinary (chunked automatically for large files)
+        const cloudinaryData = await uploadToCloudinaryBrowser({
+          file,
+          signed: {
+            cloudName: signData.cloudName,
+            apiKey: signData.apiKey,
+            timestamp: signData.timestamp,
+            signature: signData.signature,
+            folder: signData.folder,
+          },
+          onProgress: (pct) => setUploadProgress(Math.max(15, pct)),
+        });
 
         // 3) Save upload metadata to DB
         const mediaType: MediaItem['type'] =

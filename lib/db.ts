@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+/** Read at connect time so missing env on Vercel fails with a clear error instead of crashing module load. */
+function getMongoUri(): string {
+  const uri = process.env.MONGODB_URI?.trim();
+  if (!uri) {
+    throw new Error(
+      'MONGODB_URI is not set. Add it in Vercel Project → Settings → Environment Variables (and Atlas → Network Access must allow Vercel).'
+    );
+  }
+  return uri;
 }
-
-const MONGODB_URI: string = process.env.MONGODB_URI;
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -31,7 +36,8 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    const uri = getMongoUri();
+    cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
       return mongoose;
     });
   }
