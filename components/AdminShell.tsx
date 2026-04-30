@@ -10,6 +10,7 @@ const NAV = [
   { href: '/admin/orders', label: 'Orders', icon: OrdersIcon },
   { href: '/admin/codes', label: 'Codes', icon: CodesIcon },
   { href: '/admin/configs', label: 'Configs', icon: ConfigsIcon },
+  { href: '/admin/storage', label: 'Storage', icon: StorageIcon },
   { href: '/admin/template-viewer', label: 'Templates', icon: TemplatesIcon },
   { href: '/admin/shopify', label: 'Shopify', icon: ShopifyIcon },
 ];
@@ -20,6 +21,7 @@ const TITLES: Record<string, string> = {
   '/admin/orders': 'Orders',
   '/admin/codes': 'Codes',
   '/admin/configs': 'Configs',
+  '/admin/storage': 'Storage',
   '/admin/template-viewer': 'Templates',
   '/admin/shopify': 'Shopify',
 };
@@ -95,6 +97,19 @@ function ShopifyIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+  );
+}
+
+function StorageIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7l8 4 8-4M4 7l8-4 8 4m-8 4v10"
+      />
     </svg>
   );
 }
@@ -276,6 +291,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               pathname === item.href ||
               (item.href !== '/admin/codes' &&
                 item.href !== '/admin/configs' &&
+                item.href !== '/admin/storage' &&
                 pathname.startsWith(item.href + '/'));
             return (
               <Link

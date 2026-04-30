@@ -15,7 +15,7 @@ import {
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_VIDEO_UPLOAD_LABEL,
 } from '@/lib/media-upload-limits';
-import { uploadToCloudinaryBrowser } from '@/lib/cloudinary-browser-upload';
+import { uploadFileViaPresignedPut } from '@/lib/s3-browser-upload';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -222,35 +222,45 @@ function UnlockPageContent() {
         toast.error(isAudio ? 'Audio max 40 MB' : 'Photo max 40 MB');
         return;
       }
+      if (!isImage && !isVideo && !isAudio) {
+        toast.error('Please use an image, video, or audio file.');
+        return;
+      }
       setUploading(true);
       setUploadProgress(0);
-      const progressInterval = setInterval(() => setUploadProgress((p) => Math.min(p + 10, 90)), 200);
       try {
-        // 1) Get signed upload params from our API
-        const signRes = await fetch('/api/media/cloudinary-signature', {
+        const contentType =
+          file.type ||
+          (isVideo ? 'video/mp4' : isAudio ? 'audio/mpeg' : 'image/jpeg');
+
+        const signRes = await fetch('/api/media/presign-upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: uploadCode.toUpperCase() }),
+          body: JSON.stringify({
+            code: uploadCode.toUpperCase(),
+            fileName: file.name,
+            contentType,
+            fileSize: file.size,
+          }),
         });
         const signData = await parseResponseSafely(signRes);
         if (!signRes.ok) {
           throw new Error(signData.error || 'Failed to initialize upload');
         }
 
-        // 2) Upload directly to Cloudinary (chunked automatically for large files)
-        const cloudinaryData = await uploadToCloudinaryBrowser({
-          file,
-          signed: {
-            cloudName: signData.cloudName,
-            apiKey: signData.apiKey,
-            timestamp: signData.timestamp,
-            signature: signData.signature,
-            folder: signData.folder,
-          },
-          onProgress: (pct) => setUploadProgress(Math.max(15, pct)),
-        });
+        const { uploadUrl, objectKey } = signData;
+        if (!uploadUrl || !objectKey) {
+          throw new Error('Server did not return an upload URL');
+        }
 
-        // 3) Save upload metadata to DB
+        setUploadProgress(0);
+        await uploadFileViaPresignedPut(
+          file,
+          uploadUrl,
+          contentType,
+          (pct) => setUploadProgress(pct)
+        );
+
         const mediaType: MediaItem['type'] =
           isImage ? 'image' : isVideo ? 'video' : isAudio ? 'audio' : 'text';
         const res = await fetch('/api/media/complete-upload', {
@@ -259,11 +269,9 @@ function UnlockPageContent() {
           body: JSON.stringify({
             code: uploadCode.toUpperCase(),
             mediaType,
-            url: cloudinaryData.secure_url,
-            publicId: cloudinaryData.public_id,
+            objectKey,
           }),
         });
-        clearInterval(progressInterval);
         setUploadProgress(100);
         if (!res.ok) {
           const data = await parseResponseSafely(res);

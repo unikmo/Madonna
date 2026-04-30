@@ -13,7 +13,7 @@ import {
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_VIDEO_UPLOAD_LABEL,
 } from '@/lib/media-upload-limits';
-import { uploadToCloudinaryBrowser } from '@/lib/cloudinary-browser-upload';
+import { uploadFileViaPresignedPut } from '@/lib/s3-browser-upload';
 
 interface MediaItem {
   type: 'image' | 'video' | 'audio' | 'text';
@@ -31,6 +31,9 @@ function UploadPageContent() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  /** presign = getting URL; s3 = byte upload to S3; finalize = saving metadata */
+  const [uploadPhase, setUploadPhase] = useState<'idle' | 'presign' | 's3' | 'finalize'>('idle');
+  const [uploadTotalMb, setUploadTotalMb] = useState<number | null>(null);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(false);
   const [deletingMediaUrl, setDeletingMediaUrl] = useState<string | null>(null);
@@ -241,24 +244,41 @@ function UploadPageContent() {
       return;
     }
 
+    if (!isImage && !isVideo && !isAudio) {
+      const msg = 'Please use an image, video, or audio file.';
+      setError(msg);
+      showMomentModal({
+        variant: 'alert',
+        title: 'Unsupported file',
+        message: msg,
+        emoji: '📎✨',
+      });
+      return;
+    }
+
     setUploading(true);
     setUploadProgress(0);
+    setUploadPhase('presign');
+    setUploadTotalMb(file.size / (1024 * 1024));
 
-    let progressInterval: ReturnType<typeof setInterval> | null = null;
     try {
-      // Simulate progress
-      progressInterval = setInterval(() => {
-        setUploadProgress((prev) => Math.min(prev + 10, 90));
-      }, 200);
-
       const abortController = new AbortController();
       uploadAbortRef.current = abortController;
 
-      // 1) Get signed upload params from our API
-      const signResponse = await fetch('/api/media/cloudinary-signature', {
+      const contentType =
+        file.type ||
+        (isVideo ? 'video/mp4' : isAudio ? 'audio/mpeg' : 'image/jpeg');
+
+      // 1) Presigned PUT URL from our API (browser uploads directly to S3)
+      const signResponse = await fetch('/api/media/presign-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.toUpperCase() }),
+        body: JSON.stringify({
+          code: code.toUpperCase(),
+          fileName: file.name,
+          contentType,
+          fileSize: file.size,
+        }),
         signal: abortController.signal,
       });
       const signData = await parseResponseSafely(signResponse);
@@ -299,21 +319,26 @@ function UploadPageContent() {
         throw new Error(signData.error || 'Failed to initialize upload');
       }
 
-      // 2) Upload directly to Cloudinary (chunked automatically for large files)
-      const cloudinaryData = await uploadToCloudinaryBrowser({
-        file,
-        signal: abortController.signal,
-        signed: {
-          cloudName: signData.cloudName,
-          apiKey: signData.apiKey,
-          timestamp: signData.timestamp,
-          signature: signData.signature,
-          folder: signData.folder,
-        },
-        onProgress: (pct) => setUploadProgress(Math.max(10, pct)),
-      });
+      const { uploadUrl, objectKey } = signData;
+      if (!uploadUrl || !objectKey) {
+        throw new Error('Server did not return an upload URL');
+      }
 
-      // 3) Save upload metadata to DB
+      setUploadPhase('s3');
+      setUploadProgress(0);
+
+      // 2) PUT file bytes to S3 (progress = bytes sent / file size)
+      await uploadFileViaPresignedPut(
+        file,
+        uploadUrl,
+        contentType,
+        (pct) => setUploadProgress(pct),
+        abortController.signal
+      );
+
+      setUploadPhase('finalize');
+
+      // 3) Save upload metadata to DB (URL is derived server-side from objectKey)
       const mediaType: MediaItem['type'] =
         isImage ? 'image' : isVideo ? 'video' : isAudio ? 'audio' : 'text';
       const response = await fetch('/api/media/complete-upload', {
@@ -322,13 +347,11 @@ function UploadPageContent() {
         body: JSON.stringify({
           code: code.toUpperCase(),
           mediaType,
-          url: cloudinaryData.secure_url,
-          publicId: cloudinaryData.public_id,
+          objectKey,
         }),
         signal: abortController.signal,
       });
 
-      if (progressInterval) clearInterval(progressInterval);
       setUploadProgress(100);
 
       if (!response.ok) {
@@ -382,7 +405,6 @@ function UploadPageContent() {
         confirmLabel: 'Wonderful',
       });
 
-      // Reset progress after a moment
       setTimeout(() => setUploadProgress(0), 1000);
     } catch (err: any) {
       if (err?.name === 'AbortError') {
@@ -404,9 +426,10 @@ function UploadPageContent() {
         emoji: '📤✨',
       });
     } finally {
-      if (progressInterval) clearInterval(progressInterval);
       uploadAbortRef.current = null;
       setUploading(false);
+      setUploadPhase('idle');
+      setUploadTotalMb(null);
     }
   };
 
@@ -580,15 +603,43 @@ function UploadPageContent() {
                       exit={{ opacity: 0 }}
                       className="mt-8"
                     >
-                      <div className="w-full bg-[#EFE3D8] rounded-full h-2 mb-2">
-                        <motion.div
-                          className="bg-[#2D2926] h-2 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${uploadProgress}%` }}
-                          transition={{ duration: 0.3 }}
-                        />
+                      <div className="w-full bg-[#EFE3D8] rounded-full h-2 mb-2 overflow-hidden relative">
+                        {uploadPhase === 'presign' ? (
+                          <motion.div
+                            className="absolute top-0 h-2 w-[35%] rounded-full bg-[#2D2926]/75"
+                            initial={{ left: '-35%' }}
+                            animate={{ left: '100%' }}
+                            transition={{
+                              repeat: Infinity,
+                              duration: 1.25,
+                              ease: 'easeInOut',
+                            }}
+                          />
+                        ) : (
+                          <motion.div
+                            className="bg-[#2D2926] h-2 rounded-full max-w-full"
+                            initial={false}
+                            animate={{
+                              width:
+                                uploadPhase === 'finalize'
+                                  ? '100%'
+                                  : `${uploadProgress}%`,
+                            }}
+                            transition={{
+                              duration: uploadPhase === 's3' ? 0.08 : 0.2,
+                              ease: 'linear',
+                            }}
+                          />
+                        )}
                       </div>
-                      <p className="text-sm text-[#2D2926]/65 mb-3">Uploading... {uploadProgress}%</p>
+                      <p className="text-sm text-[#2D2926]/65 mb-3">
+                        {uploadPhase === 'presign' && 'Preparing upload…'}
+                        {uploadPhase === 's3' &&
+                          (uploadTotalMb != null
+                            ? `Uploading… ${uploadProgress}% (${uploadTotalMb.toFixed(1)} MB file)`
+                            : `Uploading… ${uploadProgress}%`)}
+                        {uploadPhase === 'finalize' && 'Saving your moment…'}
+                      </p>
                       <button
                         type="button"
                         onClick={handleCancelUpload}

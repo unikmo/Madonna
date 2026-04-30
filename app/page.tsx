@@ -2002,7 +2002,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">4. Data Storage</h4>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Media is stored via cloud providers (for example, Cloudinary).</li>
+                <li>Media is stored via cloud object storage (for example, Amazon S3).</li>
                 <li>Data is stored securely (for example, MongoDB).</li>
               </ul>
               <p className="mt-2">We take reasonable security measures, but no system is 100% secure.</p>

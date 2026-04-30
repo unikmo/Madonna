@@ -1,28 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
-import { deleteFromCloudinary } from '@/lib/cloudinary';
+import { buildPublicUrlForKey, deleteS3Object, getS3Config } from '@/lib/s3';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
-    const { code, mediaType, url, publicId } = await request.json();
+    if (!getS3Config()) {
+      return NextResponse.json(
+        { error: 'S3 is not configured (AWS_REGION, AWS_S3_BUCKET).' },
+        { status: 500 }
+      );
+    }
+
+    const { code, mediaType, objectKey } = await request.json();
     const normalizedCode = String(code || '').toUpperCase().trim();
+    const key = String(objectKey || '').trim();
 
-    if (!normalizedCode || !mediaType || !url || !publicId) {
+    if (!normalizedCode || !mediaType || !key) {
       return NextResponse.json(
-        { error: 'code, mediaType, url, and publicId are required' },
+        { error: 'code, mediaType, and objectKey are required' },
         { status: 400 }
       );
     }
 
-    if (!String(publicId).startsWith(`unikmo-moments/${normalizedCode}/`)) {
+    if (!key.startsWith(`unikmo-moments/${normalizedCode}/`)) {
       return NextResponse.json(
-        { error: 'Invalid upload source. Public ID folder mismatch.' },
+        { error: 'Invalid upload source. Object key does not match this code.' },
         { status: 400 }
       );
     }
+
+    const url = buildPublicUrlForKey(key);
 
     await connectDB();
     const momentCode = await MomentCode.findOne({ code: normalizedCode });
@@ -56,11 +66,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (Array.isArray(momentCode.media) && momentCode.media.length > 0) {
-      // Prevent orphan file if client already uploaded to Cloudinary.
       try {
-        await deleteFromCloudinary(String(publicId));
+        await deleteS3Object(key);
       } catch (cleanupError) {
-        console.warn('Failed to cleanup extra Cloudinary file:', cleanupError);
+        console.warn('Failed to cleanup extra S3 object:', cleanupError);
       }
 
       return NextResponse.json(
@@ -105,4 +114,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
