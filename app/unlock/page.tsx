@@ -313,11 +313,21 @@ function UnlockPageContent() {
     if (!uploadCode || !media || deletingMedia) return;
     setDeletingMedia(true);
     try {
-      const res = await fetch('/api/media/delete', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: uploadCode.toUpperCase(), mediaUrl: media.url }),
-      });
+      const payload = { code: uploadCode.toUpperCase(), mediaUrl: media.url };
+      let res: Response;
+      try {
+        res = await fetch('/api/media/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        res = await fetch('/api/media/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
       if (!res.ok) throw new Error('Delete failed');
       setMedia(null);
       toast.success('Media deleted');

@@ -34,6 +34,7 @@ function UploadPageContent() {
   /** presign = getting URL; s3 = byte upload to S3; finalize = saving metadata */
   const [uploadPhase, setUploadPhase] = useState<'idle' | 'presign' | 's3' | 'finalize'>('idle');
   const [uploadTotalMb, setUploadTotalMb] = useState<number | null>(null);
+  const [uploadTotalBytes, setUploadTotalBytes] = useState<number>(0);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(false);
   const [deletingMediaUrl, setDeletingMediaUrl] = useState<string | null>(null);
@@ -67,6 +68,13 @@ function UploadPageContent() {
 
   const closeMomentModal = () => {
     setMomentModal((m) => ({ ...m, open: false }));
+  };
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   };
 
   const parseResponseSafely = async (response: Response) => {
@@ -260,6 +268,7 @@ function UploadPageContent() {
     setUploadProgress(0);
     setUploadPhase('presign');
     setUploadTotalMb(file.size / (1024 * 1024));
+    setUploadTotalBytes(file.size);
 
     try {
       const abortController = new AbortController();
@@ -430,6 +439,7 @@ function UploadPageContent() {
       setUploading(false);
       setUploadPhase('idle');
       setUploadTotalMb(null);
+      setUploadTotalBytes(0);
     }
   };
 
@@ -438,16 +448,29 @@ function UploadPageContent() {
 
     setDeletingMediaUrl(mediaUrl);
     try {
-      const response = await fetch('/api/media/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: code.toUpperCase(),
-          mediaUrl,
-        }),
-      });
+      const payload = {
+        code: code.toUpperCase(),
+        mediaUrl,
+      };
+
+      let response: Response;
+      try {
+        response = await fetch('/api/media/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        response = await fetch('/api/media/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (!response.ok) {
         const data = await parseResponseSafely(response);
@@ -632,21 +655,32 @@ function UploadPageContent() {
                           />
                         )}
                       </div>
-                      <p className="text-sm text-[#2D2926]/65 mb-3">
-                        {uploadPhase === 'presign' && 'Preparing upload…'}
-                        {uploadPhase === 's3' &&
-                          (uploadTotalMb != null
-                            ? `Uploading… ${uploadProgress}% (${uploadTotalMb.toFixed(1)} MB file)`
-                            : `Uploading… ${uploadProgress}%`)}
-                        {uploadPhase === 'finalize' && 'Saving your moment…'}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={handleCancelUpload}
-                        className="px-4 py-2 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
-                      >
-                        Cancel upload
-                      </button>
+                      <div className="flex flex-col items-center">
+                        <p className="text-sm text-[#2D2926]/65 mb-3 inline-flex items-center justify-center gap-2 text-center">
+                          <svg
+                            className="h-4 w-4 animate-spin text-[#2D2926]/70"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4zm2 5.29A7.95 7.95 0 014 12H0c0 3.04 1.14 5.82 3 7.94l3-2.65z" />
+                          </svg>
+                          {uploadPhase === 'presign' && 'Preparing upload…'}
+                          {uploadPhase === 's3' &&
+                            (uploadTotalBytes > 0
+                              ? `Uploading… ${uploadProgress}% (${formatBytes(Math.round((uploadProgress / 100) * uploadTotalBytes))} / ${formatBytes(uploadTotalBytes)})`
+                              : `Uploading… ${uploadProgress}%`)}
+                          {uploadPhase === 'finalize' && 'Saving your moment…'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleCancelUpload}
+                          className="px-4 py-2 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
+                        >
+                          Cancel upload
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -682,6 +716,7 @@ function UploadPageContent() {
                       >
                         {/* Delete Button */}
                         <button
+                          type="button"
                           onClick={() => handleDeleteMedia(item.url)}
                           disabled={deletingMediaUrl === item.url}
                           className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#2D2926] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"

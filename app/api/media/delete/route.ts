@@ -3,7 +3,7 @@ import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
 import { deleteS3Object, extractS3ObjectKeyFromMediaUrl, getS3Config } from '@/lib/s3';
 
-export async function DELETE(request: NextRequest) {
+async function handleDelete(request: NextRequest) {
   try {
     const { code, mediaUrl } = await request.json();
 
@@ -61,4 +61,15 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  return handleDelete(request);
+}
+
+/**
+ * Compatibility fallback for clients/environments where DELETE with body is blocked.
+ */
+export async function POST(request: NextRequest) {
+  return handleDelete(request);
 }
