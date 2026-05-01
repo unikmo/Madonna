@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
 import '@/models/Order';
+import '@/models/User';
 import { sendUnlockNotificationEmail } from '@/lib/email';
 
 // Simple in-memory rate limiting (in production, use Redis)
