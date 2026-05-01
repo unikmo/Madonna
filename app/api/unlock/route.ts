@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import MomentCode from '@/models/MomentCode';
+import '@/models/Order';
 import { sendUnlockNotificationEmail } from '@/lib/email';
 
 // Simple in-memory rate limiting (in production, use Redis)
@@ -165,6 +166,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        message: err?.message || 'Unknown error',
+        name: err?.name || 'Error',
+      },
+      { status: 500 }
+    );
   }
 }
