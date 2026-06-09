@@ -217,12 +217,12 @@ function Hero() {
             <div className="flex justify-center lg:justify-start w-full max-lg:max-w-[540px] max-lg:mx-auto lg:max-w-none lg:-ml-8 lg:w-[calc(100%+2rem)]">
               <div className="relative w-full lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
                 <Image
-                  src="/nr1.jpg"
-                  alt="She thought it was just a card — a meaningful moment on her phone"
+                  src="/banner/banner.jpeg"
+                  alt="A meaningful moment — someone smiling while opening their memory on their phone"
                   fill
                   priority
                   sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="object-cover object-[28%_35%]"
+                  className="object-cover object-[50%_42%]"
                 />
               </div>
             </div>
