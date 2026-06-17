@@ -8,6 +8,13 @@ import {
   type AnimatedMomentModalVariant,
 } from '@/components/AnimatedMomentModal';
 
+/** Matches cream in product card photography — avoids white letterboxing around images */
+const PRODUCT_IMAGE_BG = '#FAF6F1';
+const productImageFrameClass =
+  'relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 overflow-hidden';
+const productImageClass =
+  'absolute inset-0 w-full h-full object-cover object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500';
+
 type PublicSiteConfig = {
   sellingEnabled: boolean;
   waitlistHeadline: string;
@@ -490,14 +497,15 @@ function StoryIn({
                     <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">
                       {i.tierLabel}
                     </p>
-                    <div className="relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-white rounded-lg overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-                      {/* Plain img with absolute fill so it actually scales with container (no Next/Image limit) */}
-                      {/* First product image is wider aspect; use object-cover + position so it fills like 2nd/3rd */}
+                    <div
+                      className={productImageFrameClass}
+                      style={{ backgroundColor: PRODUCT_IMAGE_BG }}
+                    >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={i.img}
                         alt={i.imageAlt || i.displayTitle}
-                        className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 brightness-105 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                        className={productImageClass}
                         loading={idx < 3 ? 'eager' : 'lazy'}
                       />
                     </div>
@@ -608,12 +616,15 @@ function CreateMomentModal({
                   className="text-center group transition-all duration-700 cursor-pointer w-full border-0 bg-transparent p-0 px-4 opacity-100"
                 >
                   <p className="text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium mb-4">{i.tierLabel}</p>
-                  <div className={`relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 bg-[#FDF9F5] ${idx === 0 ? 'mt-[43px]' : ''}`}>
+                  <div
+                    className={productImageFrameClass}
+                    style={{ backgroundColor: PRODUCT_IMAGE_BG }}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={i.img}
                       alt={i.imageAlt || i.displayTitle}
-                      className={`absolute inset-0 w-full h-full object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? 'object-cover object-[50%_85%]' : 'object-contain'}`}
+                      className={productImageClass}
                       loading="eager"
                     />
                   </div>
@@ -873,7 +884,6 @@ function ProductModal({
 
   const product = selected.product;
   const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
-  const isFirstImage = selected.isFirstImage ?? false;
 
   const getVariantIdForDelivery = () => {
     const variants = product.variants || [];
@@ -1008,12 +1018,15 @@ function ProductModal({
             </div>
           )}
 
-          <div className="relative aspect-[3/2] w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] mx-auto rounded-xl overflow-hidden mb-6 bg-[#E8E4DF] shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+          <div
+            className={`${productImageFrameClass} rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)]`}
+            style={{ backgroundColor: PRODUCT_IMAGE_BG }}
+          >
             <Image
               src={selected.img}
               alt={selected.imageAlt}
               fill
-              className={isFirstImage ? 'object-cover object-[50%_85%]' : 'object-contain'}
+              className="object-cover object-center"
               sizes="(max-width: 640px) 460px, (max-width: 1024px) 500px, 560px"
             />
           </div>
