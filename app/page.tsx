@@ -1061,7 +1061,7 @@ function ProductModal({
                 />
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Physical card + digital access</p>
-                  <p className="text-xs text-[#2D2926]/70">We ship the card and send your Moment Code by email.</p>
+                  <p className="text-xs text-[#2D2926]/70">We ship the card and send your Moment key by email.</p>
                 </div>
               </label>
 
@@ -1077,7 +1077,7 @@ function ProductModal({
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Digital card ( Images )</p>
                   <p className="text-xs text-[#2D2926]/70">
-                    We email you a digital card image with your Moment Code and QR — no physical card is shipped.
+                    We email you a digital card image with your Moment key and QR — no physical card is shipped.
                   </p>
                 </div>
               </label>
@@ -1349,7 +1349,7 @@ function ProductExperience() {
             <div className="relative aspect-[4/3] w-full rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
               <Image
                 src="/cardfrontunikmo.jpg"
-                alt="Card back with Moment Code"
+                alt="Card back with Moment key"
                 fill
                 className="object-contain"
                 sizes="(min-width: 1224px) 80vw, 130vw"
@@ -1366,9 +1366,9 @@ function ProductExperience() {
 
               <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6 text-[#2D2926]/80">
                 <p className="text-[16px] sm:text-[18px] lg:text-[20px] font-light leading-relaxed">
-                  Scan QR code. Make sure you see unikmo link below. Or type www.unikmo.com/unlock
+                  Scan QR key. Make sure you see unikmo link below. Or type www.unikmo.com/unlock
                 </p>
-                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Enter the Moment Code</p>
+                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Enter the Moment Key</p>
                 <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Experience the memory</p>
               </div>
             </div>
@@ -1428,7 +1428,7 @@ function StoryInEveryKey() {
     { label: 'No app required', icon: <IconSpark /> },
     { label: 'No login', icon: <IconLock /> },
     { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One code – one memory', icon: <IconCode /> },
+    { label: 'One key – one memory', icon: <IconCode /> },
     { label: 'A tree planted', icon: <IconLeaf /> },
   ];
 
@@ -1620,13 +1620,13 @@ const UNLOCK_LINK_CLASS = 'font-semibold text-[#2D2926] no-underline hover:text-
 // Grid order as in design: row1 = 1, 2, 4 | row2 = 3, 4, 5 (step 4 appears twice)
 const HOW_IT_WORKS_GRID = [
   { num: 1, title: 'Choose your Key', body: 'Select the card option that fits your story — Single Key, 4-Key Bundle or 7-Key Collection.' },
-  { num: 2, title: 'Receive your Moment Code', body: 'After purchase, the code is sent only to YOU by email. Unikmo never sends codes to recipients.' },
+  { num: 2, title: 'Receive your Moment Key', body: 'After purchase, the key is sent only to YOU by email. Unikmo never sends keys to recipients.' },
   {
     num: 4,
     title: 'Share your Moment',
     body: (
       <>
-        The recipient enters the code at{' '}
+        The recipient enters the key at{' '}
         <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
           www.unikmo.com/unlock
         </a>
@@ -1643,11 +1643,11 @@ const HOW_IT_WORKS_GRID = [
         <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
           www.unikmo.com/unlock
         </a>
-        . Upload your video, voice message, photo or text. One code = one private memory.
+        . Upload your video, voice message, photo or text. One key = one private memory.
       </>
     ),
   },
-  { num: 4, title: '', body: 'You decide how to share: Send the code yourself, Give the physical card, Or both. Only the person you trust can unlock it.' },
+  { num: 4, title: '', body: 'You decide how to share: Send the key yourself, Give the physical card, Or both. Only the person you trust can unlock it.' },
   {
     num: 5,
     title: 'They unlock & keep it',
@@ -1663,9 +1663,9 @@ const HOW_IT_WORKS_GRID = [
 ];
 
 const DELIVERY_OPTIONS = [
-  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the code by email.', defaultChecked: true },
-  { id: 'digital-only', label: 'Digital Only', desc: 'You receive a digital card and the code by email.', defaultChecked: false },
-  { id: 'split', label: 'Split Delivery', desc: 'We deliver the card to the recipient. You receive the code by email.', defaultChecked: false },
+  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the key by email.', defaultChecked: true },
+  { id: 'digital-only', label: 'Digital Only', desc: 'You receive a digital card and the key by email.', defaultChecked: false },
+  { id: 'split', label: 'Split Delivery', desc: 'We deliver the card to the recipient. You receive the key by email.', defaultChecked: false },
 ];
 
 function HowItWorksModal({ onClose }: { onClose: () => void }) {
