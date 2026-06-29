@@ -67,7 +67,7 @@ export default function LandingPage() {
         <Hero />
         <WhenToUseUnikmo />
         <SocialProof />
-        <HowItWorks2 />
+        <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
         {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
@@ -1268,19 +1268,13 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
           </div>
 
           <div className="pt-6 sm:pt-8">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg flex-shrink-0" aria-hidden>🚚</span>
-              <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px]">Delivery Options</h3>
-            </div>
+            <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px] mb-1">Options</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4">
               {DELIVERY_OPTIONS.map((opt) => (
-                <label key={opt.id} className="flex gap-3 cursor-pointer group">
-                  <input type="radio" name="delivery-section" defaultChecked={opt.defaultChecked} className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/30 focus:ring-[#2D2926]/50" readOnly tabIndex={-1} />
-                  <div>
-                    <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block group-hover:text-[#1E1B18]">{opt.label}</span>
-                    <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
-                  </div>
-                </label>
+                <div key={opt.id}>
+                  <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block">{opt.label}</span>
+                  <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -1290,7 +1284,7 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   );
 }
 
-function HowItWorks2() {
+function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   return (
     <section
       id="how-it-works"
@@ -1299,13 +1293,20 @@ function HowItWorks2() {
       <Container>
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
-            Simple as a key
+             How it works.
           </h2>
           <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
-            ① Choose Your Key &nbsp;→&nbsp; ② Upload Moment &nbsp;→&nbsp; ③ They Unlock
+            ① Choose a Card &nbsp;→&nbsp; ② Add a private Moment &nbsp;→&nbsp; ③ Give them the Key to unlock it
           </p>
           <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed">
-            We never send the Key to the recipient — you stay in control.
+            Each card includes one digital Key for one private memory: video, photo, voice note, or message. You upload it first. They unlock it later.{' '}
+            <button
+              type="button"
+              onClick={onLearnMoreClick}
+              className="font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors"
+            >
+              More
+            </button>
           </p>
         </div>
       </Container>
@@ -1614,58 +1615,46 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
   );
 }
 
+const UPLOAD_URL = 'https://unikmo.com/upload';
 const UNLOCK_URL = 'https://unikmo.com/unlock';
 const UNLOCK_LINK_CLASS = 'font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors';
 
-// Grid order as in design: row1 = 1, 2, 4 | row2 = 3, 4, 5 (step 4 appears twice)
 const HOW_IT_WORKS_GRID = [
-  { num: 1, title: 'Choose your Key', body: 'Select the card option that fits your story — Single Key, 4-Key Bundle or 7-Key Collection.' },
-  { num: 2, title: 'Receive your Moment Key', body: 'After purchase, the key is sent only to YOU by email. Unikmo never sends keys to recipients.' },
-  {
-    num: 4,
-    title: 'Share your Moment',
-    body: (
-      <>
-        The recipient enters the key at{' '}
-        <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
-          www.unikmo.com/unlock
-        </a>
-        . Your memory becomes theirs to revisit anytime.
-      </>
-    ),
-  },
+  { num: 1, title: 'Choose your Card', body: 'Select a Single Card, 4-Card Bundle, or 7-Card Collection. Each card includes one private digital Key.' },
+  { num: 2, title: 'Receive your Key', body: 'After purchase, the Key is sent to you by email. UNIKMO does not send it to the recipient.' },
   {
     num: 3,
-    title: 'Create your Moment',
+    title: 'Upload your Moment',
     body: (
       <>
         Go to{' '}
-        <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
-          www.unikmo.com/unlock
-        </a>
-        . Upload your video, voice message, photo or text. One key = one private memory.
+        <a href={UPLOAD_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
+          www.unikmo.com/upload
+        </a>{' '}
+        and add your video, photo, voice note, or message.
       </>
     ),
   },
-  { num: 4, title: '', body: 'You decide how to share: Send the key yourself, Give the physical card, Or both. Only the person you trust can unlock it.' },
+  { num: 4, title: 'Give the Card', body: 'Send the digital card, give the physical card, or choose split delivery.' },
   {
     num: 5,
-    title: 'They unlock & keep it',
+    title: 'They unlock it',
     body: (
       <>
+        The recipient goes to{' '}
         <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
           www.unikmo.com/unlock
         </a>
-        . Your memory becomes theirs to revisit anytime.
+        , enters the Key, and opens the memory.
       </>
     ),
   },
 ];
 
 const DELIVERY_OPTIONS = [
-  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the key by email.', defaultChecked: true },
-  { id: 'digital-only', label: 'Digital Only', desc: 'You receive a digital card and the key by email.', defaultChecked: false },
-  { id: 'split', label: 'Split Delivery', desc: 'We deliver the card to the recipient. You receive the key by email.', defaultChecked: false },
+  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the Key by email.' },
+  { id: 'digital-only', label: 'Digital Only', desc: 'You receive the digital card and the Key by email.' },
+  { id: 'split', label: 'Split Delivery', desc: 'We send the physical card to the recipient. You receive the Key by email.' },
 ];
 
 function HowItWorksModal({ onClose }: { onClose: () => void }) {
@@ -1684,9 +1673,13 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
-          <h2 id="how-it-works-title" className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-8 sm:mb-10">
+          <h2 id="how-it-works-title" className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-4 sm:mb-5">
             How It Works
           </h2>
+
+          <p className="text-center text-[14px] sm:text-[15px] lg:text-[16px] text-red-600 font-medium leading-relaxed mb-8 sm:mb-10 max-w-2xl mx-auto">
+            Choose a card, add your private memory, and give someone the Key to unlock it.
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10 sm:mb-12">
             {HOW_IT_WORKS_GRID.map((step, idx) => (
@@ -1696,26 +1689,20 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
                 </span>
                 <div className="min-w-0">
                   {step.title && <h3 className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] mb-1">{step.title}</h3>}
-                  <p className="text-[13px] sm:text-[14px] text-[#2D2926]/90 leading-relaxed">{step.body}</p>
+                  {step.body && <p className="text-[13px] sm:text-[14px] text-[#2D2926]/90 leading-relaxed">{step.body}</p>}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="pt-6 sm:pt-8">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg flex-shrink-0" aria-hidden>🚚</span>
-              <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px]">Delivery Options</h3>
-            </div>
+          <div className="pt-6 sm:pt-8 border-t border-[#2D2926]/10">
+            <h3 className="font-semibold text-[#2D2926] text-[15px] sm:text-[16px] mb-1">Options</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4">
               {DELIVERY_OPTIONS.map((opt) => (
-                <label key={opt.id} className="flex gap-3 cursor-pointer group">
-                  <input type="radio" name="delivery" defaultChecked={opt.defaultChecked} className="mt-1 w-4 h-4 text-[#2D2926] border-[#2D2926]/30 focus:ring-[#2D2926]/50" />
-                  <div>
-                    <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block group-hover:text-[#1E1B18]">{opt.label}</span>
-                    <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
-                  </div>
-                </label>
+                <div key={opt.id}>
+                  <span className="font-semibold text-[#2D2926] text-[14px] sm:text-[15px] block">{opt.label}</span>
+                  <span className="text-[13px] sm:text-[14px] text-[#2D2926]/80">{opt.desc}</span>
+                </div>
               ))}
             </div>
           </div>

@@ -555,11 +555,11 @@ Stack note: **Next.js 14 (App Router)** API routes + **MongoDB (Mongoose)** — 
 
 ### 64
 
-**Subject:** “Simple as a key” section  
+**Subject:** “ How it works.” section  
 
 **Milestone:** UI/UX Modernization  
 
-**Task Description:** Three-step flow (Choose key → Upload moment → They unlock), support line about key not sent to recipient; removed duplicate “more” / Learn more links.
+**Task Description:** Three-step flow (Choose key → Add a private Moment → Give them the Key to unlock it), support line about key not sent to recipient; removed duplicate “more” / Learn more links.
 
 ### 65
 

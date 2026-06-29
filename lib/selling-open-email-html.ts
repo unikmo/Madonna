@@ -51,7 +51,7 @@ export function buildSellingOpenEmailHtml(params: SellingOpenEmailParams): { htm
                   <tr>
                     <td style="padding:0;text-align:center;">
                       <p style="margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#6b635c;">Next step</p>
-                      <p style="margin:0;font-size:15px;line-height:1.5;color:#2D2926;font-weight:600;">Open the site and choose your key</p>
+                      <p style="margin:0;font-size:15px;line-height:1.5;color:#2D2926;font-weight:600;">Open the site and Choose a Card</p>
                     </td>
                   </tr>
                 </table>

@@ -35,7 +35,7 @@ Encourage customers to invite others, and reward them when those invites become 
 - Customers can clearly see progress (for example: 3 of 5 completed).
 - Customers get notified when:
   - a referral is successful,
-  - they unlock a reward.
+  - Give them the Key to unlock it a reward.
 
 ## Open Questions for Final Approval
 1. Should the inviter be required to have already placed at least one order before they can earn referral rewards?
