@@ -136,7 +136,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 }
 
 /**
- * Sends Moment Code(s) to buyer via email
+ * Sends Moment Key(s) to buyer via email
  */
 /**
  * Sends waitlist confirmation with the same marketing copy as Admin → Configs.
@@ -159,7 +159,7 @@ export async function sendMomentCodesEmail(
   const baseUrl = (process.env.BASE_URL || 'https://yourdomain.com').replace(/\/$/, '');
   const { html } = buildMomentCodesEmailHtml({ codes, orderId, baseUrl });
 
-  const subject = `Your Moment Code${codes.length > 1 ? 's' : ''} - UNIKMO`;
+  const subject = `Your Moment Key${codes.length > 1 ? 's' : ''} - UNIKMO`;
 
   const success = await sendEmail(to, subject, html);
   
@@ -169,7 +169,7 @@ export async function sendMomentCodesEmail(
 }
 
 /**
- * Sends unlock notification email to buyer when a code is unlocked.
+ * Sends unlock notification email to buyer when a Key is unlocked.
  */
 export async function sendUnlockNotificationEmail(params: {
   to: string;
@@ -229,7 +229,7 @@ export async function sendUnlockNotificationEmail(params: {
             Great news — someone just unlocked one of your UNIKMO moments.
           </div>
           <div class="info-box">
-            <div class="row-label">Moment Code</div>
+            <div class="row-label">Moment Key</div>
             <div class="row-value">${params.code}</div>
             <div class="meta">Unlocked at: ${unlockedAtText}</div>
           </div>
@@ -238,7 +238,7 @@ export async function sendUnlockNotificationEmail(params: {
           </div>
           <div class="footer">
             <div class="footer-text">
-              You are receiving this because this code is connected to your purchase.
+              You are receiving this because this Key is connected to your purchase.
             </div>
           </div>
         </div>

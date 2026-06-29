@@ -1,5 +1,5 @@
 /**
- * Builds the exact HTML used for the Moment Codes email.
+ * Builds the exact HTML used for the Moment Keys email.
  * This is intentionally "HTML-only" (no nodemailer / server deps) so it can be used
  * both in the email sender and in the admin preview (client-side iframe).
  */
@@ -96,7 +96,7 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
                 <img
                   src="${qrUrlForCode}"
                   width="92"
-                  alt="QR for ${code}"
+                  alt="QR for Key ${code}"
                   style="
                     position: absolute;
                     left: ${tier.qr.leftPct}%;
@@ -184,14 +184,14 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
       <div class="email-container">
         <div class="header">
           <div class="logo">UNIKMO</div>
-          <div class="header-subtitle">Your Moment Codes Are Ready! 🎁</div>
+          <div class="header-subtitle">Your Moment Keys Are Ready! 🎁</div>
         </div>
         
         <div class="content">
           <div class="greeting">Thank You for Your Purchase!</div>
           
           <div class="message">
-            Your order has been confirmed and your unique Moment Code${codes.length > 1 ? 's are' : ' is'} ready to use.
+            Your order has been confirmed and your unique Moment Key${codes.length > 1 ? 's are' : ' is'} ready to use.
           </div>
           
           <div class="order-info">
@@ -223,8 +223,8 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
             <div class="info-title"><span>💡 Important Information</span></div>
             <div class="info-text">
               <strong>Upload your media:</strong> Visit ${uploadUrl}<br>
-              <strong>Share with recipient:</strong> Give them the code above and they can unlock at ${unlockBaseUrl}<br>
-              <strong>Remember:</strong> Keep your code safe - it's the only way to access your moment!
+              <strong>Share with recipient:</strong> Give them the Key above and they can unlock at ${unlockBaseUrl}<br>
+              <strong>Remember:</strong> Keep your Key safe - it's the only way to access your moment!
             </div>
           </div>
           
