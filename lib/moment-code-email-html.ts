@@ -62,7 +62,8 @@ function normalizeBaseUrl(baseUrl: string) {
 
 export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryType }: BuildArgs): { html: string } {
   const safeBaseUrl = normalizeBaseUrl(baseUrl ?? 'https://yourdomain.com');
-  const uploadUrl = `${safeBaseUrl}/upload?code=${encodeURIComponent(codes[0] || '')}`;
+  const uploadPageUrl = `${safeBaseUrl}/upload`;
+  const uploadUrl = `${uploadPageUrl}?code=${encodeURIComponent(codes[0] || '')}`;
   const unlockBaseUrl = `${safeBaseUrl}/unlock`;
 
   const firstCode = codes[0] || '';
@@ -222,8 +223,8 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
           <div class="info-box">
             <div class="info-title"><span>💡 Important Information</span></div>
             <div class="info-text">
-              <strong>Upload your media:</strong> Visit ${uploadUrl}<br>
-              <strong>Share with recipient:</strong> Give them the Key above and they can unlock at ${unlockBaseUrl}<br>
+              <strong>Upload your media:</strong> <a href="${uploadUrl}" style="color: #2D2926; font-weight: 600;">${uploadPageUrl.replace(/^https?:\/\//, '')}</a> (your Key is pre-filled)<br>
+              <strong>Share with recipient:</strong> Give them the Key above and they can unlock at <a href="${unlockBaseUrl}" style="color: #2D2926; font-weight: 600;">${unlockBaseUrl.replace(/^https?:\/\//, '')}</a><br>
               <strong>Remember:</strong> Keep your Key safe - it's the only way to access your moment!
             </div>
           </div>
