@@ -218,10 +218,17 @@ function SiteHeader({
           </nav>
 
           <a
-            className="font-serif text-lg sm:text-xl tracking-[0.32em] text-[#1E1B18]/90 hover:scale-105 transition-transform duration-300"
+            className="inline-flex items-center hover:scale-105 transition-transform duration-300"
             href="#top"
           >
-            UNIKMO
+            <Image
+              src="/unikmo-logo-header.png"
+              alt="UNIKMO"
+              width={729}
+              height={220}
+              priority
+              className="h-7 sm:h-8 w-auto"
+            />
           </a>
 
           <nav className="flex-1 flex justify-end">
