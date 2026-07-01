@@ -310,7 +310,7 @@ function Hero() {
                   Create Your Moment
                 </a>
                 <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-                  First release limited to 500 key moments.
+                  Founding release — 100 cards only.
                 </p>
               </div>
             </div>
@@ -1714,7 +1714,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
             Create Your Moment
           </button>
           <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-            First release limited to 500 key moments.
+            Founding release — 100 cards only.
           </p>
         </div>
       </div>
