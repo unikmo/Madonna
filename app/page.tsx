@@ -352,7 +352,7 @@ function PreFooterTrustStrip() {
 
 const whenToGiveOneColumns = [
   ['Long-distance birthdays', 'Anniversaries', 'Wedding mornings', 'Graduations'],
-  ['Open-when messages', 'Apologies', 'Family memories', 'Messages from far away'],
+  ['Open-when messages', 'Apologies', 'Family memories', 'Just-because moments'],
 ] as const;
 
 function WhenToUseUnikmo() {
@@ -375,14 +375,10 @@ function WhenToUseUnikmo() {
               {column.map((line, lineIdx) => (
                 <div
                   key={line}
-                  className={`flex items-start gap-3 sm:gap-4 text-left pb-4 sm:pb-5 border-b border-[#2D2926]/10 ${
+                  className={`text-left pb-4 sm:pb-5 border-b border-[#2D2926]/10 ${
                     lineIdx === column.length - 1 ? 'border-b-0 pb-0' : ''
                   }`}
                 >
-                  <span
-                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D2926]/35"
-                    aria-hidden
-                  />
                   <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
                     {line}
                   </p>
