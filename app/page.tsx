@@ -1623,8 +1623,8 @@ function SocialProof() {
           ))}
         </ul>
 
-        <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
-          No app. No login. Just one key to one private memory.
+        <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light tracking-wide animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
+          NO APP REQUIRED &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; ONE KEY = ONE MEMORY
         </p>
       </div>
     </section>
