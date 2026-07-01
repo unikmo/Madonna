@@ -26,6 +26,51 @@ type PublicSiteConfig = {
   waitlistCtaLabel: string;
 };
 
+const ORGANIZATION_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'UNIKMO',
+  url: 'https://www.unikmo.com/',
+  sameAs: [
+    'https://www.instagram.com/myunikmo',
+    'https://www.tiktok.com/@myunikmo',
+  ],
+  description:
+    'UNIKMO creates personalized memory gifts: a physical key that unlocks a private video, voice note, photo, or message.',
+};
+
+const PRODUCTS_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'UNIKMO Keys',
+  itemListElement: [
+    {
+      '@type': 'Product',
+      position: 1,
+      name: 'Single Key',
+      description: 'One private memory, beautifully unlocked.',
+      brand: { '@type': 'Brand', name: 'UNIKMO' },
+      offers: { '@type': 'Offer', price: '24.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
+    },
+    {
+      '@type': 'Product',
+      position: 2,
+      name: '4-Key Set',
+      description: 'Four moments for a birthday, anniversary, or open-when story.',
+      brand: { '@type': 'Brand', name: 'UNIKMO' },
+      offers: { '@type': 'Offer', price: '64.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
+    },
+    {
+      '@type': 'Product',
+      position: 3,
+      name: '7-Key Collection',
+      description: 'A full memory journey told over time.',
+      brand: { '@type': 'Brand', name: 'UNIKMO' },
+      offers: { '@type': 'Offer', price: '72.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
+    },
+  ],
+};
+
 export default function LandingPage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
@@ -61,14 +106,21 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF9F5] text-[#1E1B18]">
-      <SiteHeader onContactClick={() => setShowContactModal(true)} onHowItWorksClick={() => setShowHowItWorksModal(true)} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(PRODUCTS_JSON_LD) }}
+      />
+      <SiteHeader onHowItWorksClick={() => setShowHowItWorksModal(true)} />
 
       <main>
         <Hero />
+        <HowItWorks2 />
         <WhenToUseUnikmo />
         <SocialProof />
-        <HowItWorks2 onLearnMoreClick={() => setShowHowItWorksModal(true)} />
-        {/* <HowItWorks onLearnMoreClick={() => setShowHowItWorksModal(true)} /> */}
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
           setShowCreateMomentModal={setShowCreateMomentModal}
@@ -77,11 +129,13 @@ export default function LandingPage() {
         />
         {/* <EmotionalPositioning /> */}
         {/* <ProductExperience /> */}
-        <FinalCta onCreateMomentClick={handleCreateMomentClick} />
         <PreFooterTrustStrip />
+        <QuestionsSection onContactClick={() => setShowContactModal(true)} />
+        <FinalCta onCreateMomentClick={handleCreateMomentClick} />
       </main>
 
       <SiteFooter
+        onContactClick={() => setShowContactModal(true)}
         onPrivacyClick={() => setShowPrivacyModal(true)}
         onTermsClick={() => setShowTermsModal(true)}
         onImprintClick={() => setShowImprintModal(true)}
@@ -125,10 +179,8 @@ function Button({
 }
 
 function SiteHeader({
-  onContactClick,
   onHowItWorksClick,
 }: {
-  onContactClick: () => void;
   onHowItWorksClick: () => void;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -142,14 +194,14 @@ function SiteHeader({
   }, []);
 
   return (
-    <header 
+    <header
       className={`sticky top-0 z-50 bg-[#FDF9F5] transition-all duration-300 ${
         isScrolled ? 'bg-[#FDF9F5]/90 backdrop-blur-md shadow-md' : ''
       }`}
     >
       <Container>
         <div className="flex h-14 sm:h-16 items-center justify-between">
-          <nav className="flex-1">
+          <nav className="flex-1 flex items-center gap-4 sm:gap-6">
             <button
               type="button"
               onClick={onHowItWorksClick}
@@ -157,6 +209,12 @@ function SiteHeader({
             >
               How it Works
             </button>
+            <a
+              href="#gift-ideas"
+              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block"
+            >
+              Gift Ideas
+            </a>
           </nav>
 
           <a
@@ -167,13 +225,12 @@ function SiteHeader({
           </a>
 
           <nav className="flex-1 flex justify-end">
-            <button
-              type="button"
-              onClick={onContactClick}
+            <a
+              href="#shop"
               className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1"
             >
-              Contact
-            </button>
+              Create Your Moment
+            </a>
           </nav>
         </div>
       </Container>
@@ -182,10 +239,10 @@ function SiteHeader({
 }
 
 const preFooterTrustItems = [
-  { label: 'No app required', icon: <IconSpark /> },
-  { label: 'No login', icon: <IconLock /> },
-  { label: 'Private & secure', icon: <IconShield /> },
-  { label: 'One key = one memory', icon: <IconKey /> },
+  { label: 'No app required', detail: 'They open the memory in the browser.', icon: <IconSpark /> },
+  { label: 'No login', detail: 'The recipient does not need an account.', icon: <IconLock /> },
+  { label: 'Private & secure', detail: 'Only the key opens the memory.', icon: <IconShield /> },
+  { label: 'One key = one memory', detail: 'Simple, personal, and intentional.', icon: <IconKey /> },
 ];
 
 function Hero() {
@@ -237,12 +294,14 @@ function Hero() {
             <div className="flex flex-col justify-center text-center lg:text-left px-1 sm:px-2 lg:px-4 xl:pr-8">
               {/* 1. Headline */}
               <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
-                You can&apos;t be there when it matters most.
+                A physical key to a private memory.
               </h1>
 
               {/* 2. Subline */}
               <p className="mt-4 sm:mt-6 lg:mt-8 text-[15px] sm:text-[17px] lg:text-[19px] xl:text-[20px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
-                But you can still give them something they&apos;ll never forget.
+                Upload a video, voice note, photo, or message.
+                <br />
+                They unlock it with their own UNIKMO key.
               </p>
 
               {/* 3. Supporting text */}
@@ -253,12 +312,12 @@ function Hero() {
               <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-2.5">
                 <a
                   href="#shop"
-                  className="inline-flex items-center justify-center rounded-full bg-[#E9DCCF] hover:bg-[#DDD0C4] active:bg-[#D3C7BB] text-[#2D2926] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
+                  className="inline-flex items-center justify-center rounded-full bg-[#DDD0C4] hover:bg-[#D3C7BB] active:bg-[#C7BAAC] text-[#2D2926] px-9 py-4 sm:px-11 sm:py-5 text-[13px] sm:text-[14px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
                 >
-                  Create a moment they&apos;ll never forget
+                  Create Your Moment
                 </a>
                 <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-                  Limited first release — first 500 people
+                  First release limited to 500 key moments.
                 </p>
               </div>
             </div>
@@ -277,12 +336,18 @@ function PreFooterTrustStrip() {
       className="bg-[#F5EEED] pt-8 sm:pt-10 pb-10 sm:pb-12 lg:pb-14 border-0"
     >
       <Container>
+        <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] text-center mb-8 sm:mb-10">
+          Private by design.
+        </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 max-w-5xl mx-auto">
           {preFooterTrustItems.map((item) => (
             <div key={item.label} className="flex flex-col items-center text-center">
               <div className="text-[#2D2926]/40 mb-2 sm:mb-3">{item.icon}</div>
               <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
                 {item.label}
+              </p>
+              <p className="mt-1.5 text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug">
+                {item.detail}
               </p>
             </div>
           ))}
@@ -292,18 +357,15 @@ function PreFooterTrustStrip() {
   );
 }
 
-const whenToUseUnikmoLines = [
-  "When you can't be there",
-  'When it really matters',
-  'When you have something to say',
-  "When a message isn't enough",
-  'When you want them to feel it',
-  'When it should last',
+const whenToGiveOneColumns = [
+  ['Long-distance birthdays', 'Anniversaries', 'Wedding mornings', 'Graduations'],
+  ['Open-when messages', 'Apologies', 'Family memories', 'Messages from far away'],
 ] as const;
 
 function WhenToUseUnikmo() {
   return (
     <section
+      id="gift-ideas"
       aria-labelledby="when-to-use-unikmo-heading"
       className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6"
     >
@@ -312,21 +374,27 @@ function WhenToUseUnikmo() {
           id="when-to-use-unikmo-heading"
           className="font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14"
         >
-          When words aren&apos;t enough
+          For moments that deserve more than a message.
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 lg:gap-x-20 gap-y-5 sm:gap-y-6 max-w-4xl mx-auto">
-          {whenToUseUnikmoLines.map((line) => (
-            <div
-              key={line}
-              className="flex items-start gap-3 sm:gap-4 text-left border-b border-[#2D2926]/10 pb-4 sm:pb-5 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
-            >
-              <span
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D2926]/35"
-                aria-hidden
-              />
-              <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
-                {line}
-              </p>
+          {whenToGiveOneColumns.map((column, columnIdx) => (
+            <div key={columnIdx} className="space-y-5 sm:space-y-6">
+              {column.map((line, lineIdx) => (
+                <div
+                  key={line}
+                  className={`flex items-start gap-3 sm:gap-4 text-left pb-4 sm:pb-5 border-b border-[#2D2926]/10 ${
+                    lineIdx === column.length - 1 ? 'border-b-0 pb-0' : ''
+                  }`}
+                >
+                  <span
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D2926]/35"
+                    aria-hidden
+                  />
+                  <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
+                    {line}
+                  </p>
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -425,17 +493,19 @@ function StoryIn({
   }, []);
 
   const items = products.map((product) => {
-    let subtitle = 'A small moment, beautifully delivered.';
+    let subtitle = 'One private memory, beautifully unlocked.';
     let tierLabel = 'The Spark';
     let displayTitle = 'Single Key';
+    let bestValue = false;
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
-      subtitle = 'A collection of memories.';
+      subtitle = 'Four moments for a birthday, anniversary, or open-when story.';
       tierLabel = 'The Journey';
       displayTitle = '4-Key Set';
     } else if (product.title.toLowerCase().includes('7') || product.title.toLowerCase().includes('seven')) {
-      subtitle = 'A story told over time.';
+      subtitle = 'A full memory journey told over time.';
       tierLabel = 'The History';
       displayTitle = '7-Key Collection';
+      bestValue = true;
     }
     return {
       product,
@@ -443,6 +513,7 @@ function StoryIn({
       displayTitle,
       tierLabel,
       subtitle,
+      bestValue,
       img: product.image || '/placeholder-product.png',
       imageAlt: product.imageAlt || product.title,
       price: product.price,
@@ -459,7 +530,7 @@ function StoryIn({
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
-            CREATE YOUR MOMENT
+            Choose your key.
           </h2>
         </div>
 
@@ -501,6 +572,11 @@ function StoryIn({
                       className={productImageFrameClass}
                       style={{ backgroundColor: PRODUCT_IMAGE_BG }}
                     >
+                      {i.bestValue && (
+                        <span className="absolute top-2 right-2 z-10 rounded-full bg-[#2D2926] px-3 py-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white shadow-sm">
+                          Best Value
+                        </span>
+                      )}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={i.img}
@@ -532,7 +608,7 @@ function StoryIn({
                 onClick={() => setShowCreateMomentModal(true)}
                 className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
               >
-                CREATE YOUR MOMENT
+                Choose Your Key
               </button>
             </div>
           </div>
@@ -569,6 +645,7 @@ type CreateMomentItem = {
   displayTitle: string;
   tierLabel: string;
   subtitle: string;
+  bestValue?: boolean;
   img: string;
   imageAlt: string;
   price?: string | null;
@@ -620,6 +697,11 @@ function CreateMomentModal({
                     className={productImageFrameClass}
                     style={{ backgroundColor: PRODUCT_IMAGE_BG }}
                   >
+                    {i.bestValue && (
+                      <span className="absolute top-2 right-2 z-10 rounded-full bg-[#2D2926] px-3 py-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white shadow-sm">
+                        Best Value
+                      </span>
+                    )}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={i.img}
@@ -1284,7 +1366,7 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
   );
 }
 
-function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
+function HowItWorks2() {
   return (
     <section
       id="how-it-works"
@@ -1293,20 +1375,13 @@ function HowItWorks2({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
       <Container>
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
-             How it works.
+             How UNIKMO works.
           </h2>
           <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
-            ① Choose a Card &nbsp;→&nbsp; ② Add a private Moment &nbsp;→&nbsp; ③ Give them the Key to unlock it
+            ① Choose your key &nbsp;→&nbsp; ② Add a private memory &nbsp;→&nbsp; ③ Give it to someone special &nbsp;→&nbsp; ④ They unlock the moment
           </p>
           <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed">
-            Each card includes one digital Key for one private memory: video, photo, voice note, or message. You upload it first. They unlock it later.{' '}
-            <button
-              type="button"
-              onClick={onLearnMoreClick}
-              className="font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors"
-            >
-              More
-            </button>
+            Each UNIKMO key unlocks one private memory: a video, photo, voice note, or written message. You upload it first. They open it later — no app or login required.
           </p>
         </div>
       </Container>
@@ -1474,14 +1549,14 @@ function StoryInEveryKey() {
 const TESTIMONIALS = [
   {
     quote:
-      'I gave this to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.',
+      'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.',
     name: 'Matt L., London',
     imageSrc: '/testimonials/customer-london.jpg',
     imageAlt: 'Matt, customer in London, smiling with his phone',
   },
   {
     quote:
-      "Such a simple idea, yet incredibly powerful. The moment we unlocked the message together, it became something we'll remember forever.",
+      "Such a simple idea, but incredibly powerful. The moment we unlocked the message together, it became something we'll remember forever.",
     name: 'Sophie M., New York',
     imageSrc: '/testimonials/customer-newyork.jpg',
     imageAlt: 'Sophie, customer in New York',
@@ -1525,10 +1600,10 @@ function SocialProof() {
             id="testimonials-heading"
             className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] text-[#2D2926] leading-snug font-normal animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000"
           >
-            Something they remember long after.
+            The moment they unlock it is the gift.
           </h2>
           <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-          Real moments from people who&apos;ve sent one.
+          Private messages, voice notes, photos, and videos — turned into something they can hold.
           </p>
         </header>
 
@@ -1558,7 +1633,46 @@ function SocialProof() {
             </li>
           ))}
         </ul>
+
+        <p className="mt-12 sm:mt-14 lg:mt-16 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
+          No app. No login. Just one key to one private memory.
+        </p>
       </div>
+    </section>
+  );
+}
+
+function QuestionsSection({ onContactClick }: { onContactClick: () => void }) {
+  return (
+    <section
+      aria-labelledby="questions-heading"
+      className="bg-[#FDF9F5] py-12 sm:py-14 lg:py-16 border-t border-[#2D2926]/6"
+    >
+      <Container>
+        <div className="max-w-xl mx-auto text-center">
+          <h2
+            id="questions-heading"
+            className="font-serif text-[22px] sm:text-[26px] lg:text-[28px] text-[#2D2926] mb-3 sm:mb-4"
+          >
+            Questions before you create one?
+          </h2>
+          <p className="text-[14px] sm:text-[15px] text-[#2D2926]/70 font-light leading-relaxed mb-6 sm:mb-7">
+            If you&apos;re not sure which key to choose, how the memory is unlocked, or whether UNIKMO fits your moment, send us a note.
+          </p>
+          <button
+            type="button"
+            onClick={onContactClick}
+            className="inline-flex items-center justify-center rounded-full bg-transparent border border-[#2D2926]/20 text-[#2D2926] px-7 py-3 text-[11px] sm:text-[12px] font-medium tracking-[0.08em] uppercase hover:bg-[#2D2926]/5 transition-colors"
+          >
+            Contact UNIKMO
+          </button>
+          <p className="mt-4 text-[12px] sm:text-[13px] text-[#2D2926]/50">
+            <a href="/faq" className="underline hover:text-[#2D2926] transition-colors">
+              Still unsure? Read the FAQ.
+            </a>
+          </p>
+        </div>
+      </Container>
     </section>
   );
 }
@@ -1595,8 +1709,12 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center pt-2 sm:pt-4">
         <h2 className="font-serif text-[28px] sm:text-[36px] lg:text-[44px] xl:text-[52px] leading-[1.08] text-[#2D2926] font-normal tracking-tight animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-          Already have someone in mind?
+          Someone already came to mind.
         </h2>
+
+        <p className="mt-4 sm:mt-5 text-[15px] sm:text-[16px] lg:text-[18px] text-[#2D2926]/85 font-light leading-relaxed animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-100">
+          Create the moment they&apos;ll never forget.
+        </p>
 
         <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2.5 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-200">
           <button
@@ -1604,10 +1722,10 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
             onClick={onCreateMomentClick}
             className="inline-flex items-center justify-center rounded-full bg-[#E9DCCF] hover:bg-[#DDD0C4] active:bg-[#D3C7BB] text-[#2D2926] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
           >
-            Join the first release
+            Create Your Moment
           </button>
           <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-            Limited to the first 500 moments
+            First release limited to 500 key moments.
           </p>
         </div>
       </div>
@@ -1808,10 +1926,12 @@ function ContactModal({ onClose }: { onClose: () => void }) {
 }
 
 function SiteFooter({
+  onContactClick,
   onPrivacyClick,
   onTermsClick,
   onImprintClick,
 }: {
+  onContactClick: () => void;
   onPrivacyClick: () => void;
   onTermsClick: () => void;
   onImprintClick: () => void;
@@ -1845,20 +1965,20 @@ function SiteFooter({
           <div className="flex items-center gap-4 sm:gap-5 lg:gap-6">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-800/40" />
-              <span>A TREE PLANTED</span>
-              <svg 
-                viewBox="0 0 24 24" 
+              <span>One tree planted with every key.</span>
+              <svg
+                viewBox="0 0 24 24"
                 className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current opacity-60"
               >
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
             </div>
-            
+
             <div className="flex items-center gap-3 sm:gap-4">
-              <a 
-                href="https://www.instagram.com/myunikmo" 
-                target="_blank" 
-                rel="noreferrer" 
+              <a
+                href="https://www.instagram.com/myunikmo"
+                target="_blank"
+                rel="noreferrer"
                 className="hover:text-[#2D2926] transition-colors"
               >
                 INSTAGRAM
@@ -1883,6 +2003,19 @@ function SiteFooter({
         </div>
 
         <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/30">
+          <a
+            href="/faq"
+            className="hover:text-[#2D2926]/60 transition-colors"
+          >
+            FAQ
+          </a>
+          <button
+            type="button"
+            onClick={onContactClick}
+            className="hover:text-[#2D2926]/60 transition-colors"
+          >
+            Contact
+          </button>
           <button
             type="button"
             onClick={onPrivacyClick}

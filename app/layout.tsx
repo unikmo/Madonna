@@ -6,26 +6,32 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 // Initialize admin user on app startup
 import "@/lib/init-admin";
 
+const siteTitle = "UNIKMO | A Physical Key to a Private Memory";
 const siteDescription =
-  "Looking for long distance gift ideas or a meaningful gift when you can't be there? This emotional gift helps you send a personal message, video, or memory in a simple and lasting way.";
+  "Create a personalized memory gift with UNIKMO. Upload a private video, voice note, photo, or message and give someone a physical key to unlock it. No app or login required.";
+const twitterDescription =
+  "Create a personalized memory gift with a private video, voice note, photo, or message unlocked by a physical key.";
 
 export const metadata: Metadata = {
-  title: "UNIKMO - Gifting Platform",
+  metadataBase: new URL("https://www.unikmo.com"),
+  title: siteTitle,
   description: siteDescription,
-  keywords: [
-    "long distance gift ideas",
-    "emotional gift",
-    "meaningful gift",
-  ],
+  alternates: {
+    canonical: "https://www.unikmo.com/",
+  },
   openGraph: {
-    title: "UNIKMO - Gifting Platform",
+    title: siteTitle,
     description: siteDescription,
     type: "website",
+    url: "https://www.unikmo.com/",
+    siteName: "UNIKMO",
+    images: ["https://www.unikmo.com/og-image.jpg"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "UNIKMO - Gifting Platform",
-    description: siteDescription,
+    title: siteTitle,
+    description: twitterDescription,
+    images: ["https://www.unikmo.com/og-image.jpg"],
   },
 };
 
