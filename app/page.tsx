@@ -183,22 +183,8 @@ function SiteHeader({
 }: {
   onHowItWorksClick: () => void;
 }) {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <header
-      className={`sticky top-0 z-50 bg-[#FDF9F5] transition-all duration-300 ${
-        isScrolled ? 'bg-[#FDF9F5]/90 backdrop-blur-md shadow-md' : ''
-      }`}
-    >
+    <header className="bg-[#FDF9F5]">
       <Container>
         <div className="flex h-14 sm:h-16 items-center justify-between">
           <nav className="flex-1 flex items-center gap-4 sm:gap-6">
@@ -305,7 +291,7 @@ function Hero() {
               </h1>
 
               {/* 2. Subline */}
-              <p className="mt-4 sm:mt-6 lg:mt-8 text-[15px] sm:text-[17px] lg:text-[19px] xl:text-[20px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
+              <p className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[22px] xl:text-[24px] text-[#2D2926]/88 font-light leading-normal tracking-wide max-w-2xl">
                 Upload a video, voice note, photo, or message.
                 <br />
                 They unlock it with their own UNIKMO key.
@@ -353,7 +339,7 @@ function PreFooterTrustStrip() {
               <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
                 {item.label}
               </p>
-              <p className="mt-1.5 text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug">
+              <p className="mt-2 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 font-light leading-relaxed">
                 {item.detail}
               </p>
             </div>
@@ -1380,12 +1366,12 @@ function HowItWorks2() {
       className="py-12 sm:py-16 lg:py-20 bg-[#FDF9F5] border-t border-[#2D2926]/6"
     >
       <Container>
-        <div className="text-center max-w-4xl mx-auto">
+        <div className="text-center max-w-5xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
              How UNIKMO works.
           </h2>
-          <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/90 leading-relaxed mb-4">
-            ① Choose your key &nbsp;→&nbsp; ② Add a private memory &nbsp;→&nbsp; ③ Give it to someone special &nbsp;→&nbsp; ④ They unlock the moment
+          <p className="text-[16px] sm:text-[18px] text-[#2D2926]/90 leading-relaxed mb-4 whitespace-normal lg:whitespace-nowrap">
+            Choose your key &nbsp;→&nbsp; Add your private memory &nbsp;→&nbsp; Give it to someone special &nbsp;→&nbsp; They unlock the moment
           </p>
           <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed">
             Each UNIKMO key unlocks one private memory: a video, photo, voice note, or written message. You upload it first. They open it later — no app or login required.
@@ -1598,11 +1584,11 @@ function SocialProof() {
     <section
       ref={sectionRef}
       aria-labelledby="testimonials-heading"
-      className="relative py-12 sm:py-16 lg:py-20 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
+      className="relative py-10 sm:py-14 lg:py-16 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
     >
-      <div className="relative mx-auto max-w-xl px-5 sm:px-6 lg:max-w-2xl">
+      <div className="relative mx-auto max-w-2xl px-5 sm:px-6 lg:max-w-3xl">
         {/* One loose heading block — reads like a note, not a deck title */}
-        <header className="mb-12 sm:mb-14 lg:mb-16">
+        <header className="mb-8 sm:mb-10 lg:mb-12">
           <h2
             id="testimonials-heading"
             className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] text-[#2D2926] leading-snug font-normal animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000"
@@ -1615,7 +1601,7 @@ function SocialProof() {
         </header>
 
         {/* Single column: stacked stories, circular faces, no cards or grid */}
-        <ul className="space-y-12 sm:space-y-14 lg:space-y-16 list-none m-0 p-0">
+        <ul className="space-y-8 sm:space-y-10 lg:space-y-12 list-none m-0 p-0">
           {TESTIMONIALS.map((t, idx) => (
             <li
               key={t.name}
@@ -1635,13 +1621,13 @@ function SocialProof() {
                 </div>
               </div>
               {idx < TESTIMONIALS.length - 1 ? (
-                <div className="mt-12 sm:mt-14 lg:mt-16 h-px w-full bg-[#2D2926]/[0.08]" aria-hidden />
+                <div className="mt-8 sm:mt-10 lg:mt-12 h-px w-full bg-[#2D2926]/[0.08]" aria-hidden />
               ) : null}
             </li>
           ))}
         </ul>
 
-        <p className="mt-12 sm:mt-14 lg:mt-16 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
+        <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
           No app. No login. Just one key to one private memory.
         </p>
       </div>
@@ -1673,8 +1659,8 @@ function QuestionsSection({ onContactClick }: { onContactClick: () => void }) {
           >
             Contact UNIKMO
           </button>
-          <p className="mt-4 text-[12px] sm:text-[13px] text-[#2D2926]/50">
-            <a href="/faq" className="underline hover:text-[#2D2926] transition-colors">
+          <p className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/70">
+            <a href="/faq" className="font-medium text-[#2D2926] underline underline-offset-2 decoration-[#2D2926]/40 hover:decoration-[#2D2926] transition-colors">
               Still unsure? Read the FAQ.
             </a>
           </p>
@@ -2009,7 +1995,7 @@ function SiteFooter({
           </div>
         </div>
 
-        <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/30">
+        <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/55">
           <a
             href="/faq"
             className="hover:text-[#2D2926]/60 transition-colors"
