@@ -603,7 +603,7 @@ function StoryIn({
                 onClick={() => setShowCreateMomentModal(true)}
                 className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
               >
-                Choose Your Key
+                Choose Your Card
               </button>
             </div>
           </div>
@@ -1452,7 +1452,7 @@ function ProductExperience() {
 
               <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6 text-[#2D2926]/80">
                 <p className="text-[16px] sm:text-[18px] lg:text-[20px] font-light leading-relaxed">
-                  Scan QR key. Make sure you see unikmo link below. Or type www.unikmo.com/unlock
+                  Scan the QR code and confirm it opens a UNIKMO link, or type www.unikmo.com/unlock.
                 </p>
                 <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Enter the Moment Key</p>
                 <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Experience the memory</p>
@@ -1514,7 +1514,7 @@ function StoryInEveryKey() {
     { label: 'No app required', icon: <IconSpark /> },
     { label: 'No login', icon: <IconLock /> },
     { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One key – one memory', icon: <IconCode /> },
+    { label: 'One card – one private memory', icon: <IconCode /> },
     { label: 'A tree planted', icon: <IconLeaf /> },
   ];
 
@@ -2126,7 +2126,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
               <h4 className="font-semibold text-[#2D2926] mb-2">2. How Data Is Used</h4>
               <p>We use data to:</p>
               <ul className="list-disc pl-5 space-y-1 mt-1">
-                <li>Deliver keys.</li>
+                <li>Deliver private access codes.</li>
                 <li>Store Moments.</li>
                 <li>Provide support.</li>
               </ul>
@@ -2137,7 +2137,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
               <h4 className="font-semibold text-[#2D2926] mb-2">3. Content Privacy</h4>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Moments are private by default.</li>
-                <li>Access is only possible via the unique key.</li>
+                <li>Access requires the unique private code.</li>
               </ul>
               <p className="mt-2">We do not view content unless required for support or required by law.</p>
             </section>
@@ -2201,7 +2201,7 @@ function TermsModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">1. Overview</h4>
               <p>
-                Unikmo provides a service that enables users to create, store, and share digital Moments (video, audio, images, or text) via unique access keys.
+                Unikmo provides a service that enables users to create, store, and share digital Moments (video, audio, images, or text) through unique private access codes.
                 By purchasing or using Unikmo, you agree to these Terms.
               </p>
             </section>
@@ -2218,14 +2218,14 @@ function TermsModal({ onClose }: { onClose: () => void }) {
 
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">3. User Responsibility (Very Important)</h4>
-              <p>The buyer is solely responsible for storing the key securely and sharing it with the intended recipient. Unikmo will never send keys to recipients.</p>
-              <p className="mt-2">If a key is lost, shared accidentally, or accessed by third parties, Unikmo is not liable.</p>
+              <p>The buyer is solely responsible for storing the private access code securely and sharing it with the intended recipient. Unikmo will never send the code to recipients.</p>
+              <p className="mt-2">If a code is lost, shared accidentally, or accessed by third parties, Unikmo is not liable.</p>
             </section>
 
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">4. Key Usage Rules</h4>
               <ul className="list-disc pl-5 space-y-1">
-                <li>One key = one Moment.</li>
+                <li>One private access code = one Moment.</li>
                 <li>Once a Moment is created, it cannot be edited or reassigned.</li>
                 <li>Keys may not be resold or redistributed commercially.</li>
               </ul>
@@ -2262,7 +2262,7 @@ function TermsModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">9. Refunds</h4>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Digital keys are non-refundable once issued.</li>
+                <li>Digital access codes are non-refundable once issued.</li>
                 <li>Physical products follow the standard return policy (if unused).</li>
               </ul>
             </section>
