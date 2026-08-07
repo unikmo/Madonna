@@ -121,7 +121,7 @@ export default function LandingPage() {
         <HowItWorks2 />
         <WhenToUseUnikmo />
         <WhyUnikmo />
-        <DistanceStory />
+        <NearAndFarStory />
         <SocialProof />
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
@@ -356,9 +356,27 @@ function PreFooterTrustStrip() {
   );
 }
 
-const whenToGiveOneColumns = [
-  ['Long-distance birthdays', 'Anniversaries', 'Wedding mornings', 'Graduations'],
-  ['Open-when messages', 'Apologies', 'Family memories', 'Just-because moments'],
+const giftIdeaGroups = [
+  {
+    title: 'Partners & close family',
+    body: 'For the people beside you and the feelings that deserve more than an ordinary card.',
+    ideas: ['Birthdays and anniversaries', 'A proposal or relationship milestone', 'Parent-to-child and child-to-parent messages', 'Gratitude, apologies, and difficult transitions'],
+  },
+  {
+    title: 'Friends at meaningful occasions',
+    body: 'Make a celebration more personal—or add the emotional element to another physical gift.',
+    ideas: ['Baby showers and new births', 'Weddings and engagements', 'Graduations and housewarmings', 'Farewells, thank-yous, and celebrations'],
+  },
+  {
+    title: 'People near and far',
+    body: 'A private message can matter across the world, across town, or across the room.',
+    ideas: ['Diaspora family celebrations', 'Long-distance birthdays and holidays', 'Messages from home', 'Everyday love made intentional'],
+  },
+  {
+    title: 'Messages for the future',
+    body: 'Create something today that can be revisited at another meaningful milestone.',
+    ideas: ['Open-when messages', 'A message for a child when older', 'Anniversary memories', 'Words for a future life chapter'],
+  },
 ] as const;
 
 function WhenToUseUnikmo() {
@@ -369,29 +387,37 @@ function WhenToUseUnikmo() {
       className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6"
     >
       <Container>
-        <h2
-          id="when-to-use-unikmo-heading"
-          className="font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14"
-        >
-          For moments that deserve more than a message.
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 lg:gap-x-20 gap-y-5 sm:gap-y-6 max-w-4xl mx-auto">
-          {whenToGiveOneColumns.map((column, columnIdx) => (
-            <div key={columnIdx} className="space-y-5 sm:space-y-6">
-              {column.map((line, lineIdx) => (
-                <div
-                  key={line}
-                  className={`text-left pb-4 sm:pb-5 border-b border-[#2D2926]/10 ${
-                    lineIdx === column.length - 1 ? 'border-b-0 pb-0' : ''
-                  }`}
-                >
-                  <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-[#2D2926]/88 font-light leading-relaxed tracking-wide">
-                    {line}
-                  </p>
-                </div>
-              ))}
-            </div>
+        <div className="text-center max-w-3xl mx-auto">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium">Gift ideas</p>
+          <h2 id="when-to-use-unikmo-heading" className="mt-3 font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight">
+            For important feelings—whether they are near or far.
+          </h2>
+          <p className="mt-4 text-[15px] sm:text-[17px] text-[#2D2926]/70 font-light leading-relaxed">
+            Give the card on its own, or make flowers, jewelry, a baby gift, or another present more personal.
+          </p>
+        </div>
+        <div className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+          {giftIdeaGroups.map((group) => (
+            <article key={group.title} className="rounded-2xl border border-[#2D2926]/10 bg-white/45 p-6 sm:p-7">
+              <h3 className="font-serif text-[21px] sm:text-[23px] text-[#2D2926]">{group.title}</h3>
+              <p className="mt-2 text-[14px] sm:text-[15px] text-[#2D2926]/65 font-light leading-relaxed">{group.body}</p>
+              <ul className="mt-5 space-y-2.5">
+                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">•</span>{idea}</li>)}
+              </ul>
+            </article>
           ))}
+        </div>
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+          <article className="rounded-2xl bg-[#EFE8E5] p-6 sm:p-8">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#2D2926]/50 font-medium">A different kind of baby gift</p>
+            <h3 className="mt-3 font-serif text-[24px] sm:text-[28px] text-[#2D2926] leading-tight">They will outgrow the clothes. The memory can stay.</h3>
+            <p className="mt-3 text-[14px] sm:text-[15px] text-[#2D2926]/70 font-light leading-relaxed">Welcome the baby, record wishes for the parents, gather messages from grandparents, or create something for the child to open when they are older.</p>
+          </article>
+          <article className="rounded-2xl bg-[#2D2926] p-6 sm:p-8 text-[#FDF9F5]">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#FDF9F5]/50 font-medium">For the person beside you</p>
+            <h3 className="mt-3 font-serif text-[24px] sm:text-[28px] leading-tight">You see them every day. That does not mean you have said everything that matters.</h3>
+            <p className="mt-3 text-[14px] sm:text-[15px] text-[#FDF9F5]/70 font-light leading-relaxed">Preserve an anniversary message, proposal, birthday tribute, shared photographs, or words that are difficult to fit into an ordinary greeting card.</p>
+          </article>
         </div>
       </Container>
     </section>
@@ -2478,15 +2504,15 @@ function WhyUnikmo() {
   );
 }
 
-function DistanceStory() {
+function NearAndFarStory() {
   return (
     <section className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6">
       <Container>
         <div className="rounded-[2rem] bg-[#2D2926] px-6 py-10 sm:px-10 sm:py-12 lg:px-16 lg:py-14 text-[#FDF9F5]">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[#FDF9F5]/55 font-medium">For families across the distance</p>
-          <h2 className="mt-3 max-w-3xl font-serif text-[28px] sm:text-[36px] lg:text-[46px] leading-tight">Far away does not have to feel far apart.</h2>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#FDF9F5]/55 font-medium">Emotional gifting, near or far</p>
+          <h2 className="mt-3 max-w-4xl font-serif text-[28px] sm:text-[36px] lg:text-[46px] leading-tight">A meaningful message, made into a gift someone can hold and revisit.</h2>
           <p className="mt-4 max-w-2xl text-[15px] sm:text-[17px] text-[#FDF9F5]/75 font-light leading-relaxed">
-            Create a private family message, connect it to a physical card, and send someone a piece of home they can hold and revisit whenever they miss you.
+            Whether they are across the world or sitting beside you, UNIKMO gives an important feeling a tangible, intentional, and lasting place.
           </p>
           <a href="#shop" className="mt-7 inline-flex rounded-full bg-[#FDF9F5] px-7 py-3.5 text-[12px] font-medium tracking-[0.08em] text-[#2D2926] hover:bg-[#EFE8E5] transition-colors">Create Your Moment</a>
         </div>
