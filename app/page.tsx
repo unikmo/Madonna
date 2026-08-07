@@ -36,26 +36,26 @@ const ORGANIZATION_JSON_LD = {
     'https://www.tiktok.com/@myunikmo',
   ],
   description:
-    'UNIKMO creates personalized memory gifts: a physical key that unlocks a private video, voice note, photo, or message.',
+    'UNIKMO turns a private video, voice note, photo, or written message into a physical card someone can keep and revisit.',
 };
 
 const PRODUCTS_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'UNIKMO Keys',
+  name: 'UNIKMO Memory Cards',
   itemListElement: [
     {
       '@type': 'Product',
       position: 1,
-      name: 'Single Key',
-      description: 'One private memory, beautifully unlocked.',
+      name: 'Single Memory Card',
+      description: 'One physical card connected to one private memory.',
       brand: { '@type': 'Brand', name: 'UNIKMO' },
       offers: { '@type': 'Offer', price: '24.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
     },
     {
       '@type': 'Product',
       position: 2,
-      name: '4-Key Set',
+      name: '4-Card Set',
       description: 'Four moments for a birthday, anniversary, or open-when story.',
       brand: { '@type': 'Brand', name: 'UNIKMO' },
       offers: { '@type': 'Offer', price: '64.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
@@ -63,7 +63,7 @@ const PRODUCTS_JSON_LD = {
     {
       '@type': 'Product',
       position: 3,
-      name: '7-Key Collection',
+      name: '7-Card Collection',
       description: 'A full memory journey told over time.',
       brand: { '@type': 'Brand', name: 'UNIKMO' },
       offers: { '@type': 'Offer', price: '72.00', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
@@ -120,6 +120,8 @@ export default function LandingPage() {
         <Hero />
         <HowItWorks2 />
         <WhenToUseUnikmo />
+        <WhyUnikmo />
+        <DistanceStory />
         <SocialProof />
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
@@ -234,8 +236,8 @@ function SiteHeader({
 const preFooterTrustItems = [
   { label: 'No app required', detail: 'They open the memory in the browser.', icon: <IconSpark /> },
   { label: 'No login', detail: 'The recipient does not need an account.', icon: <IconLock /> },
-  { label: 'Private & secure', detail: 'Only the key opens the memory.', icon: <IconShield /> },
-  { label: 'One key = one memory', detail: 'Simple, personal, and intentional.', icon: <IconKey /> },
+  { label: 'Private by default', detail: 'The QR code and private code protect access.', icon: <IconShield /> },
+  { label: 'No ads', detail: 'Nothing interrupts their moment.', icon: <IconHeart /> },
 ];
 
 function Hero() {
@@ -287,14 +289,12 @@ function Hero() {
             <div className="flex flex-col justify-center text-center lg:text-left px-1 sm:px-2 lg:px-4 xl:pr-8">
               {/* 1. Headline */}
               <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
-                A physical key to a private memory.
+                Some moments deserve more than a message.
               </h1>
 
               {/* 2. Subline */}
               <p className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[22px] xl:text-[24px] text-[#2D2926]/88 font-light leading-normal tracking-wide max-w-2xl">
-                Upload a video, voice note, photo, or message.
-                <br />
-                They unlock it with their own UNIKMO key.
+                Create a private video, voice note, photo, or written message and connect it to a beautifully designed UNIKMO card. They scan the QR code, enter the private code, and open a memory they can revisit.
               </p>
 
               {/* 3. Supporting text */}
@@ -302,13 +302,19 @@ function Hero() {
               </div>
 
               {/* 4. CTA + 5. subtext */}
-              <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-2.5">
+              <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-3">
                 <a
                   href="#shop"
                   className="inline-flex items-center justify-center rounded-full bg-[#DDD0C4] hover:bg-[#D3C7BB] active:bg-[#C7BAAC] text-[#2D2926] px-9 py-4 sm:px-11 sm:py-5 text-[13px] sm:text-[14px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
                 >
                   Create Your Moment
                 </a>
+                <a href="#how-it-works" className="text-[12px] sm:text-[13px] font-medium text-[#2D2926]/70 underline underline-offset-4 hover:text-[#2D2926]">
+                  See How It Works
+                </a>
+                <p className="text-[11px] sm:text-[12px] text-[#2D2926]/65 font-medium">
+                  Private by default. No login required. No ads.
+                </p>
                 <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
                   Founding release — 100 cards only.
                 </p>
@@ -482,18 +488,18 @@ function StoryIn({
   }, []);
 
   const items = products.map((product) => {
-    let subtitle = 'One private memory, beautifully unlocked.';
+    let subtitle = 'One physical card connected to one private memory.';
     let tierLabel = 'The Spark';
-    let displayTitle = 'Single Key';
+    let displayTitle = 'Single Memory Card';
     let bestValue = false;
     if (product.title.toLowerCase().includes('4') || product.title.toLowerCase().includes('four')) {
       subtitle = 'Four moments for a birthday, anniversary, or open-when story.';
       tierLabel = 'The Journey';
-      displayTitle = '4-Key Set';
+      displayTitle = '4-Card Set';
     } else if (product.title.toLowerCase().includes('7') || product.title.toLowerCase().includes('seven')) {
       subtitle = 'A full memory journey told over time.';
       tierLabel = 'The History';
-      displayTitle = '7-Key Collection';
+      displayTitle = '7-Card Collection';
       bestValue = true;
     }
     return {
@@ -519,7 +525,7 @@ function StoryIn({
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
-            Choose your key.
+            Choose your card.
           </h2>
         </div>
 
@@ -1132,7 +1138,7 @@ function ProductModal({
                 />
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Physical card + digital access</p>
-                  <p className="text-xs text-[#2D2926]/70">We ship the card and send your Moment key by email.</p>
+                  <p className="text-xs text-[#2D2926]/70">We ship the card and send your private access code by email.</p>
                 </div>
               </label>
 
@@ -1148,7 +1154,7 @@ function ProductModal({
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Digital card ( Images )</p>
                   <p className="text-xs text-[#2D2926]/70">
-                    We email you a digital card image with your Moment key and QR — no physical card is shipped.
+                    We email you a digital card image with your private access code and QR code — no physical card is shipped.
                   </p>
                 </div>
               </label>
@@ -1356,6 +1362,12 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
 }
 
 function HowItWorks2() {
+  const steps = [
+    { title: 'Choose your card', body: 'Select the UNIKMO card that fits the person or occasion.' },
+    { title: 'Create your memory', body: 'Upload a private video, voice note, photograph, or written message.' },
+    { title: 'Give the card', body: 'The physical card becomes a lasting part of the gift.' },
+    { title: 'Scan and relive', body: 'They scan the QR code, enter the private code, and open the memory in their browser.' },
+  ];
   return (
     <section
       id="how-it-works"
@@ -1364,13 +1376,22 @@ function HowItWorks2() {
       <Container>
         <div className="text-center max-w-5xl mx-auto">
           <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
-             How UNIKMO works.
+            A private memory, made into a gift.
           </h2>
-          <p className="text-[16px] sm:text-[18px] text-[#2D2926]/90 leading-relaxed mb-4 whitespace-normal lg:whitespace-nowrap">
-            Choose your key &nbsp;→&nbsp; Add your private memory &nbsp;→&nbsp; Give it to someone special &nbsp;→&nbsp; They unlock the moment
+          <p className="text-[15px] sm:text-[17px] text-[#2D2926]/75 leading-relaxed max-w-3xl mx-auto">
+            The card is the keepsake. Its QR code leads to UNIKMO, and the private access code opens the memory you created.
           </p>
-          <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/75 leading-relaxed">
-            Each UNIKMO key unlocks one private memory: a video, photo, voice note, or written message. You upload it first. They open it later — no app or login required.
+          <ol className="mt-9 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
+            {steps.map((step, index) => (
+              <li key={step.title} className="rounded-2xl border border-[#2D2926]/10 bg-white/45 p-5 sm:p-6">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#2D2926] text-[#FDF9F5] text-sm font-medium">{index + 1}</span>
+                <h3 className="mt-4 font-serif text-[18px] text-[#2D2926]">{step.title}</h3>
+                <p className="mt-2 text-[14px] text-[#2D2926]/70 font-light leading-relaxed">{step.body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-7 text-[12px] sm:text-[13px] uppercase tracking-[0.16em] text-[#2D2926]/55 font-medium">
+            No app. No account. No advertising.
           </p>
         </div>
       </Container>
@@ -1414,7 +1435,7 @@ function ProductExperience() {
             <div className="relative aspect-[4/3] w-full rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
               <Image
                 src="/cardfrontunikmo.jpg"
-                alt="Card back with Moment key"
+                alt="Back of a UNIKMO card showing where the QR code and private access code appear"
                 fill
                 className="object-contain"
                 sizes="(min-width: 1224px) 80vw, 130vw"
@@ -1592,7 +1613,7 @@ function SocialProof() {
             The moment they unlock it is the gift.
           </h2>
           <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-          Private messages, voice notes, photos, and videos — turned into something they can hold.
+          Private messages, voice notes, photos, and videos — connected to something they can hold.
           </p>
         </header>
 
@@ -1624,7 +1645,7 @@ function SocialProof() {
         </ul>
 
         <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light tracking-wide animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
-          NO APP REQUIRED &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; ONE KEY = ONE MEMORY
+          PRIVATE BY DEFAULT &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; NO ADS
         </p>
       </div>
     </section>
@@ -1646,7 +1667,7 @@ function QuestionsSection({ onContactClick }: { onContactClick: () => void }) {
             Questions before you create one?
           </h2>
           <p className="text-[14px] sm:text-[15px] text-[#2D2926]/70 font-light leading-relaxed mb-6 sm:mb-7">
-            If you&apos;re not sure which key to choose, how the memory is unlocked, or whether UNIKMO fits your moment, send us a note.
+            If you&apos;re not sure which card to choose, how the private code works, or whether UNIKMO fits your moment, send us a note.
           </p>
           <button
             type="button"
@@ -1702,7 +1723,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
         </h2>
 
         <p className="mt-4 sm:mt-5 text-[15px] sm:text-[16px] lg:text-[18px] text-[#2D2926]/85 font-light leading-relaxed animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-100">
-          Create the moment they&apos;ll never forget.
+            Turn a precious memory into a lasting gift.
         </p>
 
         <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2.5 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-200">
@@ -1727,8 +1748,8 @@ const UNLOCK_URL = 'https://unikmo.com/unlock';
 const UNLOCK_LINK_CLASS = 'font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors';
 
 const HOW_IT_WORKS_GRID = [
-  { num: 1, title: 'Choose your Card', body: 'Select a Single Card, 4-Card Bundle, or 7-Card Collection. Each card includes one private digital Key.' },
-  { num: 2, title: 'Receive your Key', body: 'After purchase, the Key is sent to you by email. UNIKMO does not send it to the recipient.' },
+  { num: 1, title: 'Choose your card', body: 'Select a Single Memory Card, 4-Card Set, or 7-Card Collection. Each card connects to one private memory.' },
+  { num: 2, title: 'Receive your private code', body: 'After purchase, the private access code is sent to you by email. UNIKMO does not send it to the recipient.' },
   {
     num: 3,
     title: 'Upload your Moment',
@@ -1752,16 +1773,16 @@ const HOW_IT_WORKS_GRID = [
         <a href={UNLOCK_URL} target="_blank" rel="noopener noreferrer" className={UNLOCK_LINK_CLASS}>
           www.unikmo.com/unlock
         </a>
-        , enters the Key, and opens the memory.
+        , enters the private access code, and opens the memory.
       </>
     ),
   },
 ];
 
 const DELIVERY_OPTIONS = [
-  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and the Key by email.' },
-  { id: 'digital-only', label: 'Digital Only', desc: 'You receive the digital card and the Key by email.' },
-  { id: 'split', label: 'Split Delivery', desc: 'We send the physical card to the recipient. You receive the Key by email.' },
+  { id: 'physical-digital', label: 'Physical + Digital', desc: 'You receive the physical card and its private access code by email.' },
+  { id: 'digital-only', label: 'Digital Only', desc: 'You receive the digital card and private access code by email.' },
+  { id: 'split', label: 'Split Delivery', desc: 'We send the physical card to the recipient. You receive the private access code by email.' },
 ];
 
 function HowItWorksModal({ onClose }: { onClose: () => void }) {
@@ -1785,7 +1806,7 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
           </h2>
 
           <p className="text-center text-[14px] sm:text-[15px] lg:text-[16px] text-red-600 font-medium leading-relaxed mb-8 sm:mb-10 max-w-2xl mx-auto">
-            Choose a card, add your private memory, and give someone the Key to unlock it.
+            Choose a card, add your private memory, and give someone a keepsake they can scan and revisit.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10 sm:mb-12">
@@ -1948,13 +1969,13 @@ function SiteFooter({
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
             <span className="font-semibold text-[#2D2926]/80">UNIKMO © {new Date().getFullYear()}</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
-            <span>A physical key to a private memory.</span>
+            <span>A card that unlocks a private memory.</span>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-5 lg:gap-6">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-800/40" />
-              <span>One tree planted with every key.</span>
+              <span>One tree planted with every card.</span>
               <svg
                 viewBox="0 0 24 24"
                 className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current opacity-60"
@@ -2188,9 +2209,9 @@ function TermsModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">2. Product Nature</h4>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Each purchase grants one or more Moment keys.</li>
-                <li>Each key allows creation of one (1) digital Moment.</li>
-                <li>Moments are private and accessible only via key.</li>
+                <li>Each purchase grants one or more private access codes.</li>
+                <li>Each code allows creation of one (1) digital Moment.</li>
+                <li>Moments are private and accessible only through the corresponding code.</li>
                 <li>No account/login required.</li>
               </ul>
             </section>
@@ -2422,5 +2443,54 @@ function IconSpark() {
       <path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2Z" strokeLinejoin="round" />
       <path d="M5 14l.6 2.6L8 18l-2.4.4L5 21l-.6-2.6L2 18l2.4-.4L5 14Z" strokeLinejoin="round" opacity="0.75" />
     </svg>
+  );
+}
+
+function WhyUnikmo() {
+  const reasons = [
+    ['Created for one person', 'A memory made intentionally for someone you care about.'],
+    ['A physical keepsake', 'The card gives a digital memory a place in the real world.'],
+    ['Easy to revisit', 'Scan the card and enter the private code whenever the moment matters.'],
+    ['Quietly private', 'No public post, recipient account, or advertising.'],
+  ];
+  return (
+    <section className="bg-[#EFE8E5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/[0.07]">
+      <Container>
+        <div className="max-w-3xl">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium">Why UNIKMO</p>
+          <h2 className="mt-3 font-serif text-[28px] sm:text-[36px] lg:text-[44px] leading-tight text-[#2D2926]">
+            A meaningful message should not disappear in a chat.
+          </h2>
+          <p className="mt-4 text-[15px] sm:text-[17px] text-[#2D2926]/70 font-light leading-relaxed">
+            Everyday messages are made for the moment. UNIKMO gives one special memory an intentional presentation and a physical place to return to.
+          </p>
+        </div>
+        <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+          {reasons.map(([title, body]) => (
+            <div key={title} className="border-t border-[#2D2926]/20 pt-4">
+              <h3 className="font-serif text-[18px] text-[#2D2926]">{title}</h3>
+              <p className="mt-2 text-[14px] text-[#2D2926]/65 font-light leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function DistanceStory() {
+  return (
+    <section className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6">
+      <Container>
+        <div className="rounded-[2rem] bg-[#2D2926] px-6 py-10 sm:px-10 sm:py-12 lg:px-16 lg:py-14 text-[#FDF9F5]">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#FDF9F5]/55 font-medium">For families across the distance</p>
+          <h2 className="mt-3 max-w-3xl font-serif text-[28px] sm:text-[36px] lg:text-[46px] leading-tight">Far away does not have to feel far apart.</h2>
+          <p className="mt-4 max-w-2xl text-[15px] sm:text-[17px] text-[#FDF9F5]/75 font-light leading-relaxed">
+            Create a private family message, connect it to a physical card, and send someone a piece of home they can hold and revisit whenever they miss you.
+          </p>
+          <a href="#shop" className="mt-7 inline-flex rounded-full bg-[#FDF9F5] px-7 py-3.5 text-[12px] font-medium tracking-[0.08em] text-[#2D2926] hover:bg-[#EFE8E5] transition-colors">Create Your Moment</a>
+        </div>
+      </Container>
+    </section>
   );
 }

@@ -6,11 +6,11 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 // Initialize admin user on app startup
 import "@/lib/init-admin";
 
-const siteTitle = "UNIKMO | A Physical Key to a Private Memory";
+const siteTitle = "UNIKMO | Turn a Precious Memory Into a Lasting Gift";
 const siteDescription =
-  "Create a personalized memory gift with UNIKMO. Upload a private video, voice note, photo, or message and give someone a physical key to unlock it. No app or login required.";
+  "Create a private video, voice note, photo, or written message and connect it to a physical UNIKMO card someone can keep and revisit. No app, login, or ads.";
 const twitterDescription =
-  "Create a personalized memory gift with a private video, voice note, photo, or message unlocked by a physical key.";
+  "Turn a private video, voice note, photo, or message into a physical gift someone can revisit.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.unikmo.com"),
