@@ -13,7 +13,7 @@ export const WAITLIST_COPY_DEFAULTS: WaitlistCopyFields = {
   waitlistHeadline: "Be among the first to send something they'll never forget.",
   waitlistSubline1: "You can't always be there.",
   waitlistSubline2: 'This is the next best thing.',
-  waitlistSupportingLine: 'Limited first release — only 500 moments available.',
+  waitlistSupportingLine: 'Now on direct sale — 30% off with code LAUNCH30, limited to the first 100 orders.',
   waitlistEmailPlaceholder: 'Enter your email',
   waitlistNamePlaceholder: 'Your name',
   waitlistCtaLabel: 'Secure your spot',

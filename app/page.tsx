@@ -8,12 +8,40 @@ import {
   type AnimatedMomentModalVariant,
 } from '@/components/AnimatedMomentModal';
 
-/** Matches cream in product card photography — avoids white letterboxing around images */
+/** Matches cream in product card photography â€” avoids white letterboxing around images */
 const PRODUCT_IMAGE_BG = '#FAF6F1';
 const productImageFrameClass =
   'relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 overflow-hidden';
 const productImageClass =
   'absolute inset-0 w-full h-full object-cover object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500';
+
+/** Launch offer: real, enforced via a Shopify discount code with a 100-use limit (see /admin discounts). */
+const LAUNCH_DISCOUNT_PERCENT = 30;
+const LAUNCH_DISCOUNT_CODE = 'LAUNCH30';
+const LAUNCH_OFFER_LINE = `Now on direct sale â€” ${LAUNCH_DISCOUNT_PERCENT}% off with code ${LAUNCH_DISCOUNT_CODE}, limited to the first 100 orders.`;
+
+function formatCurrency(price?: string | null, currencyCode?: string | null): string {
+  if (price == null) return '';
+  const symbol =
+    currencyCode?.toUpperCase?.() === 'EUR' ? 'â‚¬' : currencyCode?.toUpperCase?.() === 'USD' ? '$' : (currencyCode ?? '');
+  return `${symbol}${Number(price).toFixed(2)}`;
+}
+
+/** Shows list price struck through next to the LAUNCH30 price so the discount is honest and visible everywhere price appears. */
+function PriceWithLaunchDiscount({ price, currencyCode }: { price?: string | null; currencyCode?: string | null }) {
+  if (price == null) return null;
+  const original = Number(price);
+  if (Number.isNaN(original)) return null;
+  const discounted = original * (1 - LAUNCH_DISCOUNT_PERCENT / 100);
+  return (
+    <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926] flex items-center justify-center gap-2">
+      <span className="line-through text-[#2D2926]/40 font-normal text-[13px] sm:text-[14px]">
+        {formatCurrency(price, currencyCode)}
+      </span>
+      <span>{formatCurrency(discounted.toFixed(2), currencyCode)}</span>
+    </p>
+  );
+}
 
 type PublicSiteConfig = {
   sellingEnabled: boolean;
@@ -193,20 +221,20 @@ function SiteHeader({
             <button
               type="button"
               onClick={onHowItWorksClick}
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block"
+              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block py-3 -my-3 min-h-[44px] flex items-center"
             >
               How it Works
             </button>
             <a
               href="#gift-ideas"
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block"
+              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block py-3 -my-3 min-h-[44px] flex items-center"
             >
               Gift Ideas
             </a>
           </nav>
 
           <a
-            className="inline-flex items-center hover:scale-105 transition-transform duration-300"
+            className="inline-flex items-center justify-center hover:scale-105 transition-transform duration-300 min-h-[44px] min-w-[44px]"
             href="#top"
           >
             <Image
@@ -222,7 +250,7 @@ function SiteHeader({
           <nav className="flex-1 flex justify-end">
             <a
               href="#shop"
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1"
+              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1 py-3 -my-3 min-h-[44px] flex items-center"
             >
               Create Your Moment
             </a>
@@ -268,20 +296,23 @@ function Hero() {
       ref={heroRef}
       className="relative overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#F5EEED]"
     >
-      {/* Main hero: image + copy — balanced columns, image fills frame */}
+      {/* Main hero: image + copy â€” balanced columns, image fills frame */}
       <div className="relative z-10 w-full pt-8 pb-2 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-6">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.28fr)_minmax(0,0.72fr)] gap-10 lg:gap-8 xl:gap-12 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
             {/* Wider image + bleed left into section padding so the banner uses horizontal space (text on photo stays in frame via object-left) */}
             <div className="flex justify-center lg:justify-start w-full max-lg:max-w-[540px] max-lg:mx-auto lg:max-w-none lg:-ml-8 lg:w-[calc(100%+2rem)]">
               <div className="relative w-full lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
-                <Image
-                  src="/banner/banner.jpeg"
-                  alt="A meaningful moment — someone smiling while opening their memory on their phone"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="object-cover object-[50%_42%]"
+                <video
+                  src="/video/unikmo-hero.mp4"
+                  poster="/banner/banner.jpeg"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  aria-label="UNIKMO â€” a physical key to a private memory. From card to scan to unlocked memory."
+                  className="absolute inset-0 h-full w-full object-cover object-[50%_42%]"
                 />
               </div>
             </div>
@@ -297,15 +328,16 @@ function Hero() {
                 Create a private video, voice note, photo, or written message and connect it to a beautifully designed UNIKMO card. They scan the QR code, enter the private code, and open a memory they can revisit.
               </p>
 
-              {/* 3. Supporting text */}
-              <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[14px] sm:text-[16px] lg:text-[18px] xl:text-[19px] text-[#2D2926]/85 font-light leading-relaxed tracking-wide">
+              {/* 3. Supporting text â€” reinforces what Unikmo is within the first 2 seconds on the page */}
+              <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 font-medium uppercase tracking-[0.12em]">
+                No app required &middot; No login &middot; One key = one memory
               </div>
 
               {/* 4. CTA + 5. subtext */}
               <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-3">
                 <a
                   href="#shop"
-                  className="inline-flex items-center justify-center rounded-full bg-[#DDD0C4] hover:bg-[#D3C7BB] active:bg-[#C7BAAC] text-[#2D2926] px-9 py-4 sm:px-11 sm:py-5 text-[13px] sm:text-[14px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
+                  className="inline-flex items-center justify-center rounded-full bg-[#2D2926] hover:bg-[#1E1B18] active:bg-black text-[#FDF9F5] px-9 py-4 sm:px-11 sm:py-5 text-[13px] sm:text-[14px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
                 >
                   Create Your Moment
                 </a>
@@ -316,7 +348,7 @@ function Hero() {
                   Private by default. No login required. No ads.
                 </p>
                 <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-                  Founding release — 100 cards only.
+                  {LAUNCH_OFFER_LINE}
                 </p>
               </div>
             </div>
@@ -327,7 +359,7 @@ function Hero() {
   );
 }
 
-/** Trust bullets — blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
+/** Trust bullets â€” blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
 function PreFooterTrustStrip() {
   return (
     <section
@@ -364,7 +396,7 @@ const giftIdeaGroups = [
   },
   {
     title: 'Friends at meaningful occasions',
-    body: 'Make a celebration more personal—or add the emotional element to another physical gift.',
+    body: 'Make a celebration more personalâ€”or add the emotional element to another physical gift.',
     ideas: ['Baby showers and new births', 'Weddings and engagements', 'Graduations and housewarmings', 'Farewells, thank-yous, and celebrations'],
   },
   {
@@ -390,7 +422,7 @@ function WhenToUseUnikmo() {
         <div className="text-center max-w-3xl mx-auto">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium">Gift ideas</p>
           <h2 id="when-to-use-unikmo-heading" className="mt-3 font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight">
-            For important feelings—whether they are near or far.
+            For important feelingsâ€”whether they are near or far.
           </h2>
           <p className="mt-4 text-[15px] sm:text-[17px] text-[#2D2926]/70 font-light leading-relaxed">
             Give the card on its own, or make flowers, jewelry, a baby gift, or another present more personal.
@@ -402,7 +434,7 @@ function WhenToUseUnikmo() {
               <h3 className="font-serif text-[21px] sm:text-[23px] text-[#2D2926]">{group.title}</h3>
               <p className="mt-2 text-[14px] sm:text-[15px] text-[#2D2926]/65 font-light leading-relaxed">{group.body}</p>
               <ul className="mt-5 space-y-2.5">
-                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">•</span>{idea}</li>)}
+                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">â€¢</span>{idea}</li>)}
               </ul>
             </article>
           ))}
@@ -550,9 +582,12 @@ function StoryIn({
     >
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-8 sm:mb-10 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
+          <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-3 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
             Choose your card.
           </h2>
+          <p className="text-center text-[12px] sm:text-[13px] uppercase tracking-[0.15em] font-semibold text-[#2D2926]/70 mb-8 sm:mb-10">
+            {LAUNCH_OFFER_LINE}
+          </p>
         </div>
 
           {/* Outside max-w-7xl so row can be 1400px and containerW reaches ~460 (log showed 341) */}
@@ -612,11 +647,7 @@ function StoryIn({
                     <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">
                       {i.subtitle}
                     </p>
-                    {i.price != null && (
-                      <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
-                        {(i.currencyCode?.toUpperCase?.() === 'EUR' ? '€' : i.currencyCode?.toUpperCase?.() === 'USD' ? '$' : i.currencyCode ?? '')}{Number(i.price).toFixed(2)}
-                      </p>
-                    )}
+                    <PriceWithLaunchDiscount price={i.price} currencyCode={i.currencyCode} />
                   </button>
                 ))}
               </div>
@@ -627,7 +658,7 @@ function StoryIn({
               <button
                 type="button"
                 onClick={() => setShowCreateMomentModal(true)}
-                className="inline-flex items-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
+                className="inline-flex items-center justify-center rounded-sm bg-[#2D2926] px-8 sm:px-10 py-3 min-h-[44px] text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-white hover:bg-black transition-colors"
               >
                 Choose Your Card
               </button>
@@ -733,11 +764,7 @@ function CreateMomentModal({
                   </div>
                   <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">{i.displayTitle}</h4>
                   <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">{i.subtitle}</p>
-                  {i.price != null && (
-                    <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
-                      {(i.currencyCode?.toUpperCase?.() === 'EUR' ? '€' : i.currencyCode?.toUpperCase?.() === 'USD' ? '$' : i.currencyCode ?? '')}{Number(i.price).toFixed(2)}
-                    </p>
-                  )}
+                  <PriceWithLaunchDiscount price={i.price} currencyCode={i.currencyCode} />
                 </button>
               ))}
             </div>
@@ -896,7 +923,7 @@ function WaitlistModal({
                 disabled={submitting}
                 className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50"
               >
-                {submitting ? 'Please wait…' : config.waitlistCtaLabel}
+                {submitting ? 'Please waitâ€¦' : config.waitlistCtaLabel}
               </button>
             </>
           )}
@@ -1056,8 +1083,8 @@ function ProductModal({
           message:
             data.emailSent === true
               ? 'Your spot is saved. Check your inbox for a confirmation email.'
-              : 'Your spot is saved. We could not send the confirmation email this time — you are still on the list.',
-          emoji: '✨',
+              : 'Your spot is saved. We could not send the confirmation email this time â€” you are still on the list.',
+          emoji: 'âœ¨',
           confirmLabel: 'Okay',
         });
       } catch {
@@ -1140,14 +1167,16 @@ function ProductModal({
               </p>
               <h3 className="font-serif text-[20px] sm:text-[22px] text-[#2D2926]">{selected.displayTitle}</h3>
               <p className="text-[#2D2926]/55 text-sm mt-1">{selected.subtitle}</p>
+              <PriceWithLaunchDiscount price={product.price} currencyCode={product.currencyCode} />
             </div>
           ) : (
-            <>
-              <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center mb-1">
+            <div className="text-center mb-5">
+              <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] mb-1">
                 {selected.displayTitle}
               </h3>
-              <p className="text-[#2D2926]/60 text-sm text-center mb-5">{selected.subtitle}</p>
-            </>
+              <p className="text-[#2D2926]/60 text-sm">{selected.subtitle}</p>
+              <PriceWithLaunchDiscount price={product.price} currencyCode={product.currencyCode} />
+            </div>
           )}
 
           <div className="mb-6">
@@ -1180,7 +1209,7 @@ function ProductModal({
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Digital card ( Images )</p>
                   <p className="text-xs text-[#2D2926]/70">
-                    We email you a digital card image with your private access code and QR code — no physical card is shipped.
+                    We email you a digital card image with your private access code and QR code â€” no physical card is shipped.
                   </p>
                 </div>
               </label>
@@ -1308,7 +1337,7 @@ function EmotionalPositioning() {
                       That Lasts Forever
                     </p>
                     <p className="mt-2 text-[8px] sm:text-[9px] lg:text-[10px] leading-relaxed text-[#FDF9F5]/85 animate-slide-up">
-                      Hold onto what matters most—private memories saved for years.
+                      Hold onto what matters mostâ€”private memories saved for years.
                     </p> */}
 
                     <div className="mt-3 sm:mt-4 lg:mt-5 flex flex-wrap gap-2">
@@ -1336,7 +1365,7 @@ function EmotionalPositioning() {
               Not just a gift. A moment.
             </h2>
             <p className="mt-4 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#2D2926]/60">
-              Unikmo turns memories into something you can hold. A small card unlocks a personal video, voice message, or photo — saved for years to come.
+              Unikmo turns memories into something you can hold. A small card unlocks a personal video, voice message, or photo â€” saved for years to come.
             </p>
           </div>
         </div>
@@ -1540,7 +1569,7 @@ function StoryInEveryKey() {
     { label: 'No app required', icon: <IconSpark /> },
     { label: 'No login', icon: <IconLock /> },
     { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One card – one private memory', icon: <IconCode /> },
+    { label: 'One card â€“ one private memory', icon: <IconCode /> },
     { label: 'A tree planted', icon: <IconLeaf /> },
   ];
 
@@ -1572,7 +1601,7 @@ function StoryInEveryKey() {
               <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-[#2D2926]/60 font-light mb-6 sm:mb-7 lg:mb-8 italic">{p.sub}</p>
               
               <button className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 group-hover:text-[#2D2926] transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
-                Discover <span className="text-[12px] sm:text-[13px] lg:text-[14px]">→</span>
+                Discover <span className="text-[12px] sm:text-[13px] lg:text-[14px]">â†’</span>
               </button>
             </div>
           ))}
@@ -1585,7 +1614,7 @@ function StoryInEveryKey() {
 const TESTIMONIALS = [
   {
     quote:
-      'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.',
+      'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal â€” not just another gift.',
     name: 'Matt L., London',
     imageSrc: '/testimonials/customer-london.jpg',
     imageAlt: 'Matt, customer in London, smiling with his phone',
@@ -1630,7 +1659,7 @@ function SocialProof() {
       className="relative py-10 sm:py-14 lg:py-16 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
     >
       <div className="relative mx-auto max-w-2xl px-5 sm:px-6 lg:max-w-3xl">
-        {/* One loose heading block — reads like a note, not a deck title */}
+        {/* One loose heading block â€” reads like a note, not a deck title */}
         <header className="mb-8 sm:mb-10 lg:mb-12">
           <h2
             id="testimonials-heading"
@@ -1639,7 +1668,7 @@ function SocialProof() {
             The moment they unlock it is the gift.
           </h2>
           <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-          Private messages, voice notes, photos, and videos — connected to something they can hold.
+          Private messages, voice notes, photos, and videos â€” connected to something they can hold.
           </p>
         </header>
 
@@ -1671,7 +1700,7 @@ function SocialProof() {
         </ul>
 
         <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light tracking-wide animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
-          PRIVATE BY DEFAULT &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; NO ADS
+          PRIVATE BY DEFAULT &nbsp;Â·&nbsp; NO LOGIN &nbsp;Â·&nbsp; NO ADS
         </p>
       </div>
     </section>
@@ -1703,7 +1732,7 @@ function QuestionsSection({ onContactClick }: { onContactClick: () => void }) {
             Contact UNIKMO
           </button>
           <p className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/70">
-            <a href="/faq" className="font-medium text-[#2D2926] underline underline-offset-2 decoration-[#2D2926]/40 hover:decoration-[#2D2926] transition-colors">
+            <a href="/faq" className="font-medium text-[#2D2926] underline underline-offset-2 decoration-[#2D2926]/40 hover:decoration-[#2D2926] transition-colors py-3 -my-3 inline-flex items-center min-h-[44px]">
               Still unsure? Read the FAQ.
             </a>
           </p>
@@ -1756,12 +1785,12 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
           <button
             type="button"
             onClick={onCreateMomentClick}
-            className="inline-flex items-center justify-center rounded-full bg-[#E9DCCF] hover:bg-[#DDD0C4] active:bg-[#D3C7BB] text-[#2D2926] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
+            className="inline-flex items-center justify-center rounded-full bg-[#2D2926] hover:bg-[#1E1B18] active:bg-black text-[#FDF9F5] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
           >
             Create Your Moment
           </button>
           <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-            Founding release — 100 cards only.
+            {LAUNCH_OFFER_LINE}
           </p>
         </div>
       </div>
@@ -1974,7 +2003,7 @@ function SiteFooter({
 }) {
   return (
     <footer className="bg-[#FDF9F5] border-t border-[#2D2926]/[0.07]">
-      {/* Tree = footer hero / accent — only this + links are footer; trust strip stays in <main> above */}
+      {/* Tree = footer hero / accent â€” only this + links are footer; trust strip stays in <main> above */}
       <div className="bg-[#FDF9F5] pt-0 pb-0 leading-[0]" aria-hidden>
         <div className="max-w-7xl mx-auto flex justify-center sm:justify-end pr-0 sm:pr-4 md:pr-6">
           <Image
@@ -1993,7 +2022,7 @@ function SiteFooter({
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
           
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
-            <span className="font-semibold text-[#2D2926]/80">UNIKMO © {new Date().getFullYear()}</span>
+            <span className="font-semibold text-[#2D2926]/80">UNIKMO Â© {new Date().getFullYear()}</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
             <span>A card that unlocks a private memory.</span>
           </div>
@@ -2015,7 +2044,7 @@ function SiteFooter({
                 href="https://www.instagram.com/myunikmo"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-[#2D2926] transition-colors"
+                className="hover:text-[#2D2926] transition-colors py-3 -my-3 min-h-[44px] flex items-center"
               >
                 INSTAGRAM
               </a>
@@ -2023,7 +2052,7 @@ function SiteFooter({
                 href="https://www.tiktok.com/@myunikmo"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-[#2D2926] transition-colors flex items-center gap-1"
+                className="hover:text-[#2D2926] transition-colors flex items-center gap-1 py-3 -my-3 min-h-[44px]"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -2041,35 +2070,35 @@ function SiteFooter({
         <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/55">
           <a
             href="/faq"
-            className="hover:text-[#2D2926]/60 transition-colors"
+            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
           >
             FAQ
           </a>
           <button
             type="button"
             onClick={onContactClick}
-            className="hover:text-[#2D2926]/60 transition-colors"
+            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
           >
             Contact
           </button>
           <button
             type="button"
             onClick={onPrivacyClick}
-            className="hover:text-[#2D2926]/60 transition-colors"
+            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
           >
             Privacy
           </button>
           <button
             type="button"
             onClick={onTermsClick}
-            className="hover:text-[#2D2926]/60 transition-colors"
+            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
           >
             Terms
           </button>
           <button
             type="button"
             onClick={onImprintClick}
-            className="hover:text-[#2D2926]/60 transition-colors"
+            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
           >
             Imprint
           </button>
@@ -2099,9 +2128,9 @@ function ImprintModal({ onClose }: { onClose: () => void }) {
 
           <div className="space-y-4 text-[#2D2926]/90 text-[14px] sm:text-[15px] leading-relaxed">
             <h4 className="font-semibold text-[#2D2926]">Operator Information</h4>
-            <p><span className="font-medium text-[#2D2926]">Company Name:</span> PlanetHike OÜ</p>
+            <p><span className="font-medium text-[#2D2926]">Company Name:</span> PlanetHike OÃœ</p>
             <p><span className="font-medium text-[#2D2926]">Product:</span> unikmo</p>
-            <p><span className="font-medium text-[#2D2926]">Registered Office Address:</span> Järvevana tee 9, Tallinn, 11314, Estonia</p>
+            <p><span className="font-medium text-[#2D2926]">Registered Office Address:</span> JÃ¤rvevana tee 9, Tallinn, 11314, Estonia</p>
             <p><span className="font-medium text-[#2D2926]">Registration Number:</span> 80656111</p>
             <p><span className="font-medium text-[#2D2926]">Legal Representative / Founder:</span> Tichi Mbanwie</p>
             <p>
@@ -2192,12 +2221,24 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">7. User Rights (GDPR)</h4>
               <p>Users can request access, correction, and deletion.</p>
-              <p className="mt-2">Contact: your email</p>
+              <p className="mt-2">Contact: hello@planethike.org, or use the Contact form on this site.</p>
             </section>
 
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">8. Cookies</h4>
               <p>We use minimal cookies for website functionality and analytics (if enabled).</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">9. Governing Law & Supervisory Authority</h4>
+              <p>
+                Unikmo is operated by PlanetHike OÃœ, registered in Tallinn, Estonia. This Privacy Policy is governed by Estonian
+                law and the EU General Data Protection Regulation (GDPR).
+              </p>
+              <p className="mt-2">
+                If you believe your data protection rights have been violated, you may lodge a complaint with the Estonian Data
+                Protection Inspectorate (Andmekaitse Inspektsioon) or the supervisory authority in your own country of residence.
+              </p>
             </section>
           </div>
         </div>
@@ -2304,6 +2345,19 @@ function TermsModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">11. Changes</h4>
               <p>We may update these Terms at any time.</p>
+            </section>
+
+            <section>
+              <h4 className="font-semibold text-[#2D2926] mb-2">12. Governing Law & Jurisdiction</h4>
+              <p>
+                These Terms are governed by the laws of Estonia, without regard to conflict-of-law principles. Any dispute
+                arising from these Terms or your use of Unikmo is subject to the exclusive jurisdiction of the courts of
+                Estonia.
+              </p>
+              <p className="mt-2">
+                If you are a consumer resident in the European Union, this choice of law does not deprive you of the
+                protections afforded to you by the mandatory consumer-protection laws of your country of habitual residence.
+              </p>
             </section>
           </div>
         </div>

@@ -16,7 +16,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How does it work?',
-    a: 'Choose your card, create your private memory, and give the card to someone special. They scan its QR code, enter the private code, and open the memory in their browser — no app or account required.',
+    a: 'Choose your card, create your private memory, and give the card to someone special. They scan its QR code, enter the private code, and open the memory in their browser â€” no app or account required.',
   },
   {
     q: 'What can I upload?',
@@ -28,7 +28,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Is the memory private?',
-    a: 'Memories are private by default. Access requires the UNIKMO link and the card’s private code, so keep the card and code within the people you intend to share it with.',
+    a: 'Memories are private by default. Access requires the UNIKMO link and the cardâ€™s private code, so keep the card and code within the people you intend to share it with.',
   },
   {
     q: 'Can I change the memory later?',
@@ -36,7 +36,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'When should I give someone a UNIKMO card?',
-    a: 'UNIKMO is made for moments that deserve more than a message — long-distance birthdays, anniversaries, wedding mornings, open-when messages, apologies, family memories, graduations, and messages from far away.',
+    a: 'UNIKMO is made for moments that deserve more than a message â€” long-distance birthdays, anniversaries, wedding mornings, open-when messages, apologies, family memories, graduations, and messages from far away.',
   },
   {
     q: 'What is the difference between the card options?',
@@ -72,14 +72,14 @@ export default function FaqPage() {
           href="/"
           className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-colors"
         >
-          ← Back to UNIKMO
+          â† Back to UNIKMO
         </a>
 
         <h1 className="mt-6 sm:mt-8 font-serif text-[30px] sm:text-[38px] lg:text-[44px] leading-[1.1] text-[#2D2926] font-normal tracking-tight">
           Questions about UNIKMO
         </h1>
         <p className="mt-4 sm:mt-5 text-[15px] sm:text-[17px] text-[#2D2926]/80 font-light leading-relaxed max-w-2xl">
-          UNIKMO is a physical card that unlocks a private memory — a video, photo, voice note, or message created by you.
+          UNIKMO is a physical card that unlocks a private memory â€” a video, photo, voice note, or message created by you.
         </p>
 
         <div className="mt-10 sm:mt-12 lg:mt-14 space-y-8 sm:space-y-10">
