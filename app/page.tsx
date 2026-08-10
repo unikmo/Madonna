@@ -148,18 +148,15 @@ export default function LandingPage() {
         <Hero />
         <HowItWorks2 />
         <WhenToUseUnikmo />
-        <WhyUnikmo />
-        <NearAndFarStory />
-        <SocialProof />
+        <ProductExperience />
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
           setShowCreateMomentModal={setShowCreateMomentModal}
           waitlistMode={waitlistMode}
           siteConfig={siteConfig}
         />
-        {/* <EmotionalPositioning /> */}
-        {/* <ProductExperience /> */}
         <PreFooterTrustStrip />
+        <SocialProof />
         <QuestionsSection onContactClick={() => setShowContactModal(true)} />
         <FinalCta onCreateMomentClick={handleCreateMomentClick} />
       </main>
@@ -214,53 +211,38 @@ function SiteHeader({
   onHowItWorksClick: () => void;
 }) {
   return (
-    <header className="bg-[#FDF9F5]">
-      <Container>
-        <div className="flex h-14 sm:h-16 items-center justify-between">
-          <nav className="flex-1 flex items-center gap-4 sm:gap-6">
-            <button
-              type="button"
-              onClick={onHowItWorksClick}
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block py-3 -my-3 min-h-[44px] flex items-center"
-            >
-              How it Works
-            </button>
-            <a
-              href="#gift-ideas"
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:translate-x-1 inline-block py-3 -my-3 min-h-[44px] flex items-center"
-            >
-              Gift Ideas
-            </a>
-          </nav>
+    <header className="bg-[#FCF9F4] border-b border-[#22323A]/[0.07]">
+      <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center px-5 sm:px-8 lg:px-12">
+        <a href="#top" className="shrink-0 inline-flex items-center" aria-label="UNIKMO home">
+          <Image
+            src="/unikmo-logo-header.png"
+            alt="UNIKMO — The Key to Your Memory"
+            width={729}
+            height={220}
+            priority
+            className="h-8 sm:h-9 lg:h-10 w-auto"
+          />
+        </a>
 
-          <a
-            className="inline-flex items-center justify-center hover:scale-105 transition-transform duration-300 min-h-[44px] min-w-[44px]"
-            href="#top"
-          >
-            <Image
-              src="/unikmo-logo-header.png"
-              alt="UNIKMO"
-              width={729}
-              height={220}
-              priority
-              className="h-7 sm:h-8 w-auto"
-            />
-          </a>
+        <nav className="ml-auto hidden md:flex items-center gap-7 lg:gap-9 text-[12px] text-[#22323A]/75">
+          <button type="button" onClick={onHowItWorksClick} className="hover:text-[#B38846] transition-colors">
+            How It Works
+          </button>
+          <a href="#gift-ideas" className="hover:text-[#B38846] transition-colors">Examples</a>
+          <a href="#shop" className="hover:text-[#B38846] transition-colors">Pricing</a>
+          <a href="#about" className="hover:text-[#B38846] transition-colors">About</a>
+        </nav>
 
-          <nav className="flex-1 flex justify-end">
-            <a
-              href="#shop"
-              className="text-[10px] sm:text-xs font-medium text-[#1E1B18]/55 hover:text-[#1E1B18] transition-all duration-300 hover:-translate-x-1 py-3 -my-3 min-h-[44px] flex items-center"
-            >
-              Create Your Moment
-            </a>
-          </nav>
-        </div>
-      </Container>
+        <a
+          href="#shop"
+          className="ml-auto md:ml-8 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#B38846] px-5 sm:px-6 text-[11px] sm:text-[12px] font-medium text-white shadow-[0_8px_25px_rgba(179,136,70,0.20)] hover:bg-[#9F783D] transition-colors"
+        >
+          Create Your Moment
+        </a>
+      </div>
     </header>
   );
 }
-
 const preFooterTrustItems = [
   { label: 'No app required', detail: 'They open the memory in the browser.', icon: <IconSpark /> },
   { label: 'No login', detail: 'The recipient does not need an account.', icon: <IconLock /> },
@@ -269,193 +251,153 @@ const preFooterTrustItems = [
 ];
 
 function Hero() {
-  const heroRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('opacity-100', 'translate-y-0');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section
-      id="top"
-      ref={heroRef}
-      className="relative overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#F5EEED]"
-    >
-      {/* Main hero: image + copy — balanced columns, image fills frame */}
-      <div className="relative z-10 w-full pt-8 pb-2 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-6">
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.28fr)_minmax(0,0.72fr)] gap-10 lg:gap-8 xl:gap-12 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
-            {/* Wider image + bleed left into section padding so the banner uses horizontal space (text on photo stays in frame via object-left) */}
-            <div className="flex justify-center lg:justify-start w-full max-lg:max-w-[540px] max-lg:mx-auto lg:max-w-none lg:-ml-8 lg:w-[calc(100%+2rem)]">
-              <div className="relative w-full lg:max-w-none lg:h-full lg:min-h-[min(52vh,560px)] aspect-[5/4] sm:aspect-[5/4] lg:aspect-auto rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(45,41,38,0.1)] ring-1 ring-[#2D2926]/5">
-                <video
-                  src="/video/unikmo-hero.mp4"
-                  poster="/banner/banner.jpeg"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  aria-label="UNIKMO — a physical key to a private memory. From card to scan to unlocked memory."
-                  className="absolute inset-0 h-full w-full object-cover object-[50%_42%]"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center text-center lg:text-left px-1 sm:px-2 lg:px-4 xl:pr-8">
-              {/* 1. Headline */}
-              <h1 className="font-serif text-[32px] sm:text-[40px] lg:text-[52px] xl:text-[68px] leading-[1.05] text-[#2D2926] font-normal tracking-tight">
-                Some moments deserve more than a message.
-              </h1>
-
-              {/* 2. Subline */}
-              <p className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[22px] xl:text-[24px] text-[#2D2926]/88 font-light leading-normal tracking-wide max-w-2xl">
-                Create a private video, voice note, photo, or written message and connect it to a beautifully designed UNIKMO card. They scan the QR code, enter the private code, and open a memory they can revisit.
-              </p>
-
-              {/* 3. Supporting text — reinforces what Unikmo is within the first 2 seconds on the page */}
-              <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 font-medium uppercase tracking-[0.12em]">
-                No app required &middot; No login &middot; One key = one memory
-              </div>
-
-              {/* 4. CTA + 5. subtext */}
-              <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center lg:items-start gap-3">
-                <a
-                  href="#shop"
-                  className="inline-flex items-center justify-center rounded-full bg-[#2D2926] hover:bg-[#1E1B18] active:bg-black text-[#FDF9F5] px-9 py-4 sm:px-11 sm:py-5 text-[13px] sm:text-[14px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
-                >
-                  Create Your Moment
-                </a>
-                <a href="#how-it-works" className="text-[12px] sm:text-[13px] font-medium text-[#2D2926]/70 underline underline-offset-4 hover:text-[#2D2926]">
-                  See How It Works
-                </a>
-                <p className="text-[11px] sm:text-[12px] text-[#2D2926]/65 font-medium">
-                  Private by default. No login required. No ads.
-                </p>
-                <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-                  {LAUNCH_OFFER_LINE}
-                </p>
-              </div>
+    <section id="top" className="bg-[#FCF9F4] py-5 sm:py-8 lg:py-10">
+      <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-7 lg:gap-12 xl:gap-16 items-stretch">
+          <div className="relative min-h-[360px] sm:min-h-[500px] lg:min-h-[610px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_18px_55px_rgba(44,48,49,0.10)]">
+            <Image
+              src="/banner/banner.jpeg"
+              alt="A personal UNIKMO moment being opened on a phone"
+              fill
+              priority
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/20 via-transparent to-transparent" />
+            <div className="absolute left-5 bottom-5 sm:left-7 sm:bottom-7 rounded-full bg-[#FCF9F4]/90 backdrop-blur px-4 py-2.5 text-[11px] tracking-[0.12em] uppercase text-[#22323A]/75 shadow-sm">
+              The moment, made tangible.
             </div>
           </div>
-        </Container>
+
+          <div className="flex flex-col justify-center py-4 lg:py-8 xl:pr-8">
+            <div className="mb-5 text-[#B38846]" aria-hidden>
+              <svg viewBox="0 0 32 52" className="h-11 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <circle cx="16" cy="10" r="6" />
+                <path d="M16 16v27m0-17h7m-7 8h5m-5 9h5" />
+              </svg>
+            </div>
+
+            <h1 className="font-serif text-[44px] sm:text-[58px] lg:text-[64px] xl:text-[74px] leading-[0.98] tracking-[-0.025em] text-[#22323A]">
+              Some moments
+              <br />
+              deserve <span className="text-[#B38846]">more</span>
+              <br />
+              <span className="text-[#B38846]">than a message.</span>
+            </h1>
+
+            <div className="mt-7 flex items-center gap-3 max-w-[320px] text-[#B38846]" aria-hidden>
+              <span className="h-px flex-1 bg-[#B38846]/40" />
+              <span className="text-[11px]">♥</span>
+              <span className="h-px flex-1 bg-[#B38846]/40" />
+            </div>
+
+            <p className="mt-7 max-w-[560px] text-[16px] sm:text-[18px] leading-[1.65] text-[#22323A]/80 font-light">
+              Turn a private video, voice note, photo or message into a beautifully made card they can hold — and return to whenever it matters.
+            </p>
+
+            <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-7">
+              <a
+                href="#shop"
+                className="inline-flex min-h-[50px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[12px] font-medium text-white shadow-[0_10px_28px_rgba(179,136,70,0.22)] hover:bg-[#9F783D] transition-colors"
+              >
+                Create Your Moment
+              </a>
+              <a href="#how-it-works" className="inline-flex min-h-[44px] items-center text-[12px] font-medium text-[#22323A]/75 hover:text-[#B38846] transition-colors">
+                See how it works <span className="ml-2">→</span>
+              </a>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-[11px] sm:text-[12px] text-[#22323A]/60">
+              <span className="inline-flex items-center gap-2"><span className="text-[#B38846]">▢</span> Private by default</span>
+              <span className="inline-flex items-center gap-2"><span className="text-[#B38846]">◫</span> No app</span>
+              <span className="inline-flex items-center gap-2"><span className="text-[#B38846]">○</span> No recipient login</span>
+            </div>
+
+            <p className="mt-5 text-[11px] text-[#22323A]/45">{LAUNCH_OFFER_LINE}</p>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-
 /** Trust bullets — blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
 function PreFooterTrustStrip() {
+  const items = [
+    {
+      title: 'Private by design',
+      body: 'The QR code and private access code keep the memory intended for the people you choose.',
+      icon: <IconLock />,
+    },
+    {
+      title: 'No app. No account.',
+      body: 'They scan, enter the private code, and open the memory directly in their browser.',
+      icon: <IconSpark />,
+    },
+    {
+      title: 'Revisit, anytime',
+      body: 'A physical card gives an important digital memory a place to return to.',
+      icon: <IconHeart />,
+    },
+  ];
+
   return (
-    <section
-      aria-label="Why Unikmo is simple"
-      className="bg-[#F5EEED] pt-8 sm:pt-10 pb-10 sm:pb-12 lg:pb-14 border-0"
-    >
-      <Container>
-        <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] text-center mb-8 sm:mb-10">
-          Private by design.
-        </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 max-w-5xl mx-auto">
-          {preFooterTrustItems.map((item) => (
-            <div key={item.label} className="flex flex-col items-center text-center">
-              <div className="text-[#2D2926]/40 mb-2 sm:mb-3">{item.icon}</div>
-              <p className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.15em] text-[#2D2926]/60 font-medium leading-tight">
-                {item.label}
-              </p>
-              <p className="mt-2 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 font-light leading-relaxed">
-                {item.detail}
-              </p>
+    <section aria-label="UNIKMO trust" className="bg-[#F7F0E9] border-y border-[#22323A]/[0.07]">
+      <div className="mx-auto grid w-full max-w-[1260px] grid-cols-1 md:grid-cols-3 px-5 sm:px-8">
+        {items.map((item, index) => (
+          <div
+            key={item.title}
+            className={`flex gap-4 py-8 sm:py-10 md:px-8 ${index > 0 ? 'border-t md:border-t-0 md:border-l border-[#22323A]/[0.08]' : ''}`}
+          >
+            <div className="shrink-0 text-[#B38846]">{item.icon}</div>
+            <div>
+              <h3 className="font-serif text-[22px] text-[#22323A]">{item.title}</h3>
+              <p className="mt-2 text-[13px] sm:text-[14px] leading-relaxed text-[#22323A]/60 font-light">{item.body}</p>
             </div>
-          ))}
-        </div>
-      </Container>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
-
-const giftIdeaGroups = [
-  {
-    title: 'Partners & close family',
-    body: 'For the people beside you and the feelings that deserve more than an ordinary card.',
-    ideas: ['Birthdays and anniversaries', 'A proposal or relationship milestone', 'Parent-to-child and child-to-parent messages', 'Gratitude, apologies, and difficult transitions'],
-  },
-  {
-    title: 'Friends at meaningful occasions',
-    body: 'Make a celebration more personal—or add the emotional element to another physical gift.',
-    ideas: ['Baby showers and new births', 'Weddings and engagements', 'Graduations and housewarmings', 'Farewells, thank-yous, and celebrations'],
-  },
-  {
-    title: 'People near and far',
-    body: 'A private message can matter across the world, across town, or across the room.',
-    ideas: ['Diaspora family celebrations', 'Long-distance birthdays and holidays', 'Messages from home', 'Everyday love made intentional'],
-  },
-  {
-    title: 'Messages for the future',
-    body: 'Create something today that can be revisited at another meaningful milestone.',
-    ideas: ['Open-when messages', 'A message for a child when older', 'Anniversary memories', 'Words for a future life chapter'],
-  },
-] as const;
-
 function WhenToUseUnikmo() {
+  const occasions = [
+    { title: 'Birthday', line: 'Make their day unforgettable.', image: '/cardfrontunikmo.jpg' },
+    { title: 'Anniversary', line: 'Give your story a place to live.', image: '/testimonials/customer-london.jpg' },
+    { title: 'Long-distance love', line: 'Make distance feel smaller.', image: '/story1.png' },
+    { title: 'Just because', line: 'Because they mean the world.', image: '/testimonials/customer-newyork.jpg' },
+  ];
+
   return (
-    <section
-      id="gift-ideas"
-      aria-labelledby="when-to-use-unikmo-heading"
-      className="bg-[#FDF9F5] py-12 sm:py-16 lg:py-20 border-t border-[#2D2926]/6"
-    >
-      <Container>
-        <div className="text-center max-w-3xl mx-auto">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium">Gift ideas</p>
-          <h2 id="when-to-use-unikmo-heading" className="mt-3 font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight">
-            For important feelings—whether they are near or far.
-          </h2>
-          <p className="mt-4 text-[15px] sm:text-[17px] text-[#2D2926]/70 font-light leading-relaxed">
-            Give the card on its own, or make flowers, jewelry, a baby gift, or another present more personal.
-          </p>
-        </div>
-        <div className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-          {giftIdeaGroups.map((group) => (
-            <article key={group.title} className="rounded-2xl border border-[#2D2926]/10 bg-white/45 p-6 sm:p-7">
-              <h3 className="font-serif text-[21px] sm:text-[23px] text-[#2D2926]">{group.title}</h3>
-              <p className="mt-2 text-[14px] sm:text-[15px] text-[#2D2926]/65 font-light leading-relaxed">{group.body}</p>
-              <ul className="mt-5 space-y-2.5">
-                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">•</span>{idea}</li>)}
-              </ul>
+    <section id="gift-ideas" className="bg-[#FCF9F4] py-14 sm:py-16 lg:py-24 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-10">
+        <p className="text-center text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B38846]">
+          When to use UNIKMO
+        </p>
+        <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {occasions.map((occasion) => (
+            <article key={occasion.title} className="overflow-hidden rounded-[18px] border border-[#22323A]/[0.08] bg-white/60">
+              <div className="relative aspect-[1.38/1] overflow-hidden bg-[#EEE5DA]">
+                <Image
+                  src={occasion.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 hover:scale-[1.03]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/10 to-transparent" />
+              </div>
+              <div className="px-5 py-5 text-center">
+                <h3 className="font-serif text-[23px] text-[#22323A]">{occasion.title}</h3>
+                <p className="mt-1.5 text-[12px] sm:text-[13px] text-[#22323A]/60">{occasion.line}</p>
+              </div>
             </article>
           ))}
         </div>
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
-          <article className="rounded-2xl bg-[#EFE8E5] p-6 sm:p-8">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-[#2D2926]/50 font-medium">A different kind of baby gift</p>
-            <h3 className="mt-3 font-serif text-[24px] sm:text-[28px] text-[#2D2926] leading-tight">They will outgrow the clothes. The memory can stay.</h3>
-            <p className="mt-3 text-[14px] sm:text-[15px] text-[#2D2926]/70 font-light leading-relaxed">Welcome the baby, record wishes for the parents, gather messages from grandparents, or create something for the child to open when they are older.</p>
-          </article>
-          <article className="rounded-2xl bg-[#2D2926] p-6 sm:p-8 text-[#FDF9F5]">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-[#FDF9F5]/50 font-medium">For the person beside you</p>
-            <h3 className="mt-3 font-serif text-[24px] sm:text-[28px] leading-tight">You see them every day. That does not mean you have said everything that matters.</h3>
-            <p className="mt-3 text-[14px] sm:text-[15px] text-[#FDF9F5]/70 font-light leading-relaxed">Preserve an anniversary message, proposal, birthday tribute, shared photographs, or words that are difficult to fit into an ordinary greeting card.</p>
-          </article>
-        </div>
-      </Container>
+      </div>
     </section>
   );
 }
-
 type Product = {
   id: string;
   title: string;
@@ -578,12 +520,12 @@ function StoryIn({
     <section
       ref={sectionRef}
       id="shop"
-      className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-[#FEF9F5] border-t border-[#2D2926]/6"
+      className="relative overflow-hidden py-14 sm:py-16 lg:py-24 bg-[#FCF9F4] border-t border-[#22323A]/[0.06]"
     >
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-3 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
-            Choose your card.
+            Choose the way you want to give it.
           </h2>
           <p className="text-center text-[12px] sm:text-[13px] uppercase tracking-[0.15em] font-semibold text-[#2D2926]/70 mb-8 sm:mb-10">
             {LAUNCH_OFFER_LINE}
@@ -1418,108 +1360,100 @@ function HowItWorks({ onLearnMoreClick }: { onLearnMoreClick?: () => void }) {
 
 function HowItWorks2() {
   const steps = [
-    { title: 'Choose your card', body: 'Select the UNIKMO card that fits the person or occasion.' },
-    { title: 'Create your memory', body: 'Upload a private video, voice note, photograph, or written message.' },
-    { title: 'Give the card', body: 'The physical card becomes a lasting part of the gift.' },
-    { title: 'Scan and relive', body: 'They scan the QR code, enter the private code, and open the memory in their browser.' },
+    { n: '1', title: 'Create', body: 'Record or upload your video, voice note, photo or message.' },
+    { n: '2', title: 'We make it', body: 'Your memory is connected to a beautifully made UNIKMO card.' },
+    { n: '3', title: 'They unlock it', body: 'They scan the QR code, enter the private code, and revisit it whenever it matters.' },
   ];
+
   return (
-    <section
-      id="how-it-works"
-      className="py-12 sm:py-16 lg:py-20 bg-[#FDF9F5] border-t border-[#2D2926]/6"
-    >
-      <Container>
-        <div className="text-center max-w-5xl mx-auto">
-          <h2 className="font-serif text-[22px] sm:text-[26px] lg:text-[30px] text-[#2D2926] mb-6 sm:mb-8">
-            A private memory, made into a gift.
-          </h2>
-          <p className="text-[15px] sm:text-[17px] text-[#2D2926]/75 leading-relaxed max-w-3xl mx-auto">
-            The card is the keepsake. Its QR code leads to UNIKMO, and the private access code opens the memory you created.
-          </p>
-          <ol className="mt-9 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
-            {steps.map((step, index) => (
-              <li key={step.title} className="rounded-2xl border border-[#2D2926]/10 bg-white/45 p-5 sm:p-6">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#2D2926] text-[#FDF9F5] text-sm font-medium">{index + 1}</span>
-                <h3 className="mt-4 font-serif text-[18px] text-[#2D2926]">{step.title}</h3>
-                <p className="mt-2 text-[14px] text-[#2D2926]/70 font-light leading-relaxed">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-7 text-[12px] sm:text-[13px] uppercase tracking-[0.16em] text-[#2D2926]/55 font-medium">
-            No app. No account. No advertising.
-          </p>
+    <section id="how-it-works" className="bg-[#FCF9F4] py-10 sm:py-12 lg:py-14 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto w-full max-w-[1260px] px-5 sm:px-8">
+        <div className="flex items-center gap-4">
+          <span className="h-px flex-1 bg-[#B38846]/25" />
+          <h2 className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B38846]">How it works</h2>
+          <span className="h-px flex-1 bg-[#B38846]/25" />
         </div>
-      </Container>
+
+        <ol className="mt-8 grid grid-cols-1 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <li
+              key={step.n}
+              className={`flex items-start gap-4 px-1 py-5 md:px-8 ${index > 0 ? 'border-t md:border-t-0 md:border-l border-[#22323A]/[0.08]' : ''}`}
+            >
+              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#B38846]/35 text-[15px] text-[#B38846]">
+                {step.n}
+              </span>
+              <div>
+                <h3 className="font-serif text-[22px] text-[#22323A]">{step.title}</h3>
+                <p className="mt-1.5 text-[13px] sm:text-[14px] leading-relaxed text-[#22323A]/60 font-light">{step.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
-
 function ProductExperience() {
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.animate-on-scroll').forEach((el) => {
-              el.classList.add('opacity-100', 'translate-y-0', 'translate-x-0');
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#FDF9F5] py-16 sm:py-20 lg:py-24 xl:py-32">
-      <div className="absolute inset-0 z-0">
-        <Image src="/story1.png" alt="" fill className="object-cover opacity-20" sizes="100vw" />
-      </div>
+    <section id="about" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 lg:grid-cols-[0.72fr_1.28fr] gap-10 lg:gap-14 px-5 sm:px-8 lg:px-10 items-center">
+        <div>
+          <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.26em] text-[#B38846]">A card that holds more</p>
+          <h2 className="mt-4 font-serif text-[38px] sm:text-[48px] lg:text-[56px] leading-[1.02] text-[#22323A]">
+            More than a card.
+            <br />
+            A moment they can keep.
+          </h2>
+          <p className="mt-6 max-w-[460px] text-[15px] sm:text-[16px] leading-relaxed text-[#22323A]/70 font-light">
+            Each UNIKMO card gives one private memory a physical place in the world — simple to give, personal to open, easy to return to.
+          </p>
+          <p className="mt-5 font-serif text-[21px] text-[#22323A]">Simple to give. Impossible to forget.</p>
+        </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-16 xl:gap-24 items-center">
-          <div className="lg:col-span-6 w-full animate-on-scroll opacity-0 -translate-x-8 transition-all duration-1000">
-            <div className="relative aspect-[4/3] w-full rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <figure>
+            <div className="relative aspect-[1.52/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.08] bg-[#F0E7DC] shadow-[0_18px_45px_rgba(44,48,49,0.08)]">
               <Image
                 src="/cardfrontunikmo.jpg"
-                alt="Back of a UNIKMO card showing where the QR code and private access code appear"
+                alt="UNIKMO card"
                 fill
-                className="object-contain"
-                sizes="(min-width: 1224px) 80vw, 130vw"
-                priority
+                sizes="(min-width: 1024px) 32vw, 90vw"
+                className="object-cover"
               />
             </div>
-          </div>
+            <figcaption className="mt-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[#22323A]/55">The card</figcaption>
+          </figure>
 
-          <div className="lg:col-span-6 flex flex-col justify-center text-center lg:text-left animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-            <div className="max-w-xl mx-auto lg:mx-0">
-              <h2 className="font-serif text-[30px] sm:text-[38px] lg:text-[48px] xl:text-[56px] leading-[1.1] text-[#2D2926]">
-                Simple. Private. Personal.
-              </h2>
-
-              <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6 text-[#2D2926]/80">
-                <p className="text-[16px] sm:text-[18px] lg:text-[20px] font-light leading-relaxed">
-                  Scan the QR code and confirm it opens a UNIKMO link, or type www.unikmo.com/unlock.
-                </p>
-                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Enter the Moment Key</p>
-                <p className="text-[18px] sm:text-[20px] lg:text-[22px] font-serif italic">Experience the memory</p>
-              </div>
+          <figure>
+            <div className="aspect-[1.52/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#EFE5D9] shadow-[0_18px_45px_rgba(44,48,49,0.08)] flex flex-col items-center justify-center px-8">
+              <svg aria-hidden viewBox="0 0 76 76" className="h-20 w-20 text-[#22323A]">
+                <rect width="76" height="76" rx="2" fill="#FCF9F4" />
+                <g fill="currentColor">
+                  <rect x="8" y="8" width="22" height="22" />
+                  <rect x="12" y="12" width="14" height="14" fill="#FCF9F4" />
+                  <rect x="46" y="8" width="22" height="22" />
+                  <rect x="50" y="12" width="14" height="14" fill="#FCF9F4" />
+                  <rect x="8" y="46" width="22" height="22" />
+                  <rect x="12" y="50" width="14" height="14" fill="#FCF9F4" />
+                  <rect x="37" y="36" width="7" height="7" />
+                  <rect x="49" y="38" width="6" height="14" />
+                  <rect x="58" y="35" width="8" height="8" />
+                  <rect x="35" y="52" width="8" height="7" />
+                  <rect x="45" y="58" width="7" height="8" />
+                  <rect x="58" y="55" width="9" height="10" />
+                </g>
+              </svg>
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#22323A]">Unlock your moment</p>
+              <p className="mt-3 text-[10px] tracking-[0.12em] text-[#22323A]/50">PRIVATE QR + ACCESS CODE</p>
             </div>
-          </div>
+            <figcaption className="mt-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[#22323A]/55">Private access</figcaption>
+          </figure>
         </div>
       </div>
     </section>
   );
 }
-
 function StoryInEveryKey() {
   const sectionRef = useRef(null);
 
@@ -1629,175 +1563,103 @@ const TESTIMONIALS = [
 ];
 
 function SocialProof() {
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.animate-on-scroll').forEach((el) => {
-              el.classList.add('opacity-100', 'translate-y-0');
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
+  const t = TESTIMONIALS[0];
   return (
-    <section
-      ref={sectionRef}
-      aria-labelledby="testimonials-heading"
-      className="relative py-10 sm:py-14 lg:py-16 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
-    >
-      <div className="relative mx-auto max-w-2xl px-5 sm:px-6 lg:max-w-3xl">
-        {/* One loose heading block — reads like a note, not a deck title */}
-        <header className="mb-8 sm:mb-10 lg:mb-12">
-          <h2
-            id="testimonials-heading"
-            className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] text-[#2D2926] leading-snug font-normal animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000"
-          >
-            The moment they unlock it is the gift.
-          </h2>
-          <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-          Private messages, voice notes, photos, and videos — connected to something they can hold.
-          </p>
-        </header>
-
-        {/* Single column: stacked stories, circular faces, no cards or grid */}
-        <ul className="space-y-8 sm:space-y-10 lg:space-y-12 list-none m-0 p-0">
-          {TESTIMONIALS.map((t, idx) => (
-            <li
-              key={t.name}
-              className={`animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ${
-                idx === 0 ? 'delay-100' : 'delay-200'
-              }`}
-            >
-              <div className="flex gap-4 sm:gap-5">
-                <div className="relative h-[52px] w-[52px] sm:h-[60px] sm:w-[60px] shrink-0 overflow-hidden rounded-full ring-2 ring-[#FDF9F5] shadow-[0_2px_12px_rgba(45,41,38,0.08)]">
-                  <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover" sizes="60px" />
-                </div>
-                <div className="min-w-0 flex-1 pt-0.5">
-                  <p className="text-[15px] sm:text-[16px] lg:text-[17px] text-[#2D2926]/88 font-light leading-[1.65]">
-                    {t.quote}
-                  </p>
-                  <p className="mt-3 text-[13px] sm:text-[14px] text-[#2D2926]/50">{t.name}</p>
-                </div>
-              </div>
-              {idx < TESTIMONIALS.length - 1 ? (
-                <div className="mt-8 sm:mt-10 lg:mt-12 h-px w-full bg-[#2D2926]/[0.08]" aria-hidden />
-              ) : null}
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light tracking-wide animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
-          PRIVATE BY DEFAULT &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; NO ADS
-        </p>
+    <section id="stories" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto w-full max-w-[980px] px-5 sm:px-8">
+        <div className="text-center">
+          <div className="font-serif text-[58px] leading-none text-[#B38846]/55">“</div>
+          <blockquote className="mx-auto -mt-2 max-w-[820px] font-serif text-[25px] sm:text-[31px] lg:text-[36px] leading-[1.25] text-[#22323A]">
+            {t.quote}
+          </blockquote>
+          <div className="mt-7 flex items-center justify-center gap-3">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full">
+              <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover" sizes="40px" />
+            </div>
+            <p className="text-[12px] text-[#22323A]/55">{t.name}</p>
+          </div>
+          <div className="mt-6 flex justify-center gap-2" aria-hidden>
+            <span className="h-2 w-2 rounded-full bg-[#22323A]" />
+            <span className="h-2 w-2 rounded-full border border-[#22323A]/25" />
+            <span className="h-2 w-2 rounded-full border border-[#22323A]/25" />
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-
 function QuestionsSection({ onContactClick }: { onContactClick: () => void }) {
+  const faqs = [
+    'How does UNIKMO work?',
+    'Is it really private?',
+    'Does the recipient need an app?',
+    'How long will my moment last?',
+  ];
+
   return (
-    <section
-      aria-labelledby="questions-heading"
-      className="bg-[#FDF9F5] py-12 sm:py-14 lg:py-16 border-t border-[#2D2926]/6"
-    >
-      <Container>
-        <div className="max-w-xl mx-auto text-center">
-          <h2
-            id="questions-heading"
-            className="font-serif text-[22px] sm:text-[26px] lg:text-[28px] text-[#2D2926] mb-3 sm:mb-4"
-          >
-            Questions before you create one?
+    <section className="bg-[#FCF9F4] py-12 sm:py-16 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto w-full max-w-[1260px] px-5 sm:px-8">
+        <div className="flex items-center gap-4">
+          <span className="h-px flex-1 bg-[#B38846]/25" />
+          <h2 className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">
+            Questions? We’ve got answers.
           </h2>
-          <p className="text-[14px] sm:text-[15px] text-[#2D2926]/70 font-light leading-relaxed mb-6 sm:mb-7">
-            If you&apos;re not sure which card to choose, how the private code works, or whether UNIKMO fits your moment, send us a note.
-          </p>
-          <button
-            type="button"
-            onClick={onContactClick}
-            className="inline-flex items-center justify-center rounded-full bg-transparent border border-[#2D2926]/20 text-[#2D2926] px-7 py-3 text-[11px] sm:text-[12px] font-medium tracking-[0.08em] uppercase hover:bg-[#2D2926]/5 transition-colors"
-          >
-            Contact UNIKMO
-          </button>
-          <p className="mt-4 text-[13px] sm:text-[14px] text-[#2D2926]/70">
-            <a href="/faq" className="font-medium text-[#2D2926] underline underline-offset-2 decoration-[#2D2926]/40 hover:decoration-[#2D2926] transition-colors py-3 -my-3 inline-flex items-center min-h-[44px]">
-              Still unsure? Read the FAQ.
-            </a>
-          </p>
+          <span className="h-px flex-1 bg-[#B38846]/25" />
         </div>
-      </Container>
+
+        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {faqs.map((faq) => (
+            <a
+              key={faq}
+              href="/faq"
+              className="flex min-h-[52px] items-center justify-between rounded-lg border border-[#22323A]/[0.09] bg-white/60 px-4 text-[12px] text-[#22323A]/75 hover:border-[#B38846]/45 hover:text-[#22323A] transition-colors"
+            >
+              {faq}
+              <span className="ml-3 text-[#B38846]">⌄</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-7 text-center">
+          <button type="button" onClick={onContactClick} className="text-[12px] text-[#22323A]/55 underline underline-offset-4 hover:text-[#B38846]">
+            Still have a question? Contact UNIKMO.
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
-
 function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) {
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.animate-on-scroll').forEach((el) => {
-              el.classList.add('opacity-100', 'translate-y-0');
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      id="final-cta"
-      className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#F5EEED] border-t border-[#2D2926]/[0.06]"
-    >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center pt-2 sm:pt-4">
-        <h2 className="font-serif text-[28px] sm:text-[36px] lg:text-[44px] xl:text-[52px] leading-[1.08] text-[#2D2926] font-normal tracking-tight animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000">
-          Someone already came to mind.
-        </h2>
-
-        <p className="mt-4 sm:mt-5 text-[15px] sm:text-[16px] lg:text-[18px] text-[#2D2926]/85 font-light leading-relaxed animate-on-scroll opacity-0 translate-y-6 transition-all duration-1000 delay-100">
-            Turn a precious memory into a lasting gift.
-        </p>
-
-        <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2.5 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 delay-200">
+    <section className="bg-[#FCF9F4] px-5 sm:px-8 pb-14 sm:pb-20">
+      <div className="mx-auto grid w-full max-w-[1260px] grid-cols-1 md:grid-cols-[0.9fr_1.1fr] overflow-hidden rounded-[22px] border border-[#22323A]/[0.07] bg-[#EFE6DC]">
+        <div className="relative min-h-[230px] md:min-h-[330px]">
+          <Image
+            src="/cardfrontunikmo.jpg"
+            alt="UNIKMO card presented as a meaningful gift"
+            fill
+            sizes="(min-width: 768px) 45vw, 100vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="flex flex-col justify-center px-7 py-10 sm:px-10 lg:px-14">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#B38846]">You already know who it’s for.</p>
+          <h2 className="mt-4 font-serif text-[36px] sm:text-[44px] lg:text-[52px] leading-[1.03] text-[#22323A]">
+            Create a moment they’ll treasure — and revisit.
+          </h2>
           <button
             type="button"
             onClick={onCreateMomentClick}
-            className="inline-flex items-center justify-center rounded-full bg-[#2D2926] hover:bg-[#1E1B18] active:bg-black text-[#FDF9F5] px-8 py-3.5 sm:px-10 sm:py-4 text-[12px] sm:text-[13px] font-medium tracking-[0.08em] transition-colors shadow-sm border border-[#2D2926]/10"
+            className="mt-7 inline-flex min-h-[48px] w-fit items-center justify-center rounded-lg bg-[#B38846] px-7 text-[12px] font-medium text-white hover:bg-[#9F783D] transition-colors"
           >
-            Create Your Moment
+            Create Your Moment <span className="ml-2">→</span>
           </button>
-          <p className="text-[11px] sm:text-[12px] text-[#2D2926]/50 font-light leading-snug max-w-md">
-            {LAUNCH_OFFER_LINE}
-          </p>
+          <p className="mt-4 text-[11px] text-[#22323A]/45">{LAUNCH_OFFER_LINE}</p>
         </div>
       </div>
     </section>
   );
 }
-
 const UPLOAD_URL = 'https://unikmo.com/upload';
 const UNLOCK_URL = 'https://unikmo.com/unlock';
 const UNLOCK_LINK_CLASS = 'font-semibold text-[#2D2926] no-underline hover:text-[#1E1B18] hover:bg-[#2D2926]/8 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/40 focus:ring-offset-1 rounded px-1 -mx-0.5 transition-colors';
