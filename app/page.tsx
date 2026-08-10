@@ -8,7 +8,7 @@ import {
   type AnimatedMomentModalVariant,
 } from '@/components/AnimatedMomentModal';
 
-/** Matches cream in product card photography â€” avoids white letterboxing around images */
+/** Matches cream in product card photography — avoids white letterboxing around images */
 const PRODUCT_IMAGE_BG = '#FAF6F1';
 const productImageFrameClass =
   'relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 overflow-hidden';
@@ -18,12 +18,12 @@ const productImageClass =
 /** Launch offer: real, enforced via a Shopify discount code with a 100-use limit (see /admin discounts). */
 const LAUNCH_DISCOUNT_PERCENT = 30;
 const LAUNCH_DISCOUNT_CODE = 'LAUNCH30';
-const LAUNCH_OFFER_LINE = `Now on direct sale â€” ${LAUNCH_DISCOUNT_PERCENT}% off with code ${LAUNCH_DISCOUNT_CODE}, limited to the first 100 orders.`;
+const LAUNCH_OFFER_LINE = `Now on direct sale — ${LAUNCH_DISCOUNT_PERCENT}% off with code ${LAUNCH_DISCOUNT_CODE}, limited to the first 100 orders.`;
 
 function formatCurrency(price?: string | null, currencyCode?: string | null): string {
   if (price == null) return '';
   const symbol =
-    currencyCode?.toUpperCase?.() === 'EUR' ? 'â‚¬' : currencyCode?.toUpperCase?.() === 'USD' ? '$' : (currencyCode ?? '');
+    currencyCode?.toUpperCase?.() === 'EUR' ? '€' : currencyCode?.toUpperCase?.() === 'USD' ? '$' : (currencyCode ?? '');
   return `${symbol}${Number(price).toFixed(2)}`;
 }
 
@@ -296,7 +296,7 @@ function Hero() {
       ref={heroRef}
       className="relative overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 bg-[#F5EEED]"
     >
-      {/* Main hero: image + copy â€” balanced columns, image fills frame */}
+      {/* Main hero: image + copy — balanced columns, image fills frame */}
       <div className="relative z-10 w-full pt-8 pb-2 sm:pt-10 sm:pb-4 lg:pt-12 lg:pb-6">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.28fr)_minmax(0,0.72fr)] gap-10 lg:gap-8 xl:gap-12 items-center lg:items-stretch lg:min-h-[min(72vh,600px)]">
@@ -311,7 +311,7 @@ function Hero() {
                   loop
                   playsInline
                   preload="auto"
-                  aria-label="UNIKMO â€” a physical key to a private memory. From card to scan to unlocked memory."
+                  aria-label="UNIKMO — a physical key to a private memory. From card to scan to unlocked memory."
                   className="absolute inset-0 h-full w-full object-cover object-[50%_42%]"
                 />
               </div>
@@ -328,7 +328,7 @@ function Hero() {
                 Create a private video, voice note, photo, or written message and connect it to a beautifully designed UNIKMO card. They scan the QR code, enter the private code, and open a memory they can revisit.
               </p>
 
-              {/* 3. Supporting text â€” reinforces what Unikmo is within the first 2 seconds on the page */}
+              {/* 3. Supporting text — reinforces what Unikmo is within the first 2 seconds on the page */}
               <div className="mt-6 sm:mt-8 lg:mt-10 space-y-3 text-[13px] sm:text-[14px] lg:text-[15px] text-[#2D2926]/60 font-medium uppercase tracking-[0.12em]">
                 No app required &middot; No login &middot; One key = one memory
               </div>
@@ -359,7 +359,7 @@ function Hero() {
   );
 }
 
-/** Trust bullets â€” blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
+/** Trust bullets — blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
 function PreFooterTrustStrip() {
   return (
     <section
@@ -396,7 +396,7 @@ const giftIdeaGroups = [
   },
   {
     title: 'Friends at meaningful occasions',
-    body: 'Make a celebration more personalâ€”or add the emotional element to another physical gift.',
+    body: 'Make a celebration more personal—or add the emotional element to another physical gift.',
     ideas: ['Baby showers and new births', 'Weddings and engagements', 'Graduations and housewarmings', 'Farewells, thank-yous, and celebrations'],
   },
   {
@@ -422,7 +422,7 @@ function WhenToUseUnikmo() {
         <div className="text-center max-w-3xl mx-auto">
           <p className="text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/50 font-medium">Gift ideas</p>
           <h2 id="when-to-use-unikmo-heading" className="mt-3 font-serif text-[26px] sm:text-[32px] lg:text-[40px] text-[#2D2926] font-normal tracking-tight">
-            For important feelingsâ€”whether they are near or far.
+            For important feelings—whether they are near or far.
           </h2>
           <p className="mt-4 text-[15px] sm:text-[17px] text-[#2D2926]/70 font-light leading-relaxed">
             Give the card on its own, or make flowers, jewelry, a baby gift, or another present more personal.
@@ -434,7 +434,7 @@ function WhenToUseUnikmo() {
               <h3 className="font-serif text-[21px] sm:text-[23px] text-[#2D2926]">{group.title}</h3>
               <p className="mt-2 text-[14px] sm:text-[15px] text-[#2D2926]/65 font-light leading-relaxed">{group.body}</p>
               <ul className="mt-5 space-y-2.5">
-                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">â€¢</span>{idea}</li>)}
+                {group.ideas.map((idea) => <li key={idea} className="text-[14px] sm:text-[15px] text-[#2D2926]/82 font-light flex gap-3"><span aria-hidden className="text-[#2D2926]/35">•</span>{idea}</li>)}
               </ul>
             </article>
           ))}
@@ -923,7 +923,7 @@ function WaitlistModal({
                 disabled={submitting}
                 className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50"
               >
-                {submitting ? 'Please waitâ€¦' : config.waitlistCtaLabel}
+                {submitting ? 'Please wait…' : config.waitlistCtaLabel}
               </button>
             </>
           )}
@@ -1083,8 +1083,8 @@ function ProductModal({
           message:
             data.emailSent === true
               ? 'Your spot is saved. Check your inbox for a confirmation email.'
-              : 'Your spot is saved. We could not send the confirmation email this time â€” you are still on the list.',
-          emoji: 'âœ¨',
+              : 'Your spot is saved. We could not send the confirmation email this time — you are still on the list.',
+          emoji: '✨',
           confirmLabel: 'Okay',
         });
       } catch {
@@ -1209,7 +1209,7 @@ function ProductModal({
                 <div>
                   <p className="text-sm font-semibold text-[#2D2926]">Digital card ( Images )</p>
                   <p className="text-xs text-[#2D2926]/70">
-                    We email you a digital card image with your private access code and QR code â€” no physical card is shipped.
+                    We email you a digital card image with your private access code and QR code — no physical card is shipped.
                   </p>
                 </div>
               </label>
@@ -1337,7 +1337,7 @@ function EmotionalPositioning() {
                       That Lasts Forever
                     </p>
                     <p className="mt-2 text-[8px] sm:text-[9px] lg:text-[10px] leading-relaxed text-[#FDF9F5]/85 animate-slide-up">
-                      Hold onto what matters mostâ€”private memories saved for years.
+                      Hold onto what matters most—private memories saved for years.
                     </p> */}
 
                     <div className="mt-3 sm:mt-4 lg:mt-5 flex flex-wrap gap-2">
@@ -1365,7 +1365,7 @@ function EmotionalPositioning() {
               Not just a gift. A moment.
             </h2>
             <p className="mt-4 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#2D2926]/60">
-              Unikmo turns memories into something you can hold. A small card unlocks a personal video, voice message, or photo â€” saved for years to come.
+              Unikmo turns memories into something you can hold. A small card unlocks a personal video, voice message, or photo — saved for years to come.
             </p>
           </div>
         </div>
@@ -1569,7 +1569,7 @@ function StoryInEveryKey() {
     { label: 'No app required', icon: <IconSpark /> },
     { label: 'No login', icon: <IconLock /> },
     { label: 'Private & secure', icon: <IconShield /> },
-    { label: 'One card â€“ one private memory', icon: <IconCode /> },
+    { label: 'One card – one private memory', icon: <IconCode /> },
     { label: 'A tree planted', icon: <IconLeaf /> },
   ];
 
@@ -1601,7 +1601,7 @@ function StoryInEveryKey() {
               <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-[#2D2926]/60 font-light mb-6 sm:mb-7 lg:mb-8 italic">{p.sub}</p>
               
               <button className="text-[10px] sm:text-[11px] lg:text-[12px] uppercase tracking-[0.2em] text-[#2D2926]/40 group-hover:text-[#2D2926] transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
-                Discover <span className="text-[12px] sm:text-[13px] lg:text-[14px]">â†’</span>
+                Discover <span className="text-[12px] sm:text-[13px] lg:text-[14px]">→</span>
               </button>
             </div>
           ))}
@@ -1614,7 +1614,7 @@ function StoryInEveryKey() {
 const TESTIMONIALS = [
   {
     quote:
-      'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal â€” not just another gift.',
+      'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.',
     name: 'Matt L., London',
     imageSrc: '/testimonials/customer-london.jpg',
     imageAlt: 'Matt, customer in London, smiling with his phone',
@@ -1659,7 +1659,7 @@ function SocialProof() {
       className="relative py-10 sm:py-14 lg:py-16 bg-[#EFE8E5] border-t border-[#2D2926]/[0.07]"
     >
       <div className="relative mx-auto max-w-2xl px-5 sm:px-6 lg:max-w-3xl">
-        {/* One loose heading block â€” reads like a note, not a deck title */}
+        {/* One loose heading block — reads like a note, not a deck title */}
         <header className="mb-8 sm:mb-10 lg:mb-12">
           <h2
             id="testimonials-heading"
@@ -1668,7 +1668,7 @@ function SocialProof() {
             The moment they unlock it is the gift.
           </h2>
           <p className="mt-4 animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-75 text-[15px] sm:text-[16px] text-[#2D2926]/65 font-light leading-relaxed">
-          Private messages, voice notes, photos, and videos â€” connected to something they can hold.
+          Private messages, voice notes, photos, and videos — connected to something they can hold.
           </p>
         </header>
 
@@ -1700,7 +1700,7 @@ function SocialProof() {
         </ul>
 
         <p className="mt-8 sm:mt-10 lg:mt-12 text-center text-[13px] sm:text-[14px] text-[#2D2926]/50 font-light tracking-wide animate-on-scroll opacity-0 translate-y-4 transition-all duration-700 delay-300">
-          PRIVATE BY DEFAULT &nbsp;Â·&nbsp; NO LOGIN &nbsp;Â·&nbsp; NO ADS
+          PRIVATE BY DEFAULT &nbsp;·&nbsp; NO LOGIN &nbsp;·&nbsp; NO ADS
         </p>
       </div>
     </section>
@@ -2003,7 +2003,7 @@ function SiteFooter({
 }) {
   return (
     <footer className="bg-[#FDF9F5] border-t border-[#2D2926]/[0.07]">
-      {/* Tree = footer hero / accent â€” only this + links are footer; trust strip stays in <main> above */}
+      {/* Tree = footer hero / accent — only this + links are footer; trust strip stays in <main> above */}
       <div className="bg-[#FDF9F5] pt-0 pb-0 leading-[0]" aria-hidden>
         <div className="max-w-7xl mx-auto flex justify-center sm:justify-end pr-0 sm:pr-4 md:pr-6">
           <Image
@@ -2022,7 +2022,7 @@ function SiteFooter({
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
           
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
-            <span className="font-semibold text-[#2D2926]/80">UNIKMO Â© {new Date().getFullYear()}</span>
+            <span className="font-semibold text-[#2D2926]/80">UNIKMO © {new Date().getFullYear()}</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
             <span>A card that unlocks a private memory.</span>
           </div>
@@ -2128,9 +2128,9 @@ function ImprintModal({ onClose }: { onClose: () => void }) {
 
           <div className="space-y-4 text-[#2D2926]/90 text-[14px] sm:text-[15px] leading-relaxed">
             <h4 className="font-semibold text-[#2D2926]">Operator Information</h4>
-            <p><span className="font-medium text-[#2D2926]">Company Name:</span> PlanetHike OÃœ</p>
+            <p><span className="font-medium text-[#2D2926]">Company Name:</span> PlanetHike OÜ</p>
             <p><span className="font-medium text-[#2D2926]">Product:</span> unikmo</p>
-            <p><span className="font-medium text-[#2D2926]">Registered Office Address:</span> JÃ¤rvevana tee 9, Tallinn, 11314, Estonia</p>
+            <p><span className="font-medium text-[#2D2926]">Registered Office Address:</span> Järvevana tee 9, Tallinn, 11314, Estonia</p>
             <p><span className="font-medium text-[#2D2926]">Registration Number:</span> 80656111</p>
             <p><span className="font-medium text-[#2D2926]">Legal Representative / Founder:</span> Tichi Mbanwie</p>
             <p>
@@ -2232,7 +2232,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
             <section>
               <h4 className="font-semibold text-[#2D2926] mb-2">9. Governing Law & Supervisory Authority</h4>
               <p>
-                Unikmo is operated by PlanetHike OÃœ, registered in Tallinn, Estonia. This Privacy Policy is governed by Estonian
+                Unikmo is operated by PlanetHike OÜ, registered in Tallinn, Estonia. This Privacy Policy is governed by Estonian
                 law and the EU General Data Protection Regulation (GDPR).
               </p>
               <p className="mt-2">
