@@ -11,9 +11,9 @@ import {
 /** Matches cream in product card photography — avoids white letterboxing around images */
 const PRODUCT_IMAGE_BG = '#FAF6F1';
 const productImageFrameClass =
-  'relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 overflow-hidden';
+  'relative mx-auto w-full max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] aspect-[3/2] mb-6 overflow-hidden rounded-[18px]';
 const productImageClass =
-  'absolute inset-0 w-full h-full object-cover object-center drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500';
+  'absolute inset-0 w-full h-full object-contain object-center p-3 sm:p-5 drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-[1.02] transition-transform duration-500';
 
 /** Launch offer: real, enforced via a Shopify discount code with a 100-use limit (see /admin discounts). */
 const LAUNCH_DISCOUNT_PERCENT = 30;
@@ -256,13 +256,15 @@ function Hero() {
       <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-7 lg:gap-12 xl:gap-16 items-stretch">
           <div className="relative min-h-[360px] sm:min-h-[500px] lg:min-h-[610px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_18px_55px_rgba(44,48,49,0.10)]">
-            <Image
-              src="/banner/banner.jpeg"
-              alt="A personal UNIKMO moment being opened on a phone"
-              fill
-              priority
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              className="object-cover object-center"
+            <video
+              src="/video/unikmo-hero-final.mp4"
+              poster="/banner/banner.jpeg"
+              autoPlay
+              muted
+              playsInline
+              preload="metadata"
+              aria-label="A UNIKMO card being given, scanned and unlocked with a private access code."
+              className="absolute inset-0 h-full w-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/20 via-transparent to-transparent" />
             <div className="absolute left-5 bottom-5 sm:left-7 sm:bottom-7 rounded-full bg-[#FCF9F4]/90 backdrop-blur px-4 py-2.5 text-[11px] tracking-[0.12em] uppercase text-[#22323A]/75 shadow-sm">
@@ -362,38 +364,66 @@ function PreFooterTrustStrip() {
 }
 function WhenToUseUnikmo() {
   const occasions = [
-    { title: 'Birthday', line: 'Make their day unforgettable.', image: '/cardfrontunikmo.jpg' },
-    { title: 'Anniversary', line: 'Give your story a place to live.', image: '/testimonials/customer-london.jpg' },
-    { title: 'Long-distance love', line: 'Make distance feel smaller.', image: '/story1.png' },
-    { title: 'Just because', line: 'Because they mean the world.', image: '/testimonials/customer-newyork.jpg' },
+    {
+      title: 'Birthday',
+      line: 'Say what a birthday card never quite could.',
+      icon: <IconHeart />,
+    },
+    {
+      title: 'Anniversary',
+      line: 'Give your shared story somewhere to live.',
+      icon: <IconSpark />,
+    },
+    {
+      title: 'Long-distance love',
+      line: 'Keep something personal close, even when you are not.',
+      icon: <IconLock />,
+    },
+    {
+      title: 'Just because',
+      line: 'Some things matter precisely because no occasion requires them.',
+      icon: <IconCode />,
+    },
   ];
 
   return (
-    <section id="gift-ideas" className="bg-[#FCF9F4] py-14 sm:py-16 lg:py-24 border-t border-[#22323A]/[0.06]">
-      <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-10">
-        <p className="text-center text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B38846]">
-          When to use UNIKMO
-        </p>
-        <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {occasions.map((occasion) => (
-            <article key={occasion.title} className="overflow-hidden rounded-[18px] border border-[#22323A]/[0.08] bg-white/60">
-              <div className="relative aspect-[1.38/1] overflow-hidden bg-[#EEE5DA]">
-                <Image
-                  src={occasion.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/10 to-transparent" />
-              </div>
-              <div className="px-5 py-5 text-center">
-                <h3 className="font-serif text-[23px] text-[#22323A]">{occasion.title}</h3>
-                <p className="mt-1.5 text-[12px] sm:text-[13px] text-[#22323A]/60">{occasion.line}</p>
+    <section id="gift-ideas" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
+      <div className="mx-auto w-full max-w-[1260px] px-5 sm:px-8">
+        <div className="text-center">
+          <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B38846]">
+            When to use UNIKMO
+          </p>
+          <h2 className="mt-4 font-serif text-[30px] sm:text-[38px] lg:text-[44px] text-[#22323A]">
+            For the moments you do not want to reduce to a text.
+          </h2>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {occasions.map((occasion, index) => (
+            <article
+              key={occasion.title}
+              className="relative min-h-[250px] overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#F4ECE3] p-6 sm:p-7 flex flex-col"
+            >
+              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#B38846]/20" aria-hidden />
+              <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full border border-[#B38846]/15" aria-hidden />
+
+              <div className="text-[#B38846]">{occasion.icon}</div>
+              <div className="mt-auto">
+                <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#B38846]/75">
+                  0{index + 1}
+                </p>
+                <h3 className="font-serif text-[27px] text-[#22323A]">{occasion.title}</h3>
+                <p className="mt-2 text-[13px] sm:text-[14px] leading-relaxed text-[#22323A]/65 font-light">
+                  {occasion.line}
+                </p>
               </div>
             </article>
           ))}
         </div>
+
+        <p className="mx-auto mt-7 max-w-[760px] text-center text-[12px] sm:text-[13px] leading-relaxed text-[#22323A]/50">
+          We use real customer and product photography only. Until an authentic image belongs here, the design stays intentionally visual rather than synthetic.
+        </p>
       </div>
     </section>
   );
@@ -1098,7 +1128,7 @@ function ProductModal({
               src={selected.img}
               alt={selected.imageAlt}
               fill
-              className="object-cover object-center"
+              className="object-contain object-center p-4 sm:p-6"
               sizes="(max-width: 640px) 460px, (max-width: 1024px) 500px, 560px"
             />
           </div>
@@ -1397,58 +1427,87 @@ function HowItWorks2() {
 function ProductExperience() {
   return (
     <section id="about" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
-      <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 lg:grid-cols-[0.72fr_1.28fr] gap-10 lg:gap-14 px-5 sm:px-8 lg:px-10 items-center">
-        <div>
-          <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.26em] text-[#B38846]">A card that holds more</p>
-          <h2 className="mt-4 font-serif text-[38px] sm:text-[48px] lg:text-[56px] leading-[1.02] text-[#22323A]">
-            More than a card.
-            <br />
-            A moment they can keep.
-          </h2>
-          <p className="mt-6 max-w-[460px] text-[15px] sm:text-[16px] leading-relaxed text-[#22323A]/70 font-light">
-            Each UNIKMO card gives one private memory a physical place in the world — simple to give, personal to open, easy to return to.
-          </p>
-          <p className="mt-5 font-serif text-[21px] text-[#22323A]">Simple to give. Impossible to forget.</p>
-        </div>
+      <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.72fr_1.28fr] gap-10 lg:gap-14 items-center">
+          <div>
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.26em] text-[#B38846]">
+              One card. Two sides. One private memory.
+            </p>
+            <h2 className="mt-4 font-serif text-[38px] sm:text-[48px] lg:text-[56px] leading-[1.02] text-[#22323A]">
+              More than a card.
+              <br />
+              A moment they can keep.
+            </h2>
+            <p className="mt-6 max-w-[470px] text-[15px] sm:text-[16px] leading-relaxed text-[#22323A]/70 font-light">
+              The front is the keepsake. The back carries the QR code and private access code that unlock the memory you created.
+            </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <figure>
-            <div className="relative aspect-[1.52/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.08] bg-[#F0E7DC] shadow-[0_18px_45px_rgba(44,48,49,0.08)]">
-              <Image
-                src="/cardfrontunikmo.jpg"
-                alt="UNIKMO card"
-                fill
-                sizes="(min-width: 1024px) 32vw, 90vw"
-                className="object-cover"
-              />
+            <div className="mt-7 space-y-3 text-[13px] text-[#22323A]/65">
+              <p><span className="font-medium text-[#22323A]">Front:</span> the physical UNIKMO design they keep.</p>
+              <p><span className="font-medium text-[#22323A]">Back:</span> QR code plus private access code.</p>
+              <p><span className="font-medium text-[#22323A]">Unlock:</span> scan, enter the code, open the private memory.</p>
             </div>
-            <figcaption className="mt-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[#22323A]/55">The card</figcaption>
-          </figure>
+          </div>
 
-          <figure>
-            <div className="aspect-[1.52/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#EFE5D9] shadow-[0_18px_45px_rgba(44,48,49,0.08)] flex flex-col items-center justify-center px-8">
-              <svg aria-hidden viewBox="0 0 76 76" className="h-20 w-20 text-[#22323A]">
-                <rect width="76" height="76" rx="2" fill="#FCF9F4" />
-                <g fill="currentColor">
-                  <rect x="8" y="8" width="22" height="22" />
-                  <rect x="12" y="12" width="14" height="14" fill="#FCF9F4" />
-                  <rect x="46" y="8" width="22" height="22" />
-                  <rect x="50" y="12" width="14" height="14" fill="#FCF9F4" />
-                  <rect x="8" y="46" width="22" height="22" />
-                  <rect x="12" y="50" width="14" height="14" fill="#FCF9F4" />
-                  <rect x="37" y="36" width="7" height="7" />
-                  <rect x="49" y="38" width="6" height="14" />
-                  <rect x="58" y="35" width="8" height="8" />
-                  <rect x="35" y="52" width="8" height="7" />
-                  <rect x="45" y="58" width="7" height="8" />
-                  <rect x="58" y="55" width="9" height="10" />
-                </g>
-              </svg>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#22323A]">Unlock your moment</p>
-              <p className="mt-3 text-[10px] tracking-[0.12em] text-[#22323A]/50">PRIVATE QR + ACCESS CODE</p>
-            </div>
-            <figcaption className="mt-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[#22323A]/55">Private access</figcaption>
-          </figure>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <figure>
+              <div className="relative aspect-[1.48/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#F1E8DD] shadow-[0_18px_45px_rgba(44,48,49,0.08)] overflow-hidden">
+                <Image
+                  src="/cardfrontunikmo.jpg"
+                  alt="Front of the physical UNIKMO card"
+                  fill
+                  sizes="(min-width: 1024px) 32vw, 90vw"
+                  className="object-contain p-4 sm:p-6"
+                />
+              </div>
+              <figcaption className="mt-4 text-center">
+                <span className="block font-serif text-[20px] text-[#22323A]">Front</span>
+                <span className="mt-1 block text-[10px] uppercase tracking-[0.18em] text-[#22323A]/50">The keepsake</span>
+              </figcaption>
+            </figure>
+
+            <figure>
+              <div className="aspect-[1.48/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#F7F0E8] shadow-[0_18px_45px_rgba(44,48,49,0.08)] overflow-hidden p-5 sm:p-7">
+                <div className="h-full rounded-[10px] border border-[#22323A]/[0.10] bg-[#FCF9F4] p-5 flex flex-col">
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-[17px] tracking-[0.08em] text-[#22323A]">UNIKMO</span>
+                    <span className="text-[#B38846]"><IconLock /></span>
+                  </div>
+
+                  <div className="mt-auto flex items-end justify-between gap-5">
+                    <svg aria-label="QR code illustration" viewBox="0 0 76 76" className="h-20 w-20 shrink-0 text-[#22323A]">
+                      <rect width="76" height="76" rx="2" fill="#FCF9F4" />
+                      <g fill="currentColor">
+                        <rect x="8" y="8" width="22" height="22" />
+                        <rect x="12" y="12" width="14" height="14" fill="#FCF9F4" />
+                        <rect x="46" y="8" width="22" height="22" />
+                        <rect x="50" y="12" width="14" height="14" fill="#FCF9F4" />
+                        <rect x="8" y="46" width="22" height="22" />
+                        <rect x="12" y="50" width="14" height="14" fill="#FCF9F4" />
+                        <rect x="37" y="36" width="7" height="7" />
+                        <rect x="49" y="38" width="6" height="14" />
+                        <rect x="58" y="35" width="8" height="8" />
+                        <rect x="35" y="52" width="8" height="7" />
+                        <rect x="45" y="58" width="7" height="8" />
+                        <rect x="58" y="55" width="9" height="10" />
+                      </g>
+                    </svg>
+
+                    <div className="min-w-0 text-right">
+                      <p className="text-[8px] uppercase tracking-[0.18em] text-[#22323A]/45">Private access code</p>
+                      <p className="mt-2 font-mono text-[14px] tracking-[0.20em] text-[#22323A]">••••-••••</p>
+                      <p className="mt-3 text-[9px] leading-relaxed text-[#22323A]/45">Scan the QR code, then enter the private code.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <figcaption className="mt-4 text-center">
+                <span className="block font-serif text-[20px] text-[#22323A]">Back</span>
+                <span className="mt-1 block text-[10px] uppercase tracking-[0.18em] text-[#22323A]/50">QR + private access code</span>
+              </figcaption>
+            </figure>
+          </div>
         </div>
       </div>
     </section>
@@ -1563,26 +1622,41 @@ const TESTIMONIALS = [
 ];
 
 function SocialProof() {
-  const t = TESTIMONIALS[0];
   return (
     <section id="stories" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
-      <div className="mx-auto w-full max-w-[980px] px-5 sm:px-8">
-        <div className="text-center">
-          <div className="font-serif text-[58px] leading-none text-[#B38846]/55">“</div>
-          <blockquote className="mx-auto -mt-2 max-w-[820px] font-serif text-[25px] sm:text-[31px] lg:text-[36px] leading-[1.25] text-[#22323A]">
-            {t.quote}
-          </blockquote>
-          <div className="mt-7 flex items-center justify-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full">
-              <Image src={t.imageSrc} alt={t.imageAlt} fill className="object-cover" sizes="40px" />
-            </div>
-            <p className="text-[12px] text-[#22323A]/55">{t.name}</p>
-          </div>
-          <div className="mt-6 flex justify-center gap-2" aria-hidden>
-            <span className="h-2 w-2 rounded-full bg-[#22323A]" />
-            <span className="h-2 w-2 rounded-full border border-[#22323A]/25" />
-            <span className="h-2 w-2 rounded-full border border-[#22323A]/25" />
-          </div>
+      <div className="mx-auto w-full max-w-[1120px] px-5 sm:px-8">
+        <div className="text-center mb-10 sm:mb-12">
+          <p className="text-[10px] uppercase tracking-[0.26em] text-[#B38846] font-semibold">Their words</p>
+          <h2 className="mt-3 font-serif text-[30px] sm:text-[38px] text-[#22323A]">
+            The moment they open it is the gift.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-7">
+          {TESTIMONIALS.map((testimonial) => (
+            <article
+              key={testimonial.name}
+              className="rounded-[20px] border border-[#22323A]/[0.08] bg-[#F7F0E9] p-7 sm:p-9"
+            >
+              <div className="font-serif text-[48px] leading-none text-[#B38846]/55">“</div>
+              <blockquote className="mt-1 font-serif text-[22px] sm:text-[25px] leading-[1.35] text-[#22323A]">
+                {testimonial.quote}
+              </blockquote>
+
+              <div className="mt-7 flex items-center gap-3">
+                <div className="relative h-11 w-11 overflow-hidden rounded-full">
+                  <Image
+                    src={testimonial.imageSrc}
+                    alt={testimonial.imageAlt}
+                    fill
+                    className="object-cover"
+                    sizes="44px"
+                  />
+                </div>
+                <p className="text-[12px] text-[#22323A]/55">{testimonial.name}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -1863,114 +1937,74 @@ function SiteFooter({
   onTermsClick: () => void;
   onImprintClick: () => void;
 }) {
+  const footerSignals = [
+    { label: 'Made for someone', icon: <IconHeart /> },
+    { label: 'Private by default', icon: <IconLock /> },
+    { label: 'QR + private code', icon: <IconCode /> },
+    { label: 'No app required', icon: <IconSpark /> },
+  ];
+
   return (
-    <footer className="bg-[#FDF9F5] border-t border-[#2D2926]/[0.07]">
-      {/* Tree = footer hero / accent — only this + links are footer; trust strip stays in <main> above */}
-      <div className="bg-[#FDF9F5] pt-0 pb-0 leading-[0]" aria-hidden>
-        <div className="max-w-7xl mx-auto flex justify-center sm:justify-end pr-0 sm:pr-4 md:pr-6">
-          <Image
-            src="/plant3.png"
-            width={720}
-            height={560}
-            alt=""
-            className="h-auto w-[min(92vw,360px)] sm:w-[min(46vw,420px)] md:w-[min(40vw,440px)] lg:w-[420px] max-h-[240px] sm:max-h-[280px] md:max-h-[300px] lg:max-h-[320px] object-contain object-bottom align-bottom [filter:brightness(1.05)_saturate(0.72)_contrast(0.88)]"
-            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 420px"
-          />
+    <footer className="bg-[#FDF9F5] border-t border-[#22323A]/[0.07]">
+      <div className="border-b border-[#22323A]/[0.07] bg-[#F7F0E9]">
+        <div className="mx-auto grid max-w-[1050px] grid-cols-2 md:grid-cols-4 px-5 sm:px-8">
+          {footerSignals.map((item, index) => (
+            <div
+              key={item.label}
+              className={`flex flex-col items-center justify-center gap-2 py-7 text-center ${
+                index % 2 !== 0 ? 'border-l border-[#22323A]/[0.07]' : ''
+              } ${index > 1 ? 'border-t md:border-t-0' : ''} ${
+                index > 0 ? 'md:border-l md:border-[#22323A]/[0.07]' : ''
+              }`}
+            >
+              <div className="text-[#B38846]">{item.icon}</div>
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#22323A]/60">
+                {item.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="bg-[#FDF9F5] border-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6 text-[10px] sm:text-[11px] lg:text-[12px] tracking-widest uppercase text-[#2D2926]/50">
-          
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-7 sm:py-9 lg:py-11">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5 text-[10px] sm:text-[11px] tracking-widest uppercase text-[#2D2926]/50">
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-3 sm:gap-x-4 gap-y-2">
             <span className="font-semibold text-[#2D2926]/80">UNIKMO © {new Date().getFullYear()}</span>
             <span className="hidden sm:inline-block text-[#2D2926]/20">|</span>
             <span>A card that unlocks a private memory.</span>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-5 lg:gap-6">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-800/40" />
-              <span>One tree planted with every card.</span>
-              <svg
-                viewBox="0 0 24 24"
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current opacity-60"
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            </div>
-
-            <div className="flex items-center gap-3 sm:gap-4">
-              <a
-                href="https://www.instagram.com/myunikmo"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-[#2D2926] transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-              >
-                INSTAGRAM
-              </a>
-              <a
-                href="https://www.tiktok.com/@myunikmo"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-[#2D2926] transition-colors flex items-center gap-1 py-3 -my-3 min-h-[44px]"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current"
-                >
-                  <path d="M16.5 3c.4 1.3 1.4 2.4 2.7 2.9v3.1c-1.1-.1-2.1-.4-3-1v6.4c0 3.4-2.7 6.1-6.1 6.1S4 17.8 4 14.4c0-3.4 2.7-6.1 6.1-6.1.4 0 .8 0 1.1.1v3.1c-.3-.1-.7-.2-1.1-.2-1.6 0-2.9 1.3-2.9 3.1 0 1.7 1.3 3 2.9 3s2.9-1.3 2.9-3V3h3.5z" />
-                </svg>
-                <span>TIKTOK</span>
-              </a>
-            </div>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <a
+              href="https://www.instagram.com/myunikmo"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[#2D2926] transition-colors py-3 -my-3 min-h-[44px] flex items-center"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.tiktok.com/@myunikmo"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[#2D2926] transition-colors py-3 -my-3 min-h-[44px] flex items-center"
+            >
+              TikTok
+            </a>
           </div>
         </div>
 
-        <div className="mt-6 sm:mt-7 lg:mt-8 flex justify-center gap-4 sm:gap-6 lg:gap-8 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/55">
-          <a
-            href="/faq"
-            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-          >
-            FAQ
-          </a>
-          <button
-            type="button"
-            onClick={onContactClick}
-            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-          >
-            Contact
-          </button>
-          <button
-            type="button"
-            onClick={onPrivacyClick}
-            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-          >
-            Privacy
-          </button>
-          <button
-            type="button"
-            onClick={onTermsClick}
-            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-          >
-            Terms
-          </button>
-          <button
-            type="button"
-            onClick={onImprintClick}
-            className="hover:text-[#2D2926]/60 transition-colors py-3 -my-3 min-h-[44px] flex items-center"
-          >
-            Imprint
-          </button>
-        </div>
+        <div className="mt-5 sm:mt-7 flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-1 text-[8px] sm:text-[9px] lg:text-[10px] tracking-[0.2em] uppercase text-[#2D2926]/55">
+          <a href="/faq" className="hover:text-[#2D2926] transition-colors py-3 min-h-[44px] flex items-center">FAQ</a>
+          <button type="button" onClick={onContactClick} className="hover:text-[#2D2926] transition-colors py-3 min-h-[44px] flex items-center">Contact</button>
+          <button type="button" onClick={onPrivacyClick} className="hover:text-[#2D2926] transition-colors py-3 min-h-[44px] flex items-center">Privacy</button>
+          <button type="button" onClick={onTermsClick} className="hover:text-[#2D2926] transition-colors py-3 min-h-[44px] flex items-center">Terms</button>
+          <button type="button" onClick={onImprintClick} className="hover:text-[#2D2926] transition-colors py-3 min-h-[44px] flex items-center">Imprint</button>
         </div>
       </div>
     </footer>
   );
 }
-
 function ImprintModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose} role="dialog" aria-modal="true">
