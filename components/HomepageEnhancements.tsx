@@ -2,8 +2,7 @@
 
 import { useEffect } from 'react';
 
-const HERO_VIDEO_URL =
-  'https://videos.pexels.com/video-files/6682443/6682443-uhd_3840_2160_25fps.mp4';
+const HERO_VIDEO_URL = '/video/unikmo-hero.mp4';
 
 const OCCASION_IMAGES = [
   'https://images.pexels.com/videos/6682443/free-video-6682443.jpg?auto=compress&cs=tinysrgb&w=1600',
@@ -22,16 +21,6 @@ function configureHeroVideo() {
   video.playsInline = true;
   video.preload = 'metadata';
   video.removeAttribute('loop');
-
-  const fallback = () => {
-    if (!video.src.endsWith('/video/unikmo-hero.mp4')) {
-      video.src = '/video/unikmo-hero.mp4';
-      video.load();
-      void video.play().catch(() => undefined);
-    }
-  };
-
-  video.addEventListener('error', fallback, { once: true });
   video.src = HERO_VIDEO_URL;
   video.load();
   void video.play().catch(() => undefined);
