@@ -237,91 +237,26 @@ function installStyles() {
   style.id = 'unikmo-homepage-enhancement-styles';
   style.textContent = `
     .unikmo-proof-grid { grid-template-columns:1fr !important; }
-
-    .unikmo-occasion-editorial {
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      gap: 18px !important;
-      align-items: stretch;
-    }
-    .unikmo-occasion-image {
-      position: relative;
-      min-height: 300px;
-      overflow: hidden;
-      border-radius: 20px;
-      background: #e9e0d5;
-    }
-    .unikmo-occasion-image img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-    .unikmo-occasion-image-shade {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(21,32,37,.52), transparent 52%);
-    }
-    .unikmo-occasion-image-copy {
-      position: absolute;
-      left: 24px;
-      right: 24px;
-      bottom: 22px;
-      color: white;
-    }
-    .unikmo-occasion-image-copy p {
-      margin: 0;
-      font-family: var(--font-cormorant), Georgia, serif;
-      font-size: 28px;
-      line-height: 1.1;
-    }
-    .unikmo-occasion-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .unikmo-occasion-item {
-      display: flex;
-      gap: 14px;
-      min-height: 128px;
-      padding: 20px;
-      border: 1px solid rgba(34,50,58,.08);
-      border-radius: 16px;
-      background: rgba(247,240,233,.72);
-    }
-    .unikmo-occasion-number {
-      flex: 0 0 auto;
-      color: #B38846;
-      font-size: 10px;
-      letter-spacing: .16em;
-      padding-top: 4px;
-    }
-    .unikmo-occasion-item h3 {
-      margin: 0;
-      color: #22323A;
-      font-family: var(--font-cormorant), Georgia, serif;
-      font-size: 25px;
-      line-height: 1.05;
-    }
-    .unikmo-occasion-item p {
-      margin: 8px 0 0;
-      color: rgba(34,50,58,.62);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    @media (min-width: 768px) {
+    .unikmo-occasion-editorial { display:grid !important; grid-template-columns:1fr !important; gap:18px !important; align-items:stretch; }
+    .unikmo-occasion-image { position:relative; min-height:260px; overflow:hidden; border-radius:20px; background:#e9e0d5; }
+    .unikmo-occasion-image img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+    .unikmo-occasion-image-shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(21,32,37,.48), transparent 52%); }
+    .unikmo-occasion-image-copy { position:absolute; left:24px; right:24px; bottom:22px; color:white; }
+    .unikmo-occasion-image-copy p { margin:0; font-family:var(--font-cormorant),Georgia,serif; font-size:28px; line-height:1.1; }
+    .unikmo-occasion-list { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .unikmo-occasion-item { display:flex; gap:14px; min-height:118px; padding:18px; border:1px solid rgba(34,50,58,.08); border-radius:16px; background:rgba(247,240,233,.72); }
+    .unikmo-occasion-number { flex:0 0 auto; color:#B38846; font-size:10px; letter-spacing:.16em; padding-top:4px; }
+    .unikmo-occasion-item h3 { margin:0; color:#22323A; font-family:var(--font-cormorant),Georgia,serif; font-size:24px; line-height:1.05; }
+    .unikmo-occasion-item p { margin:8px 0 0; color:rgba(34,50,58,.62); font-size:13px; line-height:1.4; }
+    @media (min-width:768px) {
       .unikmo-proof-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
-      .unikmo-occasion-editorial { grid-template-columns: 1.05fr .95fr !important; gap: 22px !important; }
-      .unikmo-occasion-image { min-height: 390px; }
+      .unikmo-occasion-editorial { grid-template-columns:1.05fr .95fr !important; gap:22px !important; }
+      .unikmo-occasion-image { min-height:360px; }
     }
-
-    @media (max-width: 639px) {
-      .unikmo-occasion-list { grid-template-columns: 1fr; }
-      .unikmo-occasion-image { min-height: 260px; }
-      .unikmo-occasion-item { min-height: 0; }
+    @media (max-width:639px) {
+      .unikmo-occasion-list { grid-template-columns:1fr; }
+      .unikmo-occasion-image { min-height:240px; }
+      .unikmo-occasion-item { min-height:0; }
     }
   `;
   document.head.appendChild(style);
