@@ -82,6 +82,18 @@ function configureOccasions() {
   });
 }
 
+function findKeyCardSource() {
+  const shop = document.querySelector<HTMLElement>('#shop');
+  const shopImages = shop ? Array.from(shop.querySelectorAll<HTMLImageElement>('img')) : [];
+  const keyCard =
+    shopImages.find((img) => {
+      const alt = (img.alt || '').toLowerCase();
+      return alt.includes('single') || alt.includes('memory card') || alt.includes('unikmo');
+    }) || shopImages[0];
+
+  return keyCard ? keyCard.currentSrc || keyCard.src : '';
+}
+
 function configureProductSides() {
   const section = document.querySelector<HTMLElement>('#about');
   if (!section) return;
@@ -132,27 +144,38 @@ function configureProductSides() {
     backFigure.dataset.unikmoBackEnhanced = 'true';
   }
 
-  const shop = document.querySelector<HTMLElement>('#shop');
-  const shopImages = shop ? Array.from(shop.querySelectorAll<HTMLImageElement>('img')) : [];
-  const keyCard = shopImages.find((img) => {
-    const alt = (img.alt || '').toLowerCase();
-    return alt.includes('single') || alt.includes('memory card') || alt.includes('unikmo');
-  }) || shopImages[0];
-
-  if (keyCard) {
+  const keyCardSource = findKeyCardSource();
+  if (keyCardSource) {
     const frontImage = frontFigure.querySelector<HTMLImageElement>('img');
     if (frontImage) {
-      const resolved = keyCard.currentSrc || keyCard.src;
-      if (resolved) {
-        frontImage.removeAttribute('srcset');
-        frontImage.removeAttribute('sizes');
-        frontImage.src = resolved;
-        frontImage.alt = 'Front of the UNIKMO card with the gold key';
-        frontImage.style.objectFit = 'contain';
-      }
+      frontImage.removeAttribute('srcset');
+      frontImage.removeAttribute('sizes');
+      frontImage.src = keyCardSource;
+      frontImage.alt = 'Front of the UNIKMO card with the gold key';
+      frontImage.style.objectFit = 'contain';
     }
     frontFigure.dataset.unikmoFrontEnhanced = 'true';
   }
+}
+
+function configureFinalCta() {
+  const keyCardSource = findKeyCardSource();
+  if (!keyCardSource) return;
+
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('main section'));
+  const finalCta = sections.find((section) => section.textContent?.includes('You already know who it’s for.'));
+  if (!finalCta || finalCta.dataset.unikmoEnhanced === 'true') return;
+
+  const image = finalCta.querySelector<HTMLImageElement>('img');
+  if (!image) return;
+
+  image.removeAttribute('srcset');
+  image.removeAttribute('sizes');
+  image.src = keyCardSource;
+  image.alt = 'Front of the UNIKMO card with the gold key';
+  image.style.objectFit = 'contain';
+  image.style.padding = '1.25rem';
+  finalCta.dataset.unikmoEnhanced = 'true';
 }
 
 function configureSocialProof() {
@@ -161,6 +184,11 @@ function configureSocialProof() {
 
   const grid = section.querySelector<HTMLElement>('.grid');
   if (!grid) return;
+
+  const eyebrow = Array.from(section.querySelectorAll('p')).find((p) =>
+    p.textContent?.trim().toLowerCase().includes('their words')
+  );
+  if (eyebrow) eyebrow.textContent = 'In their words';
 
   section.dataset.unikmoEnhanced = 'true';
   grid.classList.add('unikmo-proof-grid');
@@ -217,6 +245,7 @@ export default function HomepageEnhancements() {
     configureHeroVideo();
     configureOccasions();
     configureProductSides();
+    configureFinalCta();
     configureSocialProof();
 
     let attempts = 0;
@@ -225,6 +254,7 @@ export default function HomepageEnhancements() {
       configureHeroVideo();
       configureOccasions();
       configureProductSides();
+      configureFinalCta();
       configureSocialProof();
       if (attempts >= 20 || document.querySelector('#about figure[data-unikmo-front-enhanced="true"]')) {
         window.clearInterval(timer);
