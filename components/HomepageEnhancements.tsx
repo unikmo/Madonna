@@ -3,13 +3,7 @@
 import { useEffect } from 'react';
 
 const HERO_VIDEO_URL = '/video/unikmo-hero.mp4';
-
-const OCCASION_IMAGES = [
-  'https://images.pexels.com/videos/6682443/free-video-6682443.jpg?auto=compress&cs=tinysrgb&w=1600',
-  'https://images.pexels.com/videos/6657830/free-video-6657830.jpg?auto=compress&cs=tinysrgb&w=1600',
-  'https://images.pexels.com/videos/6620535/free-video-6620535.jpg?auto=compress&cs=tinysrgb&w=1600',
-  'https://images.pexels.com/videos/4686302/free-video-4686302.jpg?auto=compress&cs=tinysrgb&w=1600',
-];
+const LIFESTYLE_IMAGE_URL = '/images/unikmo-lifestyle.jpg';
 
 function configureHeroVideo() {
   const video = document.querySelector<HTMLVideoElement>('#top video');
@@ -24,6 +18,22 @@ function configureHeroVideo() {
   video.src = HERO_VIDEO_URL;
   video.load();
   void video.play().catch(() => undefined);
+
+  const frame = video.parentElement as HTMLElement | null;
+  if (frame) {
+    frame.style.minHeight = '0';
+    frame.style.aspectRatio = '16 / 10';
+    frame.style.background = '#111816';
+  }
+  video.style.objectFit = 'contain';
+  video.style.objectPosition = 'center';
+
+  const overlay = frame
+    ? Array.from(frame.querySelectorAll<HTMLElement>('div')).find((el) =>
+        el.textContent?.trim().includes('The moment, made tangible.')
+      )
+    : null;
+  if (overlay) overlay.style.display = 'none';
 }
 
 function configureOccasions() {
@@ -39,30 +49,42 @@ function configureOccasions() {
   if (heading) heading.textContent = 'For the moments you do not want to reduce to a text.';
 
   const grid = articles[0]?.parentElement;
-  if (grid) grid.classList.add('unikmo-occasion-grid');
+  if (!grid) return;
 
-  articles.slice(0, 4).forEach((article, index) => {
-    const title = article.querySelector('h3')?.textContent?.trim() || '';
-    const line = article.querySelector('p:last-child')?.textContent?.trim() || '';
+  const moments = articles.slice(0, 4).map((article) => ({
+    title: article.querySelector('h3')?.textContent?.trim() || '',
+    line: article.querySelector('p:last-child')?.textContent?.trim() || '',
+  }));
 
-    article.className =
-      'group overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#EEE5DA] shadow-[0_14px_36px_rgba(34,50,58,0.06)]';
-    article.innerHTML = `
-      <div class="relative aspect-[16/10] overflow-hidden">
-        <img
-          src="${OCCASION_IMAGES[index]}"
-          alt="${title} gifting moment"
-          loading="lazy"
-          class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#13232B]/70 via-[#13232B]/10 to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white">
-          <h3 class="font-serif text-[28px] sm:text-[32px]">${title}</h3>
-          <p class="mt-2 max-w-md text-[13px] sm:text-[14px] leading-relaxed text-white/85 font-light">${line}</p>
-        </div>
+  grid.className = 'unikmo-occasion-editorial mt-10';
+  grid.innerHTML = `
+    <div class="unikmo-occasion-image">
+      <img
+        src="${LIFESTYLE_IMAGE_URL}"
+        alt="A personal UNIKMO moment being revisited on a phone"
+        loading="lazy"
+      />
+      <div class="unikmo-occasion-image-shade"></div>
+      <div class="unikmo-occasion-image-copy">
+        <p>A message worth returning to.</p>
       </div>
-    `;
-  });
+    </div>
+    <div class="unikmo-occasion-list">
+      ${moments
+        .map(
+          (item, index) => `
+            <article class="unikmo-occasion-item">
+              <span class="unikmo-occasion-number">0${index + 1}</span>
+              <div>
+                <h3>${item.title}</h3>
+                <p>${item.line}</p>
+              </div>
+            </article>
+          `
+        )
+        .join('')}
+    </div>
+  `;
 
   Array.from(section.querySelectorAll('p')).forEach((p) => {
     if (p.textContent?.includes('We use real customer and product photography only')) {
@@ -214,13 +236,92 @@ function installStyles() {
   const style = document.createElement('style');
   style.id = 'unikmo-homepage-enhancement-styles';
   style.textContent = `
-    .unikmo-occasion-grid { display:grid !important; grid-template-columns:1fr !important; gap:20px !important; }
     .unikmo-proof-grid { grid-template-columns:1fr !important; }
-    @media (min-width: 640px) {
-      .unikmo-occasion-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:24px !important; }
+
+    .unikmo-occasion-editorial {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 18px !important;
+      align-items: stretch;
     }
+    .unikmo-occasion-image {
+      position: relative;
+      min-height: 300px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #e9e0d5;
+    }
+    .unikmo-occasion-image img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .unikmo-occasion-image-shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(21,32,37,.52), transparent 52%);
+    }
+    .unikmo-occasion-image-copy {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 22px;
+      color: white;
+    }
+    .unikmo-occasion-image-copy p {
+      margin: 0;
+      font-family: var(--font-cormorant), Georgia, serif;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+    .unikmo-occasion-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .unikmo-occasion-item {
+      display: flex;
+      gap: 14px;
+      min-height: 128px;
+      padding: 20px;
+      border: 1px solid rgba(34,50,58,.08);
+      border-radius: 16px;
+      background: rgba(247,240,233,.72);
+    }
+    .unikmo-occasion-number {
+      flex: 0 0 auto;
+      color: #B38846;
+      font-size: 10px;
+      letter-spacing: .16em;
+      padding-top: 4px;
+    }
+    .unikmo-occasion-item h3 {
+      margin: 0;
+      color: #22323A;
+      font-family: var(--font-cormorant), Georgia, serif;
+      font-size: 25px;
+      line-height: 1.05;
+    }
+    .unikmo-occasion-item p {
+      margin: 8px 0 0;
+      color: rgba(34,50,58,.62);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
     @media (min-width: 768px) {
       .unikmo-proof-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+      .unikmo-occasion-editorial { grid-template-columns: 1.05fr .95fr !important; gap: 22px !important; }
+      .unikmo-occasion-image { min-height: 390px; }
+    }
+
+    @media (max-width: 639px) {
+      .unikmo-occasion-list { grid-template-columns: 1fr; }
+      .unikmo-occasion-image { min-height: 260px; }
+      .unikmo-occasion-item { min-height: 0; }
     }
   `;
   document.head.appendChild(style);
