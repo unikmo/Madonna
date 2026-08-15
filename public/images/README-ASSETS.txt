@@ -1,0 +1,1 @@
+UNIKMO homepage uses generated story/occasion visual assets controlled by HomepageEnhancements.tsx.
