@@ -2,11 +2,6 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { WAITLIST_COPY_DEFAULTS } from '@/lib/waitlist-copy-defaults';
-import {
-  AnimatedMomentModal,
-  type AnimatedMomentModalVariant,
-} from '@/components/AnimatedMomentModal';
 
 /** Matches cream in product card photography — avoids white letterboxing around images */
 const PRODUCT_IMAGE_BG = '#FAF6F1';
@@ -15,11 +10,6 @@ const productImageFrameClass =
 const productImageClass =
   'absolute inset-0 w-full h-full object-contain object-center p-3 sm:p-5 drop-shadow-[0_14px_18px_rgba(0,0,0,0.12)] group-hover:scale-[1.02] transition-transform duration-500';
 
-/** Launch offer: real, enforced via a Shopify discount code with a 100-use limit (see /admin discounts). */
-const LAUNCH_DISCOUNT_PERCENT = 30;
-const LAUNCH_DISCOUNT_CODE = 'LAUNCH30';
-const LAUNCH_OFFER_LINE = `Now on direct sale — ${LAUNCH_DISCOUNT_PERCENT}% off with code ${LAUNCH_DISCOUNT_CODE}, limited to the first 100 orders.`;
-
 function formatCurrency(price?: string | null, currencyCode?: string | null): string {
   if (price == null) return '';
   const symbol =
@@ -27,32 +17,15 @@ function formatCurrency(price?: string | null, currencyCode?: string | null): st
   return `${symbol}${Number(price).toFixed(2)}`;
 }
 
-/** Shows list price struck through next to the LAUNCH30 price so the discount is honest and visible everywhere price appears. */
-function PriceWithLaunchDiscount({ price, currencyCode }: { price?: string | null; currencyCode?: string | null }) {
+/** Plain price display. No discount math — pricing is the real Shopify price everywhere it appears. */
+function ProductPrice({ price, currencyCode }: { price?: string | null; currencyCode?: string | null }) {
   if (price == null) return null;
-  const original = Number(price);
-  if (Number.isNaN(original)) return null;
-  const discounted = original * (1 - LAUNCH_DISCOUNT_PERCENT / 100);
   return (
-    <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926] flex items-center justify-center gap-2">
-      <span className="line-through text-[#2D2926]/40 font-normal text-[13px] sm:text-[14px]">
-        {formatCurrency(price, currencyCode)}
-      </span>
-      <span>{formatCurrency(discounted.toFixed(2), currencyCode)}</span>
+    <p className="mt-2 text-[15px] sm:text-[16px] font-semibold text-[#2D2926]">
+      {formatCurrency(price, currencyCode)}
     </p>
   );
 }
-
-type PublicSiteConfig = {
-  sellingEnabled: boolean;
-  waitlistHeadline: string;
-  waitlistSubline1: string;
-  waitlistSubline2: string;
-  waitlistSupportingLine: string;
-  waitlistEmailPlaceholder: string;
-  waitlistNamePlaceholder: string;
-  waitlistCtaLabel: string;
-};
 
 const ORGANIZATION_JSON_LD = {
   '@context': 'https://schema.org',
@@ -102,7 +75,6 @@ const PRODUCTS_JSON_LD = {
 export default function LandingPage() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCreateMomentModal, setShowCreateMomentModal] = useState(false);
-  const [siteConfig, setSiteConfig] = useState<PublicSiteConfig | null>(null);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -118,15 +90,6 @@ export default function LandingPage() {
     window.addEventListener('hashchange', openIfHash);
     return () => window.removeEventListener('hashchange', openIfHash);
   }, []);
-
-  useEffect(() => {
-    fetch('/api/public/site-config')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => (d ? setSiteConfig(d as PublicSiteConfig) : setSiteConfig(null)))
-      .catch(() => setSiteConfig(null));
-  }, []);
-
-  const waitlistMode = Boolean(siteConfig && siteConfig.sellingEnabled === false);
 
   const handleCreateMomentClick = () => {
     setShowCreateMomentModal(true);
@@ -152,8 +115,6 @@ export default function LandingPage() {
         <StoryIn
           showCreateMomentModal={showCreateMomentModal}
           setShowCreateMomentModal={setShowCreateMomentModal}
-          waitlistMode={waitlistMode}
-          siteConfig={siteConfig}
         />
         <PreFooterTrustStrip />
         <SocialProof />
@@ -257,7 +218,7 @@ function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-7 lg:gap-12 xl:gap-16 items-stretch">
           <div className="relative min-h-[360px] sm:min-h-[500px] lg:min-h-[610px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_18px_55px_rgba(44,48,49,0.10)]">
             <video
-              src="/video/unikmo-hero-final.mp4"
+              src="/video/unikmo-hero.mp4"
               poster="/banner/banner.jpeg"
               autoPlay
               muted
@@ -315,8 +276,6 @@ function Hero() {
               <span className="inline-flex items-center gap-2"><span className="text-[#B38846]">◫</span> No app</span>
               <span className="inline-flex items-center gap-2"><span className="text-[#B38846]">○</span> No recipient login</span>
             </div>
-
-            <p className="mt-5 text-[11px] text-[#22323A]/45">{LAUNCH_OFFER_LINE}</p>
           </div>
         </div>
       </div>
@@ -443,15 +402,11 @@ type Product = {
 type StoryInProps = {
   showCreateMomentModal: boolean;
   setShowCreateMomentModal: (v: boolean) => void;
-  waitlistMode: boolean;
-  siteConfig: PublicSiteConfig | null;
 };
 
 function StoryIn({
   showCreateMomentModal,
   setShowCreateMomentModal,
-  waitlistMode,
-  siteConfig,
 }: StoryInProps) {
   const sectionRef = useRef(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -557,8 +512,8 @@ function StoryIn({
           <h2 className="text-center font-serif text-[24px] sm:text-[30px] lg:text-[38px] text-[#2D2926] mb-3 tracking-tight animate-on-scroll opacity-0 translate-y-4 transition-all duration-700">
             Choose the way you want to give it.
           </h2>
-          <p className="text-center text-[12px] sm:text-[13px] uppercase tracking-[0.15em] font-semibold text-[#2D2926]/70 mb-8 sm:mb-10">
-            {LAUNCH_OFFER_LINE}
+          <p className="text-center text-[12px] sm:text-[13px] uppercase tracking-[0.15em] font-semibold text-[#2D2926]/60 mb-8 sm:mb-10">
+            Founding release — a small first run, made to be treasured.
           </p>
         </div>
 
@@ -619,7 +574,7 @@ function StoryIn({
                     <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">
                       {i.subtitle}
                     </p>
-                    <PriceWithLaunchDiscount price={i.price} currencyCode={i.currencyCode} />
+                    <ProductPrice price={i.price} currencyCode={i.currencyCode} />
                   </button>
                 ))}
               </div>
@@ -654,8 +609,6 @@ function StoryIn({
         <ProductModal
           selected={selectedProduct}
           storeDomain={storeDomain}
-          waitlistMode={waitlistMode}
-          waitlistConfig={siteConfig}
           onClose={() => setSelectedProduct(null)}
         />
       )}
@@ -736,7 +689,7 @@ function CreateMomentModal({
                   </div>
                   <h4 className="font-serif text-[18px] sm:text-[20px] lg:text-[22px] text-[#2D2926] font-medium leading-tight">{i.displayTitle}</h4>
                   <p className="mt-2 text-[14px] sm:text-[15px] lg:text-[16px] text-[#2D2926]/60 leading-relaxed max-w-[220px] mx-auto whitespace-nowrap">{i.subtitle}</p>
-                  <PriceWithLaunchDiscount price={i.price} currencyCode={i.currencyCode} />
+                  <ProductPrice price={i.price} currencyCode={i.currencyCode} />
                 </button>
               ))}
             </div>
@@ -747,245 +700,20 @@ function CreateMomentModal({
   );
 }
 
-function WaitlistModal({
-  config,
-  onClose,
-}: {
-  config: PublicSiteConfig;
-  onClose: () => void;
-}) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [done, setDone] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async () => {
-    const trimmedName = name.trim();
-    const trimmedEmail = email.trim().toLowerCase();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!trimmedName) {
-      setError('Please enter your name');
-      return;
-    }
-    if (!trimmedEmail || !emailRe.test(trimmedEmail)) {
-      setError('Please enter a valid email');
-      return;
-    }
-    setError('');
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/public/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(typeof data.error === 'string' ? data.error : 'Something went wrong');
-        return;
-      }
-      setDone(true);
-    } catch {
-      setError('Network error. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="waitlist-modal-title"
-    >
-      <div
-        className="bg-[#FDF9F5] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-6 sm:p-8">
-          <div className="flex justify-end mb-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[#2D2926]/60 hover:text-[#2D2926] p-1 rounded-full transition-colors"
-              aria-label="Close"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {done ? (
-            <div className="text-center py-6">
-              <p className="font-serif text-[22px] text-[#2D2926] mb-3">You&apos;re on the list</p>
-              <p className="text-sm text-[#2D2926]/65 mb-6">
-                We&apos;ll be in touch when it&apos;s your turn.
-              </p>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-full bg-[#2D2926] text-white px-8 py-3 text-xs font-semibold tracking-[0.15em] uppercase"
-              >
-                Close
-              </button>
-            </div>
-          ) : (
-            <>
-              <h2
-                id="waitlist-modal-title"
-                className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] text-center leading-snug mb-3"
-              >
-                {config.waitlistHeadline}
-              </h2>
-              <p className="text-center text-[15px] sm:text-[16px] text-[#2D2926]/75 leading-relaxed mb-1">
-                {config.waitlistSubline1}
-              </p>
-              <p className="text-center text-[15px] sm:text-[16px] text-[#2D2926]/75 leading-relaxed mb-4">
-                {config.waitlistSubline2}
-              </p>
-              <p className="text-center text-xs sm:text-sm text-[#2D2926]/55 mb-8">
-                {config.waitlistSupportingLine}
-              </p>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label htmlFor="waitlist-name" className="block text-sm font-medium text-[#2D2926] mb-1">
-                    Name <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    id="waitlist-name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      setError('');
-                    }}
-                    placeholder={config.waitlistNamePlaceholder}
-                    autoComplete="name"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#2D2926]/15 text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="waitlist-email" className="block text-sm font-medium text-[#2D2926] mb-1">
-                    Email <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    id="waitlist-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setError('');
-                    }}
-                    placeholder={config.waitlistEmailPlaceholder}
-                    autoComplete="email"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#2D2926]/15 text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
-                  />
-                </div>
-                {error && <p className="text-red-600 text-sm">{error}</p>}
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50"
-              >
-                {submitting ? 'Please wait…' : config.waitlistCtaLabel}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ProductModal({
   selected,
   storeDomain,
-  waitlistMode,
-  waitlistConfig,
   onClose,
 }: {
   selected: { product: Product; subtitle: string; img: string; imageAlt: string; displayTitle: string; isFirstImage?: boolean };
   storeDomain: string;
-  waitlistMode: boolean;
-  waitlistConfig: PublicSiteConfig | null;
   onClose: () => void;
 }) {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [deliveryType, setDeliveryType] = useState<'physical' | 'digital'>('physical');
-  const [submitting, setSubmitting] = useState(false);
-  const [waitlistMomentModal, setWaitlistMomentModal] = useState<{
-    open: boolean;
-    variant: AnimatedMomentModalVariant;
-    title: string;
-    message: string;
-    emoji: string;
-    confirmLabel?: string;
-  }>({
-    open: false,
-    variant: 'celebrate',
-    title: '',
-    message: '',
-    emoji: '',
-  });
-  const [liveWaitlistCopy, setLiveWaitlistCopy] = useState<PublicSiteConfig | null>(null);
-
-  const wc = {
-    ...WAITLIST_COPY_DEFAULTS,
-    ...(waitlistConfig
-      ? {
-          waitlistHeadline: waitlistConfig.waitlistHeadline,
-          waitlistSubline1: waitlistConfig.waitlistSubline1,
-          waitlistSubline2: waitlistConfig.waitlistSubline2,
-          waitlistSupportingLine: waitlistConfig.waitlistSupportingLine,
-          waitlistEmailPlaceholder: waitlistConfig.waitlistEmailPlaceholder,
-          waitlistNamePlaceholder: waitlistConfig.waitlistNamePlaceholder,
-          waitlistCtaLabel: waitlistConfig.waitlistCtaLabel,
-        }
-      : {}),
-    ...(liveWaitlistCopy
-      ? {
-          waitlistHeadline: liveWaitlistCopy.waitlistHeadline,
-          waitlistSubline1: liveWaitlistCopy.waitlistSubline1,
-          waitlistSubline2: liveWaitlistCopy.waitlistSubline2,
-          waitlistSupportingLine: liveWaitlistCopy.waitlistSupportingLine,
-          waitlistEmailPlaceholder: liveWaitlistCopy.waitlistEmailPlaceholder,
-          waitlistNamePlaceholder: liveWaitlistCopy.waitlistNamePlaceholder,
-          waitlistCtaLabel: liveWaitlistCopy.waitlistCtaLabel,
-        }
-      : {}),
-  };
-
-  useEffect(() => {
-    if (!waitlistMode) {
-      setLiveWaitlistCopy(null);
-      return;
-    }
-    let cancelled = false;
-    fetch('/api/public/site-config')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!cancelled && data && data.sellingEnabled === false) {
-          setLiveWaitlistCopy(data as PublicSiteConfig);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [waitlistMode]);
 
   const product = selected.product;
-  const keyCount = product.title.toLowerCase().includes('7') ? 7 : product.title.toLowerCase().includes('4') ? 4 : 1;
 
   const getVariantIdForDelivery = () => {
     const variants = product.variants || [];
@@ -1002,14 +730,9 @@ function ProductModal({
     return chosen?.id || product.variantId;
   };
 
-  const handleBuyNow = async () => {
-    const trimmedName = name.trim();
+  const handleBuyNow = () => {
     const trimmed = email.trim().toLowerCase();
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (waitlistMode && !trimmedName) {
-      setEmailError('Name is required');
-      return;
-    }
     if (!trimmed) {
       setEmailError('Email is required');
       return;
@@ -1019,53 +742,6 @@ function ProductModal({
       return;
     }
     setEmailError('');
-
-    if (waitlistMode) {
-      setSubmitting(true);
-      try {
-        const latestConfigRes = await fetch('/api/public/site-config');
-        const latestConfig = latestConfigRes.ok ? await latestConfigRes.json() : null;
-        if (!latestConfig || latestConfig.sellingEnabled !== false) {
-          setEmailError('Selling has been re-enabled. Please continue with checkout.');
-          setSubmitting(false);
-          return;
-        }
-
-        const res = await fetch('/api/public/waitlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: trimmedName,
-            email: trimmed,
-            deliveryType,
-            productId: product.id,
-            productTitle: selected.displayTitle,
-            quantity: keyCount,
-          }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          setEmailError(typeof data.error === 'string' ? data.error : 'Failed to save your request');
-          return;
-        }
-        setWaitlistMomentModal({
-          open: true,
-          variant: 'celebrate',
-          title: "You're on the list",
-          message:
-            data.emailSent === true
-              ? 'Your spot is saved. Check your inbox for a confirmation email.'
-              : 'Your spot is saved. We could not send the confirmation email this time — you are still on the list.',
-          emoji: '✨',
-          confirmLabel: 'Okay',
-        });
-      } catch {
-        setEmailError('Network error. Please try again.');
-      } finally {
-        setSubmitting(false);
-      }
-      return;
-    }
 
     const chosenVariantId = getVariantIdForDelivery();
     if (storeDomain && chosenVariantId) {
@@ -1081,7 +757,6 @@ function ProductModal({
   };
 
   return (
-    <>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
       onClick={onClose}
@@ -1105,20 +780,6 @@ function ProductModal({
               </svg>
             </button>
           </div>
-          {waitlistMode && (
-            <div className="mb-6 rounded-2xl bg-[#F7F1EA] border border-[#2D2926]/10 px-4 py-5 sm:px-6 sm:py-6 text-center">
-              <h2 className="font-serif text-[20px] sm:text-[24px] text-[#2D2926] leading-snug mb-3">
-                {wc.waitlistHeadline}
-              </h2>
-              <p className="text-[15px] sm:text-[16px] text-[#2D2926]/80 leading-relaxed mb-1">
-                {wc.waitlistSubline1}
-              </p>
-              <p className="text-[15px] sm:text-[16px] text-[#2D2926]/80 leading-relaxed mb-3">
-                {wc.waitlistSubline2}
-              </p>
-              <p className="text-xs sm:text-sm text-[#2D2926]/60 leading-relaxed">{wc.waitlistSupportingLine}</p>
-            </div>
-          )}
 
           <div
             className={`${productImageFrameClass} rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)]`}
@@ -1132,24 +793,13 @@ function ProductModal({
               sizes="(max-width: 640px) 460px, (max-width: 1024px) 500px, 560px"
             />
           </div>
-          {waitlistMode ? (
-            <div className="mb-5 text-center">
-              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#2D2926]/45 font-medium mb-1">
-                Your selection
-              </p>
-              <h3 className="font-serif text-[20px] sm:text-[22px] text-[#2D2926]">{selected.displayTitle}</h3>
-              <p className="text-[#2D2926]/55 text-sm mt-1">{selected.subtitle}</p>
-              <PriceWithLaunchDiscount price={product.price} currencyCode={product.currencyCode} />
-            </div>
-          ) : (
-            <div className="text-center mb-5">
-              <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] mb-1">
-                {selected.displayTitle}
-              </h3>
-              <p className="text-[#2D2926]/60 text-sm">{selected.subtitle}</p>
-              <PriceWithLaunchDiscount price={product.price} currencyCode={product.currencyCode} />
-            </div>
-          )}
+          <div className="text-center mb-5">
+            <h3 className="font-serif text-[22px] sm:text-[26px] text-[#2D2926] mb-1">
+              {selected.displayTitle}
+            </h3>
+            <p className="text-[#2D2926]/60 text-sm">{selected.subtitle}</p>
+            <ProductPrice price={product.price} currencyCode={product.currencyCode} />
+          </div>
 
           <div className="mb-6">
             <p className="text-sm font-medium text-[#2D2926] mb-2">How do you want to receive it?</p>
@@ -1188,22 +838,6 @@ function ProductModal({
             </div>
           </div>
 
-          {waitlistMode && (
-            <div className="space-y-2 mb-4">
-              <label htmlFor="product-modal-name" className="block text-sm font-medium text-[#2D2926]">
-                Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                id="product-modal-name"
-                type="text"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setEmailError(''); }}
-                placeholder={wc.waitlistNamePlaceholder}
-                className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
-              />
-            </div>
-          )}
-
           <div className="space-y-2 mb-6">
             <label htmlFor="product-modal-email" className="block text-sm font-medium text-[#2D2926]">
               Email <span className="text-red-600">*</span>
@@ -1213,7 +847,7 @@ function ProductModal({
               type="email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
-              placeholder={wc.waitlistEmailPlaceholder}
+              placeholder="Enter your email"
               className="w-full px-4 py-3 rounded-xl bg-white text-[#2D2926] placeholder-[#2D2926]/40 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20"
             />
             {emailError && <p className="text-red-600 text-xs">{emailError}</p>}
@@ -1222,20 +856,12 @@ function ProductModal({
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={
-              submitting ||
-              (waitlistMode && waitlistMomentModal.open) ||
-              (!waitlistMode && (!storeDomain || !getVariantIdForDelivery()))
-            }
+            disabled={!storeDomain || !getVariantIdForDelivery()}
             className="w-full py-4 rounded-full bg-[#2D2926] text-white font-semibold text-sm tracking-wide uppercase hover:bg-[#1E1B18] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting
-              ? 'Please wait...'
-              : waitlistMode
-                ? wc.waitlistCtaLabel
-                : 'Buy now'}
+            Buy now
           </button>
-          {!waitlistMode && (!storeDomain || !getVariantIdForDelivery()) && (
+          {(!storeDomain || !getVariantIdForDelivery()) && (
             <p className="text-center text-amber-700 text-xs mt-3">
               {!storeDomain ? 'Store not configured. Set Shopify credentials in admin.' : 'Product variant not available for this option.'}
             </p>
@@ -1243,21 +869,6 @@ function ProductModal({
         </div>
       </div>
     </div>
-    {waitlistMode && (
-      <AnimatedMomentModal
-        open={waitlistMomentModal.open}
-        onClose={() => {
-          setWaitlistMomentModal((m) => ({ ...m, open: false }));
-          onClose();
-        }}
-        variant={waitlistMomentModal.variant}
-        title={waitlistMomentModal.title}
-        message={waitlistMomentModal.message}
-        emoji={waitlistMomentModal.emoji}
-        confirmLabel={waitlistMomentModal.confirmLabel}
-      />
-    )}
-    </>
   );
 }
 
@@ -1728,7 +1339,6 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
           >
             Create Your Moment <span className="ml-2">→</span>
           </button>
-          <p className="mt-4 text-[11px] text-[#22323A]/45">{LAUNCH_OFFER_LINE}</p>
         </div>
       </div>
     </section>
