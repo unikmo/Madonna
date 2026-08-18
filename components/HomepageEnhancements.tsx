@@ -122,7 +122,7 @@ function configureHero(cleanups: Array<() => void>) {
   const section = document.querySelector<HTMLElement>('#top');
   const video = section?.querySelector<HTMLVideoElement>('video');
   const frame = video?.parentElement as HTMLElement | null;
-  if (!section || !frame) return;
+  if (!section || !video || !frame) return;
 
   video.pause();
   video.removeAttribute('src');
