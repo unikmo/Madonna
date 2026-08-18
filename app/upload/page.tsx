@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AnimatedMomentModal,
@@ -146,7 +147,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'Something went wrong',
         message: 'We could not validate your code. Please try again in a moment.',
-        emoji: '⚠️✨',
+        emoji: '⚠️',
       });
     } finally {
       setIsValidating(false);
@@ -202,7 +203,7 @@ function UploadPageContent() {
         title: 'One key. One moment.',
         message:
           'You can upload one moment at a time. Delete the current file first if you want to replace it.',
-        emoji: '1️⃣✨',
+        emoji: '1️⃣',
       });
       return;
     }
@@ -223,7 +224,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'File too large',
         message: errorMsg,
-        emoji: '📹✨',
+        emoji: '📹',
       });
       return;
     }
@@ -235,7 +236,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'File too large',
         message: errorMsg,
-        emoji: '🎵✨',
+        emoji: '🎵',
       });
       return;
     }
@@ -247,7 +248,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'File too large',
         message: errorMsg,
-        emoji: '🖼️✨',
+        emoji: '🖼️',
       });
       return;
     }
@@ -259,7 +260,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'Unsupported file',
         message: msg,
-        emoji: '📎✨',
+        emoji: '📎',
       });
       return;
     }
@@ -299,7 +300,7 @@ function UploadPageContent() {
             message:
               signData.message ||
               'This code is not available from UNIKMO. Please contact the UNIKMO team.',
-            emoji: '🚫✨',
+            emoji: '🚫',
           });
           throw new Error(signData.error || 'Code unavailable');
         }
@@ -310,7 +311,7 @@ function UploadPageContent() {
             message:
               signData.message ||
               'This code has already been used. Please contact the UNIKMO team if you need help.',
-            emoji: '🔓💫',
+            emoji: '🔓',
           });
           throw new Error(signData.error || 'Already unlocked');
         }
@@ -321,7 +322,7 @@ function UploadPageContent() {
             message:
               signData.message ||
               'You can upload one moment at a time. Delete the current file first to replace it.',
-            emoji: '1️⃣✨',
+            emoji: '1️⃣',
           });
           throw new Error(signData.error || 'One moment already exists');
         }
@@ -372,7 +373,7 @@ function UploadPageContent() {
             message:
               data.message ||
               'This code is not available from UNIKMO. Please contact the UNIKMO team.',
-            emoji: '🚫✨',
+            emoji: '🚫',
           });
         } else if (data.reason === 'claimed') {
           showMomentModal({
@@ -381,7 +382,7 @@ function UploadPageContent() {
             message:
               data.message ||
               'This code has already been used. Please contact the UNIKMO team if you need help.',
-            emoji: '🔓💫',
+            emoji: '🔓',
           });
         } else if (data.reason === 'media_exists') {
           showMomentModal({
@@ -390,7 +391,7 @@ function UploadPageContent() {
             message:
               data.message ||
               'You can upload one moment at a time. Delete the current file first to replace it.',
-            emoji: '1️⃣✨',
+            emoji: '1️⃣',
           });
         }
         throw new Error(data.error || 'Upload failed');
@@ -410,7 +411,7 @@ function UploadPageContent() {
         title: `Beautiful, ${recipientName}!`,
         message:
           'Your moment is safely uploaded. Share your Unik Key so someone special can unlock it at unikmo.com/unlock.',
-        emoji: '✨🎉',
+        emoji: '🎉',
         confirmLabel: 'Wonderful',
       });
 
@@ -422,7 +423,7 @@ function UploadPageContent() {
           variant: 'gentle',
           title: 'Upload cancelled',
           message: 'No worries — you can try again whenever you are ready.',
-          emoji: '☁️✨',
+          emoji: '☁️',
         });
         return;
       }
@@ -432,7 +433,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'Upload did not finish',
         message: errorMsg,
-        emoji: '📤✨',
+        emoji: '📤',
       });
     } finally {
       uploadAbortRef.current = null;
@@ -483,7 +484,7 @@ function UploadPageContent() {
         variant: 'gentle',
         title: 'Removed',
         message: 'That file has been removed from your moment.',
-        emoji: '🗑️✨',
+        emoji: '🗑️',
       });
     } catch (err: any) {
       const errorMsg = err.message || 'Delete failed';
@@ -491,7 +492,7 @@ function UploadPageContent() {
         variant: 'alert',
         title: 'Could not delete',
         message: errorMsg,
-        emoji: '⚠️✨',
+        emoji: '⚠️',
       });
     } finally {
       setDeletingMediaUrl(null);
@@ -505,7 +506,7 @@ function UploadPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF9F5] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#FCF9F4]">
       <AnimatedMomentModal
         open={momentModal.open}
         onClose={closeMomentModal}
@@ -515,33 +516,54 @@ function UploadPageContent() {
         emoji={momentModal.emoji}
         confirmLabel={momentModal.confirmLabel}
       />
+      <header className="bg-[#FCF9F4] border-b border-[#22323A]/[0.07]">
+        <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center px-5 sm:px-8 lg:px-12">
+          <a href="/" className="shrink-0 inline-flex items-center" aria-label="UNIKMO home">
+            <Image
+              src="/unikmo-logo-header.png"
+              alt="UNIKMO — The Key to Your Memory"
+              width={729}
+              height={220}
+              priority
+              className="h-8 sm:h-9 lg:h-10 w-auto"
+            />
+          </a>
+        </div>
+      </header>
+      <div className="p-6 sm:p-8">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="rounded-2xl p-6 sm:p-8 border border-[#E3DAD0] bg-white shadow-sm"
+          className="rounded-2xl p-6 sm:p-8 border border-[#22323A]/10 bg-white shadow-sm"
         >
-          <h1 className="text-3xl sm:text-4xl font-semibold text-[#2D2926] mb-2 font-serif">
+          <div className="mb-5 text-[#B38846]" aria-hidden>
+            <svg viewBox="0 0 32 52" className="h-9 w-6" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <circle cx="16" cy="10" r="6" />
+              <path d="M16 16v27m0-17h7m-7 8h5m-5 9h5" />
+            </svg>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-[#22323A] mb-2 font-serif">
             Upload your moment
           </h1>
-          <p className="text-[#2D2926]/65 mb-8">Share your special moment with a secure code</p>
+          <p className="text-[#22323A]/65 mb-8">Share your special moment with a secure code</p>
 
           {/* Code Input */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-[#2D2926] mb-2">Moment Code</label>
+            <label className="block text-sm font-medium text-[#22323A] mb-2">Moment Code</label>
             <input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="UNIKMO-XXXX-XXXX-XXX"
-              className="w-full px-4 py-3 bg-white border border-[#D3C7BB] rounded-xl text-[#2D2926] placeholder-[#2D2926]/35 focus:outline-none focus:ring-2 focus:ring-[#2D2926]/20 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white border border-[#D3C7BB] rounded-xl text-[#22323A] placeholder-[#22323A]/35 focus:outline-none focus:ring-2 focus:ring-[#22323A]/20 focus:border-transparent"
             />
             {isValidating && (
-              <p className="mt-2 text-sm text-[#2D2926]/55">Validating...</p>
+              <p className="mt-2 text-sm text-[#22323A]/55">Validating...</p>
             )}
             {isValid === false && !isValidating && error && (
-              <p className="mt-2 text-sm text-[#2D2926]/55">{error}</p>
+              <p className="mt-2 text-sm text-[#22323A]/55">{error}</p>
             )}
             {isValid === true && !isValidating && (
               <motion.p
@@ -574,7 +596,7 @@ function UploadPageContent() {
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all mb-8 ${
                   isDragging
-                    ? 'border-[#2D2926]/50 bg-[#F5ECE3]'
+                    ? 'border-[#22323A]/50 bg-[#F5ECE3]'
                     : 'border-[#D3C7BB] bg-[#FDF9F5]'
                 } ${uploading ? 'opacity-50' : 'cursor-pointer'}`}
               >
@@ -593,7 +615,7 @@ function UploadPageContent() {
                     className="space-y-4"
                   >
                     <svg
-                      className="w-16 h-16 mx-auto text-[#2D2926]/65"
+                      className="w-16 h-16 mx-auto text-[#22323A]/65"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -606,11 +628,11 @@ function UploadPageContent() {
                       />
                     </svg>
                     <div>
-                      <p className="text-xl font-semibold text-[#2D2926] mb-2">
+                      <p className="text-xl font-semibold text-[#22323A] mb-2">
                         Drag your moment here
                       </p>
-                      <p className="text-[#2D2926]/65">or click to upload</p>
-                      <div className="text-sm text-[#2D2926]/55 mt-2 space-y-1">
+                      <p className="text-[#22323A]/65">or click to upload</p>
+                      <div className="text-sm text-[#22323A]/55 mt-2 space-y-1">
                         <p>Video, audio, or photo</p>
                       </div>
                     </div>
@@ -629,7 +651,7 @@ function UploadPageContent() {
                       <div className="w-full bg-[#EFE3D8] rounded-full h-2 mb-2 overflow-hidden relative">
                         {uploadPhase === 'presign' ? (
                           <motion.div
-                            className="absolute top-0 h-2 w-[35%] rounded-full bg-[#2D2926]/75"
+                            className="absolute top-0 h-2 w-[35%] rounded-full bg-[#22323A]/75"
                             initial={{ left: '-35%' }}
                             animate={{ left: '100%' }}
                             transition={{
@@ -640,7 +662,7 @@ function UploadPageContent() {
                           />
                         ) : (
                           <motion.div
-                            className="bg-[#2D2926] h-2 rounded-full max-w-full"
+                            className="bg-[#22323A] h-2 rounded-full max-w-full"
                             initial={false}
                             animate={{
                               width:
@@ -656,9 +678,9 @@ function UploadPageContent() {
                         )}
                       </div>
                       <div className="flex flex-col items-center">
-                        <p className="text-sm text-[#2D2926]/65 mb-3 inline-flex items-center justify-center gap-2 text-center">
+                        <p className="text-sm text-[#22323A]/65 mb-3 inline-flex items-center justify-center gap-2 text-center">
                           <svg
-                            className="h-4 w-4 animate-spin text-[#2D2926]/70"
+                            className="h-4 w-4 animate-spin text-[#22323A]/70"
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
@@ -676,7 +698,7 @@ function UploadPageContent() {
                         <button
                           type="button"
                           onClick={handleCancelUpload}
-                          className="px-4 py-2 rounded-full border border-[#D3C7BB] bg-white text-[#2D2926] text-xs hover:bg-[#F5ECE3] transition-colors"
+                          className="px-4 py-2 rounded-full border border-[#D3C7BB] bg-white text-[#22323A] text-xs hover:bg-[#F5ECE3] transition-colors"
                         >
                           Cancel upload
                         </button>
@@ -688,7 +710,7 @@ function UploadPageContent() {
 
               {/* Uploaded Media */}
               {loadingMedia ? (
-                <div className="text-center py-12 text-[#2D2926]/55">Loading media...</div>
+                <div className="text-center py-12 text-[#22323A]/55">Loading media...</div>
               ) : media.length > 0 ? (
                 <div className="mt-8">
                   <motion.div
@@ -705,21 +727,21 @@ function UploadPageContent() {
                     <p className="mt-2">The Unikmo Team</p>
                   </motion.div>
 
-                  <h3 className="text-lg font-semibold text-[#2D2926] mb-4">Uploaded Media ({media.length})</h3>
+                  <h3 className="text-lg font-semibold text-[#22323A] mb-4">Uploaded Media ({media.length})</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {media.map((item, index) => (
                       <motion.div
                         key={`${item.url}-${index}`}
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="relative group rounded-xl overflow-hidden border border-[#E3DAD0] bg-[#FDF9F5] hover:border-[#2D2926]/30 transition-all"
+                        className="relative group rounded-xl overflow-hidden border border-[#E3DAD0] bg-[#FDF9F5] hover:border-[#22323A]/30 transition-all"
                       >
                         {/* Delete Button */}
                         <button
                           type="button"
                           onClick={() => handleDeleteMedia(item.url)}
                           disabled={deletingMediaUrl === item.url}
-                          className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#2D2926] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                          className="absolute top-2 right-2 z-10 w-8 h-8 bg-[#22323A] hover:bg-[#1E1B18] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                         >
                           {deletingMediaUrl === item.url ? (
                             <svg
@@ -756,7 +778,7 @@ function UploadPageContent() {
                         {item.type === 'audio' && (
                           <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
                             <div className="text-center">
-                              <svg className="w-16 h-16 text-[#2D2926]/55 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                              <svg className="w-16 h-16 text-[#22323A]/55 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
                               </svg>
                               <audio src={item.url} controls className="w-full max-w-md" />
@@ -765,7 +787,7 @@ function UploadPageContent() {
                         )}
                         {item.type === 'text' && (
                           <div className="p-8 bg-[#F5ECE3] flex items-center justify-center h-64">
-                            <svg className="w-16 h-16 text-[#2D2926]/55" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-16 h-16 text-[#22323A]/55" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
                                 d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
@@ -777,8 +799,8 @@ function UploadPageContent() {
 
                         {/* Media Info */}
                         <div className="p-4">
-                          <p className="text-[#2D2926] font-medium capitalize text-sm">{item.type}</p>
-                          <p className="text-[#2D2926]/55 text-xs mt-1">
+                          <p className="text-[#22323A] font-medium capitalize text-sm">{item.type}</p>
+                          <p className="text-[#22323A]/55 text-xs mt-1">
                             {new Date(item.createdAt).toLocaleDateString()}
                           </p>
                         </div>
@@ -787,13 +809,14 @@ function UploadPageContent() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-[#2D2926]/55">
+                <div className="text-center py-12 text-[#22323A]/55">
                   <p>Nothing here yet. This is where your moment begins.</p>
                 </div>
               )}
             </motion.div>
           )}
         </motion.div>
+      </div>
       </div>
     </div>
   );
@@ -802,8 +825,8 @@ function UploadPageContent() {
 export default function UploadPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FDF9F5] flex items-center justify-center">
-        <div className="text-[#2D2926] text-xl">Loading...</div>
+      <div className="min-h-screen bg-[#FCF9F4] flex items-center justify-center">
+        <div className="text-[#22323A] text-xl">Loading...</div>
       </div>
     }>
       <UploadPageContent />
