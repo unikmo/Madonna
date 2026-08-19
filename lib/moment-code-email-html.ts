@@ -32,28 +32,20 @@ type TierConfig = {
   original: { imgW: number; qrW: number; qrH: number };
 };
 
+// Shared config: the email overlays a live QR code onto the real UNIKMO back-card
+// design (public/card-back.png), inside the placeholder QR box already printed on it.
+// Box measured directly from the 1920x1362 export: 496x496px centered at (959, 496).
+const BACK_CARD_TIER: TierConfig = {
+  productImagePath: '/card-back.png',
+  qr: { leftPct: 49.9479, topPct: 36.417, sizeXPct: 25.8333, sizeYPct: 36.417 },
+  qrBgColor: 'F7F2EF',
+  original: { imgW: 1920, qrW: 496, qrH: 496 },
+};
+
 const TIER_BY_COUNT: Record<1 | 4 | 7, TierConfig> = {
-  1: {
-    productImagePath: '/cardfrontunikmo.jpg',
-    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
-    qrBgColor: 'F6F4EA',
-    // Detected from `/public/cardfrontunikmo.jpg` at threshold ~80.
-    original: { imgW: 1920, qrW: 321, qrH: 324 },
-  },
-  4: {
-    productImagePath: '/cardfrontunikmo.jpg',
-    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
-    qrBgColor: 'F6F4EA',
-    // Detected from `/public/cardfrontsite_staged.jpg` at threshold ~80.
-    original: { imgW: 1360, qrW: 224, qrH: 225 },
-  },
-  7: {
-    productImagePath: '/cardfrontunikmo.jpg',
-    qr: { leftPct: 50.239583, topPct: 38.287037, sizeXPct: 23.71875, sizeYPct: 40.0 },
-    qrBgColor: 'F6F4EA',
-    // Detected from `/public/cardfrontsite7.png` at threshold ~80.
-    original: { imgW: 1536, qrW: 307, qrH: 298 },
-  },
+  1: BACK_CARD_TIER,
+  4: BACK_CARD_TIER,
+  7: BACK_CARD_TIER,
 };
 
 function normalizeBaseUrl(baseUrl: string) {

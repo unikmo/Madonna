@@ -1139,11 +1139,11 @@ function ProductExperience() {
             <figure>
               <div className="relative aspect-[1.48/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#F1E8DD] shadow-[0_18px_45px_rgba(44,48,49,0.08)] overflow-hidden">
                 <Image
-                  src="/cardfrontunikmo.jpg"
-                  alt="Front of the physical UNIKMO card"
+                  src="/card-front.png"
+                  alt="Front of the physical UNIKMO card, featuring the gold key design"
                   fill
                   sizes="(min-width: 1024px) 32vw, 90vw"
-                  className="object-contain p-4 sm:p-6"
+                  className="object-cover"
                 />
               </div>
               <figcaption className="mt-4 text-center">
@@ -1153,41 +1153,15 @@ function ProductExperience() {
             </figure>
 
             <figure>
-              <div className="aspect-[1.48/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#F7F0E8] shadow-[0_18px_45px_rgba(44,48,49,0.08)] overflow-hidden p-5 sm:p-7">
-                <div className="h-full rounded-[10px] border border-[#22323A]/[0.10] bg-[#FCF9F4] p-5 flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <span className="font-serif text-[17px] tracking-[0.08em] text-[#22323A]">UNIKMO</span>
-                    <span className="text-[#B38846]"><IconLock /></span>
-                  </div>
-
-                  <div className="mt-auto flex items-end justify-between gap-5">
-                    <svg aria-label="QR code illustration" viewBox="0 0 76 76" className="h-20 w-20 shrink-0 text-[#22323A]">
-                      <rect width="76" height="76" rx="2" fill="#FCF9F4" />
-                      <g fill="currentColor">
-                        <rect x="8" y="8" width="22" height="22" />
-                        <rect x="12" y="12" width="14" height="14" fill="#FCF9F4" />
-                        <rect x="46" y="8" width="22" height="22" />
-                        <rect x="50" y="12" width="14" height="14" fill="#FCF9F4" />
-                        <rect x="8" y="46" width="22" height="22" />
-                        <rect x="12" y="50" width="14" height="14" fill="#FCF9F4" />
-                        <rect x="37" y="36" width="7" height="7" />
-                        <rect x="49" y="38" width="6" height="14" />
-                        <rect x="58" y="35" width="8" height="8" />
-                        <rect x="35" y="52" width="8" height="7" />
-                        <rect x="45" y="58" width="7" height="8" />
-                        <rect x="58" y="55" width="9" height="10" />
-                      </g>
-                    </svg>
-
-                    <div className="min-w-0 text-right">
-                      <p className="text-[8px] uppercase tracking-[0.18em] text-[#22323A]/45">Private access code</p>
-                      <p className="mt-2 font-mono text-[14px] tracking-[0.20em] text-[#22323A]">••••-••••</p>
-                      <p className="mt-3 text-[9px] leading-relaxed text-[#22323A]/45">Scan the QR code, then enter the private code.</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="relative aspect-[1.48/1] rounded-[18px] border border-[#22323A]/[0.08] bg-[#F7F0E8] shadow-[0_18px_45px_rgba(44,48,49,0.08)] overflow-hidden">
+                <Image
+                  src="/card-back.png"
+                  alt="Back of the physical UNIKMO card, showing the QR code and private access code"
+                  fill
+                  sizes="(min-width: 1024px) 32vw, 90vw"
+                  className="object-cover"
+                />
               </div>
-
               <figcaption className="mt-4 text-center">
                 <span className="block font-serif text-[20px] text-[#22323A]">Back</span>
                 <span className="mt-1 block text-[10px] uppercase tracking-[0.18em] text-[#22323A]/50">QR + private access code</span>
@@ -1395,7 +1369,7 @@ function FinalCta({ onCreateMomentClick }: { onCreateMomentClick: () => void }) 
       <div className="mx-auto grid w-full max-w-[1260px] grid-cols-1 md:grid-cols-[0.9fr_1.1fr] overflow-hidden rounded-[22px] border border-[#22323A]/[0.07] bg-[#EFE6DC]">
         <div className="relative min-h-[230px] md:min-h-[330px]">
           <Image
-            src="/cardfrontunikmo.jpg"
+            src="/card-front.png"
             alt="UNIKMO card presented as a meaningful gift"
             fill
             sizes="(min-width: 768px) 45vw, 100vw"
