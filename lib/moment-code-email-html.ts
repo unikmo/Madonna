@@ -84,7 +84,7 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
             <td style="padding: 0;">
               ${
                 codes.length > 1
-                  ? `<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b08d57; font-weight: 600; margin: 0 0 8px 2px;">Card ${index + 1}</div>`
+                  ? `<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #B38846; font-weight: 600; margin: 0 0 8px 2px;">Card ${index + 1}</div>`
                   : ''
               }
               <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid rgba(45,41,38,0.12);">
@@ -122,7 +122,7 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
                     font-family: 'Courier New', monospace;
                     font-size: 13px;
                     letter-spacing: 1.1px;
-                    color: #2D2926;
+                    color: #22323A;
                     white-space: nowrap;
                   "
                 >${code}</div>
@@ -144,35 +144,35 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          line-height: 1.6; color: #2D2926; background: #F7F1EA;
+          line-height: 1.6; color: #22323A; background: #F7F1EA;
           padding: 40px 20px; min-height: 100vh;
         }
         .email-container { max-width: 600px; margin: 0 auto; background: #FDF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(45, 41, 38, 0.08); }
         .header { background: #EFE8E5; padding: 36px 30px; text-align: center; }
-        .logo { font-size: 28px; font-weight: 700; color: #2D2926; margin-bottom: 8px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.02em; }
-        .header-subtitle { color: #2D2926; font-size: 15px; opacity: 0.85; }
+        .logo { font-size: 28px; font-weight: 700; color: #22323A; margin-bottom: 8px; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.02em; }
+        .header-subtitle { color: #22323A; font-size: 15px; opacity: 0.85; }
         .content { padding: 36px 30px; }
-        .greeting { font-size: 22px; font-weight: 600; color: #2D2926; margin-bottom: 16px; font-family: Georgia, 'Times New Roman', serif; }
-        .message { color: #2D2926; font-size: 15px; margin-bottom: 28px; line-height: 1.7; opacity: 0.9; }
+        .greeting { font-size: 22px; font-weight: 600; color: #22323A; margin-bottom: 16px; font-family: Georgia, 'Times New Roman', serif; }
+        .message { color: #22323A; font-size: 15px; margin-bottom: 28px; line-height: 1.7; opacity: 0.9; }
         .order-info { background: #EFE8E5; border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; }
-        .order-label { color: #b08d57; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; font-weight: 600; }
-        .order-number { color: #2D2926; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; }
+        .order-label { color: #B38846; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; font-weight: 600; }
+        .order-number { color: #22323A; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; }
         .codes-section { margin: 28px 0; }
-        .codes-title { color: #2D2926; font-size: 17px; font-weight: 600; margin-bottom: 16px; text-align: center; font-family: Georgia, 'Times New Roman', serif; }
+        .codes-title { color: #22323A; font-size: 17px; font-weight: 600; margin-bottom: 16px; text-align: center; font-family: Georgia, 'Times New Roman', serif; }
         .code-item { background: #FBF7F2; border: 1px solid rgba(45, 41, 38, 0.08); border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center; box-shadow: 0 4px 16px rgba(45, 41, 38, 0.04); }
-        .code-label { color: #b08d57; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; font-weight: 600; }
-        .code-value { color: #2D2926; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: 2px; }
+        .code-label { color: #B38846; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; font-weight: 600; }
+        .code-value { color: #22323A; font-size: 20px; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: 2px; }
         .actions { margin: 32px 0; text-align: center; }
-        .button { display: inline-block; padding: 14px 28px; margin: 8px; background: #2D2926; color: #FDF9F5; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .button { display: inline-block; padding: 14px 28px; margin: 8px; background: #22323A; color: #FDF9F5; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
         .button:hover { background: #1E1B18; }
-        .button-secondary { background: #FDF9F5; color: #2D2926; border: 1px solid #D3C7BB; padding: 14px 28px; }
+        .button-secondary { background: #FDF9F5; color: #22323A; border: 1px solid #D3C7BB; padding: 14px 28px; }
         .button-secondary:hover { background: #EFE8E5; }
         .info-box { background: #EFE8E5; border-radius: 12px; padding: 18px 20px; margin: 28px 0; }
-        .info-title { color: #2D2926; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
-        .info-text { color: #2D2926; font-size: 14px; line-height: 1.65; opacity: 0.85; }
+        .info-title { color: #22323A; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+        .info-text { color: #22323A; font-size: 14px; line-height: 1.65; opacity: 0.85; }
         .footer { margin-top: 36px; padding-top: 24px; border-top: 1px solid rgba(45, 41, 38, 0.1); text-align: center; }
-        .footer-text { color: #2D2926; font-size: 13px; line-height: 1.75; opacity: 0.75; }
-        .footer-brand { color: #2D2926; font-weight: 600; margin-top: 12px; font-family: Georgia, 'Times New Roman', serif; }
+        .footer-text { color: #22323A; font-size: 13px; line-height: 1.75; opacity: 0.75; }
+        .footer-brand { color: #22323A; font-weight: 600; margin-top: 12px; font-family: Georgia, 'Times New Roman', serif; }
         .divider { height: 1px; background: rgba(45, 41, 38, 0.1); margin: 28px 0; }
         @media only screen and (max-width: 600px) {
           .content { padding: 28px 20px; }
@@ -185,23 +185,23 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
       <div class="email-container">
         <div class="header">
           <div class="logo">UNIKMO</div>
-          <div class="header-subtitle">Your Moment Keys Are Ready! 🎁</div>
+          <div class="header-subtitle">Your moment is ready</div>
         </div>
-        
+
         <div class="content">
-          <div class="greeting">Thank You for Your Purchase!</div>
-          
+          <div class="greeting">Thank you for your purchase</div>
+
           <div class="message">
-            Your order has been confirmed and your unique Moment Key${codes.length > 1 ? 's are' : ' is'} ready to use.
+            Your order is confirmed and your unique Moment Key${codes.length > 1 ? 's are' : ' is'} ready to use.
           </div>
-          
+
           <div class="order-info">
             <div class="order-label">Order Number</div>
             <div class="order-number">#${orderId}</div>
           </div>
-          
+
           <div class="codes-section">
-            <div class="codes-title">Your Digital Card</div>
+            <div class="codes-title">Your card &amp; access code</div>
             ${cardBlocksHtml}
           </div>
 
@@ -211,20 +211,20 @@ export function buildMomentCodesEmailHtml({ codes, orderId, baseUrl, deliveryTyp
             <a
               href="${uploadUrl}"
               class="button"
-              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #2D2926; color: #FDF9F5 !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #2D2926; -webkit-text-fill-color: #FDF9F5;"
+              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #22323A; color: #FDF9F5 !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #22323A; -webkit-text-fill-color: #FDF9F5;"
             >Upload your media</a>
             <a
               href="${unlockBaseUrl}"
               class="button button-secondary"
-              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #FDF9F5 !important; color: #2D2926 !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #D3C7BB; -webkit-text-fill-color: #2D2926;"
+              style="display: inline-block; padding: 14px 28px; margin: 8px; background-color: #FDF9F5 !important; color: #22323A !important; text-decoration: none !important; border-radius: 12px; font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #D3C7BB; -webkit-text-fill-color: #22323A;"
             >Unlock moment</a>
           </div>
           
           <div class="info-box">
-            <div class="info-title"><span>💡 Important Information</span></div>
+            <div class="info-title"><span>Important information</span></div>
             <div class="info-text">
-              <strong>Upload your media:</strong> <a href="${uploadUrl}" style="color: #2D2926; font-weight: 600;">${uploadPageUrl.replace(/^https?:\/\//, '')}</a> (your Key is pre-filled)<br>
-              <strong>Share with recipient:</strong> Give them the Key above and they can unlock at <a href="${unlockBaseUrl}" style="color: #2D2926; font-weight: 600;">${unlockBaseUrl.replace(/^https?:\/\//, '')}</a><br>
+              <strong>Upload your media:</strong> <a href="${uploadUrl}" style="color: #22323A; font-weight: 600;">${uploadPageUrl.replace(/^https?:\/\//, '')}</a> (your Key is pre-filled)<br>
+              <strong>Share with recipient:</strong> Give them the Key above and they can unlock at <a href="${unlockBaseUrl}" style="color: #22323A; font-weight: 600;">${unlockBaseUrl.replace(/^https?:\/\//, '')}</a><br>
               <strong>Remember:</strong> Keep your Key safe - it's the only way to access your moment!
             </div>
           </div>
