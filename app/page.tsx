@@ -388,7 +388,7 @@ function WhenToUseUnikmo() {
       line: 'Say what a birthday card never quite could.',
       icon: <IconHeart />,
       image: '/occasions/birthday.png',
-      position: 'object-[60%_22%]',
+      position: 'object-[50%_9%]',
     },
     {
       title: 'Anniversary',
@@ -409,7 +409,7 @@ function WhenToUseUnikmo() {
       line: 'Some things matter precisely because no occasion requires them.',
       icon: <IconCode />,
       image: '/occasions/just-because.png',
-      position: 'object-[68%_20%]',
+      position: 'object-[50%_14%]',
     },
   ];
 
