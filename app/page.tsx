@@ -395,14 +395,14 @@ function WhenToUseUnikmo() {
       line: 'Give your shared story somewhere to live.',
       icon: <IconSpark />,
       image: '/occasions/anniversary.png',
-      position: 'object-[50%_32%]',
+      position: 'object-[50%_12%]',
     },
     {
       title: 'Long-distance love',
       line: 'Keep something personal close, even when you are not.',
       icon: <IconLock />,
       image: '/occasions/long-distance-love.png',
-      position: 'object-[32%_25%]',
+      position: 'object-[50%_2%]',
     },
     {
       title: 'Just because',
