@@ -18,7 +18,7 @@ export interface IOrder extends Document {
   totalPrice: number;
   currency: string;
   paymentStatus: 'paid';
-  source: 'webhook' | 'admin' | 'waitlist';
+  source: 'webhook' | 'admin';
   tags: string[];
   lineItems: ILineItem[];
   createdAt: Date;
@@ -79,7 +79,7 @@ const OrderSchema: Schema = new Schema(
     },
     source: {
       type: String,
-      enum: ['webhook', 'admin', 'waitlist'],
+      enum: ['webhook', 'admin'],
       default: 'webhook',
       required: true,
       index: true,

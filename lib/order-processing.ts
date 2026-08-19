@@ -27,7 +27,7 @@ export interface ProcessOrderInput {
   currency: string;
   lineItems: ShopifyLineItemLike[];
   codesToGenerate: CodesToGenerateItem[];
-  source?: 'webhook' | 'admin' | 'waitlist';
+  source?: 'webhook' | 'admin';
   tags?: string[];
   shopifyOrderName?: string;
   customerName?: string;

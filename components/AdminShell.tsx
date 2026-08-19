@@ -9,7 +9,6 @@ const NAV = [
   { href: '/admin/buyers', label: 'Buyers', icon: BuyersIcon },
   { href: '/admin/orders', label: 'Orders', icon: OrdersIcon },
   { href: '/admin/codes', label: 'Codes', icon: CodesIcon },
-  { href: '/admin/configs', label: 'Configs', icon: ConfigsIcon },
   { href: '/admin/storage', label: 'Storage', icon: StorageIcon },
   { href: '/admin/template-viewer', label: 'Templates', icon: TemplatesIcon },
   { href: '/admin/shopify', label: 'Shopify', icon: ShopifyIcon },
@@ -20,7 +19,6 @@ const TITLES: Record<string, string> = {
   '/admin/buyers': 'Buyers',
   '/admin/orders': 'Orders',
   '/admin/codes': 'Codes',
-  '/admin/configs': 'Configs',
   '/admin/storage': 'Storage',
   '/admin/template-viewer': 'Templates',
   '/admin/shopify': 'Shopify',
@@ -75,20 +73,6 @@ function TemplatesIcon({ className }: { className?: string }) {
         strokeWidth={2}
         d="M4 19.5A2.5 2.5 0 016.5 17H20v2H6.5A.5.5 0 006 19.5c0 .276.224.5.5.5H20v2H6.5A2.5 2.5 0 014 19.5zM7 3h13a2 2 0 012 2v9a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
       />
-    </svg>
-  );
-}
-
-function ConfigsIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   );
 }
@@ -290,7 +274,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             const active =
               pathname === item.href ||
               (item.href !== '/admin/codes' &&
-                item.href !== '/admin/configs' &&
                 item.href !== '/admin/storage' &&
                 pathname.startsWith(item.href + '/'));
             return (

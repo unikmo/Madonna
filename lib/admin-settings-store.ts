@@ -1,8 +1,8 @@
 import AdminSettings from '@/models/AdminSettings';
 
 /**
- * Multiple legacy rows in `adminsettings` caused reads to return a stale doc
- * (still `sellingEnabled: true`) even after updates. We keep a single row.
+ * Multiple legacy rows in `adminsettings` caused reads to return a stale doc.
+ * We keep a single row, preferring the most recently updated.
  */
 export async function dedupeAdminSettingsIfNeeded(): Promise<void> {
   const count = await AdminSettings.countDocuments();
@@ -11,11 +11,7 @@ export async function dedupeAdminSettingsIfNeeded(): Promise<void> {
   const docs = await AdminSettings.find({}).sort({ updatedAt: -1 });
   if (docs.length === 0) return;
 
-  // Prefer a row that explicitly disabled selling (avoids keeping a stale "true" row
-  // that only got bumped by another toggle like Shopify test mode).
-  const falseDoc = docs.find((d) => d.sellingEnabled === false);
-  const keeper = falseDoc || docs[0];
-
+  const keeper = docs[0];
   await AdminSettings.deleteMany({ _id: { $ne: keeper._id } });
 }
 
@@ -33,10 +29,7 @@ export async function applyAdminSettingsPatch(patch: Record<string, unknown>): P
 
   let doc = await AdminSettings.findOne().sort({ updatedAt: -1 });
   if (!doc) {
-    await AdminSettings.create({
-      sellingEnabled: true,
-      ...patch,
-    });
+    await AdminSettings.create(patch);
     return;
   }
 
