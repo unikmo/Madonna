@@ -388,7 +388,7 @@ function WhenToUseUnikmo() {
       line: 'Say what a birthday card never quite could.',
       icon: <IconHeart />,
       image: '/occasions/birthday.png',
-      position: 'object-[60%_22%]',
+      position: 'object-[50%_15%]',
     },
     {
       title: 'Anniversary',
@@ -409,7 +409,7 @@ function WhenToUseUnikmo() {
       line: 'Some things matter precisely because no occasion requires them.',
       icon: <IconCode />,
       image: '/occasions/just-because.png',
-      position: 'object-[68%_20%]',
+      position: 'object-[50%_17%]',
     },
   ];
 
@@ -454,10 +454,6 @@ function WhenToUseUnikmo() {
             </article>
           ))}
         </div>
-
-        <p className="mx-auto mt-7 max-w-[760px] text-center text-[12px] sm:text-[13px] leading-relaxed text-[#22323A]/50">
-          Imagery above is AI-generated to represent the feeling of a moment. We are collecting real customer photography and will replace these as it comes in.
-        </p>
       </div>
     </section>
   );
