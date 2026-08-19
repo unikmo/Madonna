@@ -109,7 +109,6 @@ export default function LandingPage() {
 
       <main>
         <Hero />
-        <OurStory />
         <HowItWorks2 />
         <WhenToUseUnikmo />
         <ProductExperience />
@@ -212,34 +211,96 @@ const preFooterTrustItems = [
   { label: 'No ads', detail: 'Nothing interrupts their moment.', icon: <IconHeart /> },
 ];
 
+const HERO_SLIDES = [
+  {
+    image: '/story/matt-writes.png',
+    caption: 'Matt wanted to say more than he could fit in a card.',
+    position: 'object-[50%_25%]',
+  },
+  {
+    image: '/story/matt-seals.png',
+    caption: 'So he turned his message into something she could hold.',
+    position: 'object-[50%_25%]',
+  },
+  {
+    image: '/story/she-opens.png',
+    caption: 'She opens it — and feels the moment instantly.',
+    position: 'object-[30%_20%]',
+  },
+  {
+    image: '/story/she-scans.png',
+    caption: 'She scans the card to unlock his private message.',
+    position: 'object-[35%_20%]',
+  },
+  {
+    image: '/story/she-watches.png',
+    caption: 'And sees his video message, whenever she wants it.',
+    position: 'object-[42%_20%]',
+  },
+];
+
+function HeroCarousel() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setIndex((i) => (i + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative min-h-[360px] sm:min-h-[500px] lg:min-h-[610px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_18px_55px_rgba(44,48,49,0.10)]">
+      {HERO_SLIDES.map((slide, i) => (
+        <div
+          key={slide.image}
+          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+            i === index ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-hidden={i !== index}
+        >
+          <Image
+            src={slide.image}
+            alt={slide.caption}
+            fill
+            priority={i === 0}
+            sizes="(max-width: 1024px) 100vw, 56vw"
+            className={`object-cover ${slide.position}`}
+          />
+        </div>
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/45 via-transparent to-transparent pointer-events-none" />
+
+      <div className="absolute left-5 right-5 bottom-5 sm:left-7 sm:right-7 sm:bottom-7 flex items-end justify-between gap-4">
+        <p className="max-w-[75%] rounded-2xl bg-[#FCF9F4]/90 backdrop-blur px-4 py-2.5 text-[12px] sm:text-[13px] text-[#22323A]/85 shadow-sm">
+          {HERO_SLIDES[index].caption}
+        </p>
+        <div className="flex gap-1.5 pb-1">
+          {HERO_SLIDES.map((slide, i) => (
+            <button
+              key={slide.image}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Show step ${i + 1} of ${HERO_SLIDES.length}`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? 'w-5 bg-[#FCF9F4]' : 'w-1.5 bg-[#FCF9F4]/50'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section id="top" className="bg-[#FCF9F4] py-5 sm:py-8 lg:py-10">
       <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-7 lg:gap-12 xl:gap-16 items-stretch">
-          <div className="relative min-h-[360px] sm:min-h-[500px] lg:min-h-[610px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_18px_55px_rgba(44,48,49,0.10)]">
-            <Image
-              src="/story/she-opens.png"
-              alt="A woman opening her UNIKMO card, feeling the moment instantly."
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 56vw"
-              className="object-cover object-[30%_20%]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/20 via-transparent to-transparent" />
-            <div className="absolute left-5 bottom-5 sm:left-7 sm:bottom-7 rounded-full bg-[#FCF9F4]/90 backdrop-blur px-4 py-2.5 text-[11px] tracking-[0.12em] uppercase text-[#22323A]/75 shadow-sm">
-              The moment, made tangible.
-            </div>
-          </div>
+          <HeroCarousel />
 
           <div className="flex flex-col justify-center py-4 lg:py-8 xl:pr-8">
-            <div className="mb-5 text-[#B38846]" aria-hidden>
-              <svg viewBox="0 0 32 52" className="h-11 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
-                <circle cx="16" cy="10" r="6" />
-                <path d="M16 16v27m0-17h7m-7 8h5m-5 9h5" />
-              </svg>
-            </div>
-
             <h1 className="font-serif text-[44px] sm:text-[58px] lg:text-[64px] xl:text-[74px] leading-[0.98] tracking-[-0.025em] text-[#22323A]">
               Some moments
               <br />
@@ -281,106 +342,6 @@ function Hero() {
     </section>
   );
 }
-/** Five-beat narrative: real UNIKMO photography, one consistent tagline ("The Key to Your Memory"). */
-function OurStory() {
-  const beats = [
-    {
-      number: '01',
-      caption: 'Matt wanted to say more than he could fit in a card.',
-      image: '/story/matt-writes.png',
-      alt: 'Matt holding his UNIKMO card at his desk.',
-      position: 'object-[50%_25%]',
-    },
-    {
-      number: '02',
-      caption: 'So he turned his message into something she could hold.',
-      image: '/story/matt-seals.png',
-      alt: 'Matt sealing his UNIKMO card into its envelope.',
-      position: 'object-[50%_25%]',
-    },
-    {
-      number: '03',
-      caption: 'She opens it — and feels the moment instantly.',
-      image: '/story/she-opens.png',
-      alt: 'She opens her UNIKMO card on the bed.',
-      position: 'object-[30%_20%]',
-    },
-    {
-      number: '04',
-      caption: 'She scans the card to unlock his private message.',
-      image: '/story/she-scans.png',
-      alt: 'She scans the QR code on her UNIKMO card.',
-      position: 'object-[35%_20%]',
-    },
-    {
-      number: '05',
-      caption: 'And sees his video message, whenever she wants it.',
-      image: '/story/she-watches.png',
-      alt: 'She watches a video message from Matt on her phone.',
-      position: 'object-[42%_20%]',
-    },
-  ];
-
-  return (
-    <section id="story" className="bg-[#FCF9F4] py-14 sm:py-20 lg:py-24 border-t border-[#22323A]/[0.06]">
-      <div className="mx-auto w-full max-w-[1100px] px-5 sm:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B38846]">
-            How it feels
-          </p>
-          <h2 className="mt-4 font-serif text-[30px] sm:text-[38px] lg:text-[44px] text-[#22323A]">
-            Matt&rsquo;s key to her memory.
-          </h2>
-        </div>
-
-        <div className="space-y-14 sm:space-y-20">
-          {beats.map((beat, index) => {
-            const reversed = index % 2 === 1;
-            return (
-              <div
-                key={beat.number}
-                className={`grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 items-center ${
-                  reversed ? 'md:[&>*:first-child]:order-2' : ''
-                }`}
-              >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[18px] shadow-[0_14px_40px_rgba(34,50,58,0.10)]">
-                  <Image
-                    src={beat.image}
-                    alt={beat.alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className={`object-cover ${beat.position}`}
-                  />
-                </div>
-                <div className={reversed ? 'md:pr-6' : 'md:pl-6'}>
-                  <div className="flex items-center gap-3 text-[#B38846]">
-                    <span className="text-[13px] font-semibold tracking-[0.15em]">{beat.number}</span>
-                    <span className="h-px w-8 bg-[#B38846]/50" />
-                  </div>
-                  <p className="mt-4 font-serif text-[24px] sm:text-[28px] leading-snug text-[#22323A]">
-                    {beat.caption}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-14 sm:mt-20 flex flex-col items-center text-center">
-          <div className="text-[#B38846] mb-3" aria-hidden>
-            <svg viewBox="0 0 32 52" className="h-9 w-6" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <circle cx="16" cy="10" r="6" />
-              <path d="M16 16v27m0-17h7m-7 8h5m-5 9h5" />
-            </svg>
-          </div>
-          <p className="font-serif text-[18px] sm:text-[20px] text-[#22323A]">UNIKMO</p>
-          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#22323A]/50">The Key to Your Memory</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /** Trust bullets — blush band (same as hero / final CTA). Tree lives in <SiteFooter>, not here. */
 function PreFooterTrustStrip() {
   const items = [
