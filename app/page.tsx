@@ -327,21 +327,25 @@ function WhenToUseUnikmo() {
       title: 'Birthday',
       line: 'Say what a birthday card never quite could.',
       icon: <IconHeart />,
+      image: '/occasions/birthday.png',
     },
     {
       title: 'Anniversary',
       line: 'Give your shared story somewhere to live.',
       icon: <IconSpark />,
+      image: '/occasions/anniversary.png',
     },
     {
       title: 'Long-distance love',
       line: 'Keep something personal close, even when you are not.',
       icon: <IconLock />,
+      image: '/occasions/long-distance-love.png',
     },
     {
       title: 'Just because',
       line: 'Some things matter precisely because no occasion requires them.',
       icon: <IconCode />,
+      image: '/occasions/just-because.png',
     },
   ];
 
@@ -361,18 +365,24 @@ function WhenToUseUnikmo() {
           {occasions.map((occasion, index) => (
             <article
               key={occasion.title}
-              className="relative min-h-[250px] overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#F4ECE3] p-6 sm:p-7 flex flex-col"
+              className="group relative min-h-[340px] overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] flex flex-col"
             >
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-[#B38846]/20" aria-hidden />
-              <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full border border-[#B38846]/15" aria-hidden />
+              <Image
+                src={occasion.image}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#17130F]/85 via-[#17130F]/25 to-transparent" />
 
-              <div className="text-[#B38846]">{occasion.icon}</div>
-              <div className="mt-auto">
-                <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#B38846]/75">
+              <div className="relative mt-auto p-6 sm:p-7 text-[#FCF9F4]">
+                <div className="text-[#D9B77C]">{occasion.icon}</div>
+                <p className="mt-3 mb-2 text-[10px] uppercase tracking-[0.2em] text-[#D9B77C]/90">
                   0{index + 1}
                 </p>
-                <h3 className="font-serif text-[27px] text-[#22323A]">{occasion.title}</h3>
-                <p className="mt-2 text-[13px] sm:text-[14px] leading-relaxed text-[#22323A]/65 font-light">
+                <h3 className="font-serif text-[26px] leading-tight">{occasion.title}</h3>
+                <p className="mt-2 text-[13px] sm:text-[14px] leading-relaxed text-[#FCF9F4]/80 font-light">
                   {occasion.line}
                 </p>
               </div>
@@ -381,7 +391,7 @@ function WhenToUseUnikmo() {
         </div>
 
         <p className="mx-auto mt-7 max-w-[760px] text-center text-[12px] sm:text-[13px] leading-relaxed text-[#22323A]/50">
-          We use real customer and product photography only. Until an authentic image belongs here, the design stays intentionally visual rather than synthetic.
+          Imagery above is AI-generated to represent the feeling of a moment. We are collecting real customer photography and will replace these as it comes in.
         </p>
       </div>
     </section>
