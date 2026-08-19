@@ -3,7 +3,6 @@ import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/lib/toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import HomepageEnhancements from "@/components/HomepageEnhancements";
 // Initialize admin user on app startup
 import "@/lib/init-admin";
 
@@ -60,7 +59,6 @@ export default function RootLayout({
       <body className="antialiased font-sans">
         <ErrorBoundary>
           <ToastProvider />
-          <HomepageEnhancements />
           {children}
         </ErrorBoundary>
       </body>
