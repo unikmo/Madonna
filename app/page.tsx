@@ -33,7 +33,7 @@ const ORGANIZATION_JSON_LD = {
   name: 'UNIKMO',
   url: 'https://www.unikmo.com/',
   sameAs: [
-    'https://www.instagram.com/unikmo_',
+    'https://www.instagram.com/unikmo_first',
     'https://www.tiktok.com/@myunikmo',
   ],
   description:
@@ -1631,7 +1631,7 @@ function SiteFooter({
 
           <div className="flex items-center gap-4 sm:gap-5">
             <a
-              href="https://www.instagram.com/unikmo_"
+              href="https://www.instagram.com/unikmo_first"
               target="_blank"
               rel="noreferrer"
               className="hover:text-[#2D2926] transition-colors py-3 -my-3 min-h-[44px] flex items-center"
