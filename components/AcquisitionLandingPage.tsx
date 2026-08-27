@@ -4,9 +4,30 @@ import type { AcquisitionPage } from '@/lib/acquisition-pages';
 import { acquisitionPages } from '@/lib/acquisition-pages';
 
 const PRODUCTS = [
-  { name: 'Single Memory Card', price: '$24', cards: '1 card' },
-  { name: '4-Card Set', price: '$64', cards: '4 cards' },
-  { name: '7-Card Collection', price: '$72', cards: '7 cards' },
+  {
+    name: 'Single Key',
+    price: '$24',
+    cards: '1 card · 1 private memory',
+    image: '/cardfrontunikmo.jpg',
+    cta: 'Choose Single',
+    detail: 'One physical UNIKMO card unlocking one private video, voice note, photo or message.',
+  },
+  {
+    name: '4-Key Bundle',
+    price: '$64',
+    cards: '4 cards · 4 private memories',
+    image: '/cardfrontsite4.png',
+    cta: 'Choose 4 Cards',
+    detail: 'Four individual UNIKMO cards, each unlocking its own private moment.',
+  },
+  {
+    name: '7-Key Bundle',
+    price: '$72',
+    cards: '7 cards · 7 private memories',
+    image: '/cardfrontsite7.png',
+    cta: 'Choose 7 Cards',
+    detail: 'Seven individual UNIKMO cards, each unlocking its own private moment.',
+  },
 ] as const;
 
 function KeyMark() {
@@ -20,31 +41,49 @@ function KeyMark() {
 
 function PageHeader() {
   return (
-    <header className="border-b border-[#22323A]/[0.08] bg-[#FCF9F4]">
-      <div className="mx-auto flex h-[72px] w-full max-w-[1180px] items-center px-5 sm:px-8">
+    <header className="sticky top-0 z-40 border-b border-[#22323A]/[0.07] bg-[#FCF9F4]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] w-full max-w-[1240px] items-center px-5 sm:px-8">
         <Link href="/" className="inline-flex items-center" aria-label="UNIKMO home">
-          <Image
-            src="/unikmo-logo-header.png"
-            alt="UNIKMO — The Key to Your Memory"
-            width={729}
-            height={220}
-            priority
-            className="h-8 w-auto sm:h-9"
-          />
+          <Image src="/unikmo-logo-header.png" alt="UNIKMO — The Key to Your Memory" width={729} height={220} priority className="h-8 w-auto sm:h-9" />
         </Link>
-        <nav className="ml-auto hidden items-center gap-7 text-[12px] text-[#22323A]/70 md:flex">
-          <Link href="/#how-it-works" className="transition-colors hover:text-[#B38846]">How It Works</Link>
-          <Link href="/#shop" className="transition-colors hover:text-[#B38846]">Pricing</Link>
-          <Link href="/" className="transition-colors hover:text-[#B38846]">Main Product Page</Link>
+        <nav className="ml-auto hidden items-center gap-7 text-[11px] text-[#22323A]/65 md:flex">
+          <Link href="/#how-it-works" className="transition-colors hover:text-[#B38846]">How it works</Link>
+          <Link href="/faq" className="transition-colors hover:text-[#B38846]">FAQ</Link>
         </nav>
-        <Link
-          href="/#shop"
-          className="ml-auto rounded-lg bg-[#B38846] px-5 py-3 text-[11px] font-medium text-white shadow-[0_8px_25px_rgba(179,136,70,.18)] transition-colors hover:bg-[#9F783D] md:ml-8"
-        >
-          Create Your Moment
+        <Link href="/#shop" className="ml-auto rounded-lg bg-[#B38846] px-5 py-3 text-[11px] font-medium text-white shadow-[0_8px_25px_rgba(179,136,70,.16)] transition-colors hover:bg-[#9F783D] md:ml-8">
+          Choose Your Card
         </Link>
       </div>
     </header>
+  );
+}
+
+function ProductCard({ product, fit, featured = false }: { product: typeof PRODUCTS[number]; fit: string; featured?: boolean }) {
+  return (
+    <article className={`relative flex h-full flex-col overflow-hidden rounded-[22px] border bg-[#FCF9F4] shadow-[0_12px_34px_rgba(34,50,58,.05)] ${featured ? 'border-[#B38846]/45' : 'border-[#22323A]/[0.08]'}`}>
+      {featured ? <span className="absolute right-4 top-4 z-10 rounded-full bg-[#22323A] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white">Best value</span> : null}
+      <div className="relative aspect-[3/2] bg-[radial-gradient(circle_at_50%_42%,#FFFDF9_0%,#F2E9DF_62%,#E6D9CC_100%)] p-5">
+        <div className="relative h-full w-full overflow-hidden rounded-[14px] border border-white/55 bg-[#F9F4EE] shadow-[0_18px_34px_rgba(40,30,20,.14)]">
+          <Image src={product.image} alt={`${product.name} UNIKMO card`} fill className="object-contain p-2" sizes="(max-width:1024px) 90vw, 360px" />
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-[#B38846]">{product.cards}</p>
+            <h3 className="mt-2 font-serif text-[27px] leading-[1.04]">{product.name}</h3>
+          </div>
+          <div className="font-serif text-[30px] text-[#B38846]">{product.price}</div>
+        </div>
+        <p className="mt-5 text-[13px] leading-[1.65] text-[#22323A]/68">{product.detail}</p>
+        <p className="mt-3 text-[12px] leading-[1.6] text-[#22323A]/55">{fit}</p>
+        <div className="mt-auto pt-6">
+          <Link href="/#shop" className="inline-flex w-full min-h-[46px] items-center justify-center rounded-lg bg-[#22323A] px-5 text-[11px] font-medium text-white transition-colors hover:bg-[#34464F]">
+            {product.cta}
+          </Link>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -95,178 +134,131 @@ export default function AcquisitionLandingPage({ page }: { page: AcquisitionPage
       <PageHeader />
 
       <main>
-        <section className="border-b border-[#22323A]/[0.06] py-12 sm:py-16 lg:py-20">
-          <div className="mx-auto grid w-full max-w-[1180px] items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.02fr_.98fr] lg:gap-14">
-            <div>
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">{page.eyebrow}</p>
-              <h1 className="max-w-[720px] font-serif text-[48px] leading-[.98] tracking-[-.025em] text-[#22323A] sm:text-[60px] lg:text-[68px]">
-                {page.title}
-              </h1>
-              <p className="mt-7 max-w-[680px] text-[17px] leading-[1.7] text-[#22323A]/72">{page.intro}</p>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <Link href="/#shop" className="rounded-lg bg-[#B38846] px-7 py-3.5 text-[12px] font-medium text-white shadow-[0_10px_28px_rgba(179,136,70,.20)] transition-colors hover:bg-[#9F783D]">
-                  Create Your Moment
-                </Link>
-                <Link href="/" className="px-2 py-3 text-[12px] font-medium text-[#22323A]/70 transition-colors hover:text-[#B38846]">
-                  See the main UNIKMO page →
-                </Link>
-              </div>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[#22323A]/55">
-                <span>Private by design</span>
-                <span>No recipient app</span>
-                <span>Physical card + digital moment</span>
-              </div>
+        <section className="px-5 pb-12 pt-12 text-center sm:px-8 sm:pb-16 sm:pt-16 lg:pt-20">
+          <div className="mx-auto max-w-[900px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">{page.eyebrow}</p>
+            <h1 className="mx-auto mt-4 max-w-[860px] font-serif text-[35px] leading-[1.04] tracking-[-0.025em] sm:text-[44px] lg:text-[52px]">{page.title}</h1>
+            <p className="mx-auto mt-5 max-w-[760px] text-[15px] leading-[1.65] text-[#22323A]/72 sm:text-[17px]">
+              <strong className="font-semibold text-[#22323A]">Turn a video, voice note, photo or message into a beautiful physical card.</strong> They scan it to unlock your private moment.
+            </p>
+            <p className="mx-auto mt-4 max-w-[720px] text-[13px] leading-[1.7] text-[#22323A]/58 sm:text-[14px]">{page.intro}</p>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+              <Link href="/#shop" className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white shadow-[0_10px_28px_rgba(179,136,70,.18)] transition-colors hover:bg-[#9F783D]">Choose Your Card</Link>
+              <Link href="/#how-it-works" className="inline-flex min-h-[44px] items-center text-[11px] font-medium text-[#22323A]/68 underline decoration-[#B38846]/45 underline-offset-4 transition hover:text-[#22323A]">See how it works</Link>
             </div>
+            <div className="mx-auto mt-6 flex max-w-[640px] flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-[#22323A]/52">
+              <span>No app required</span><span aria-hidden="true">•</span><span>Private by design</span><span aria-hidden="true">•</span><span>A tree planted with every order</span>
+            </div>
+          </div>
 
-            <div className="relative overflow-hidden rounded-[24px] border border-[#22323A]/[0.08] bg-[#EEE5DA] shadow-[0_20px_55px_rgba(34,50,58,.10)]">
-              <div className="relative aspect-[4/3]">
-                <Image
-                  src="/images/unikmo-lifestyle.jpg"
-                  alt={`UNIKMO ${page.primaryKeyword} experience`}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 48vw"
-                  className="object-cover object-center"
-                />
-              </div>
-              <div className="grid grid-cols-3 border-t border-[#22323A]/[0.08] bg-[#FCF9F4]/95">
-                {PRODUCTS.map((product) => (
-                  <div key={product.name} className="px-3 py-4 text-center [&+&]:border-l [&+&]:border-[#22323A]/[0.08]">
-                    <div className="font-serif text-[22px] text-[#B38846]">{product.price}</div>
-                    <div className="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#22323A]/50">{product.cards}</div>
-                  </div>
-                ))}
-              </div>
+          <div className="mx-auto mt-9 max-w-[820px] rounded-[24px] border border-[#22323A]/[0.07] bg-[radial-gradient(circle_at_50%_38%,#FFFDF9_0%,#F2E8DE_58%,#E4D6C8_100%)] p-5 shadow-[0_24px_70px_rgba(34,50,58,.09)] sm:p-8">
+            <div className="relative mx-auto aspect-[3/2] max-w-[680px] overflow-hidden rounded-[16px] border border-white/60 bg-[#F9F4EE] shadow-[0_24px_50px_rgba(40,30,20,.16)]">
+              <Image src="/cardfrontunikmo.jpg" alt="UNIKMO Single Key card" fill priority className="object-contain p-3" sizes="(max-width:900px) 86vw, 680px" />
             </div>
           </div>
         </section>
 
-        <section className="py-14 sm:py-20">
-          <div className="mx-auto grid w-full max-w-[1040px] gap-10 px-5 sm:px-8 lg:grid-cols-2 lg:gap-16">
-            <div>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">THE SITUATION</p>
-              <h2 className="font-serif text-[38px] leading-[1.02] text-[#22323A] sm:text-[46px]">{page.situationTitle}</h2>
+        <section className="border-y border-[#22323A]/[0.06] bg-[#F7F0E8] px-5 py-14 sm:px-8 sm:py-16">
+          <div className="mx-auto max-w-[1180px]">
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Choose your card</p>
+              <h2 className="mt-3 font-serif text-[32px] sm:text-[40px]">One moment or a story told in parts.</h2>
             </div>
-            <p className="self-end text-[16px] leading-[1.75] text-[#22323A]/70">{page.situationCopy}</p>
+            <div className="mt-9 grid gap-5 lg:grid-cols-3">
+              {PRODUCTS.map((product, index) => <ProductCard key={product.name} product={product} fit={page.productFit[index]} featured={index === 2} />)}
+            </div>
           </div>
         </section>
 
-        <section className="border-y border-[#22323A]/[0.06] bg-[#F7F0E8] py-14 sm:py-16">
-          <div className="mx-auto w-full max-w-[1100px] px-5 sm:px-8">
+        <section className="px-5 py-14 sm:px-8 sm:py-18 lg:py-20">
+          <div className="mx-auto grid max-w-[1040px] gap-9 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">The moment</p>
+              <h2 className="mt-3 font-serif text-[34px] leading-[1.04] sm:text-[42px]">{page.situationTitle}</h2>
+            </div>
+            <p className="self-end text-[15px] leading-[1.75] text-[#22323A]/68">{page.situationCopy}</p>
+          </div>
+        </section>
+
+        <section className="border-y border-[#22323A]/[0.06] bg-[#F7F0E8] px-5 py-14 sm:px-8 sm:py-16">
+          <div className="mx-auto max-w-[1100px]">
             <div className="mx-auto max-w-[720px] text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">WHY UNIKMO</p>
-              <h2 className="mt-3 font-serif text-[38px] leading-[1.03] sm:text-[46px]">{page.whyTitle}</h2>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">Why UNIKMO</p>
+              <h2 className="mt-3 font-serif text-[34px] leading-[1.04] sm:text-[42px]">{page.whyTitle}</h2>
             </div>
-            <div className="mt-10 grid gap-5 md:grid-cols-3">
+            <div className="mt-9 grid gap-5 md:grid-cols-3">
               {page.whyPoints.map((point, index) => (
                 <article key={point.title} className="rounded-[18px] border border-[#22323A]/[0.07] bg-[#FCF9F4] p-6 text-center shadow-[0_8px_26px_rgba(34,50,58,.04)]">
-                  <div className="mx-auto mb-5 flex h-11 w-11 items-center justify-center rounded-full border border-[#B38846]/35 text-[#B38846]">
-                    {index === 1 ? <KeyMark /> : <span className="font-serif text-[21px]">{index + 1}</span>}
-                  </div>
-                  <h3 className="font-serif text-[25px] leading-[1.05]">{point.title}</h3>
-                  <p className="mt-3 text-[13px] leading-[1.65] text-[#22323A]/65">{point.copy}</p>
+                  <div className="mx-auto mb-5 flex h-11 w-11 items-center justify-center rounded-full border border-[#B38846]/35 text-[#B38846]">{index === 1 ? <KeyMark /> : <span className="font-serif text-[21px]">{index + 1}</span>}</div>
+                  <h3 className="font-serif text-[24px] leading-[1.08]">{point.title}</h3>
+                  <p className="mt-3 text-[13px] leading-[1.65] text-[#22323A]/64">{point.copy}</p>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-14 sm:py-20">
-          <div className="mx-auto w-full max-w-[1080px] px-5 sm:px-8">
+        <section className="px-5 py-14 sm:px-8 sm:py-18 lg:py-20">
+          <div className="mx-auto max-w-[1080px]">
             <div className="max-w-[720px]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">WHAT TO PUT INSIDE</p>
-              <h2 className="mt-3 font-serif text-[39px] leading-[1.02] sm:text-[47px]">{page.examplesTitle}</h2>
-              <p className="mt-4 max-w-[660px] text-[15px] leading-[1.7] text-[#22323A]/66">{page.examplesIntro}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">What to put inside</p>
+              <h2 className="mt-3 font-serif text-[34px] leading-[1.04] sm:text-[42px]">{page.examplesTitle}</h2>
+              <p className="mt-4 max-w-[660px] text-[14px] leading-[1.7] text-[#22323A]/64">{page.examplesIntro}</p>
             </div>
-            <div className="mt-9 grid gap-5 md:grid-cols-3">
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
               {page.examples.map((example) => (
                 <article key={example.title} className="rounded-[18px] border border-[#22323A]/[0.08] bg-white/55 p-6">
-                  <h3 className="font-serif text-[25px] leading-[1.08] text-[#22323A]">{example.title}</h3>
+                  <h3 className="font-serif text-[24px] leading-[1.08]">{example.title}</h3>
                   <p className="mt-3 text-[13px] leading-[1.65] text-[#22323A]/64">{example.copy}</p>
                 </article>
               ))}
             </div>
+            <div className="mt-9 text-center"><Link href="/#shop" className="inline-flex min-h-[46px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition-colors hover:bg-[#9F783D]">Choose Your Card</Link></div>
           </div>
         </section>
 
-        <section className="border-y border-[#22323A]/[0.06] bg-[#F7F0E8] py-14 sm:py-16">
-          <div className="mx-auto w-full max-w-[1100px] px-5 sm:px-8">
+        <section className="border-y border-[#223233A]/[0.06] bg-[#F7F0E8] px-5 py-14 sm:px-8 sm:py-16">
+          <div className="mx-auto max-w-[920px]">
             <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">CHOOSE YOUR FORMAT</p>
-              <h2 className="mt-3 font-serif text-[39px] leading-[1.02] sm:text-[47px]">Three ways to give the moment.</h2>
-              <p className="mx-auto mt-4 max-w-[620px] text-[14px] leading-[1.7] text-[#22323A]/64">All three options use the same private UNIKMO experience. Choose the number of physical cards that fits the story you want to tell.</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">Questions</p>
+              <h2 className="mt-3 font-serif text-[34px] leading-[1.04] sm:text-[42px]">Questions about {page.primaryKeyword}.</h2>
             </div>
-            <div className="mt-10 grid gap-5 lg:grid-cols-3">
-              {PRODUCTS.map((product, index) => (
-                <article key={product.name} className="flex min-h-[310px] flex-col rounded-[20px] border border-[#22323A]/[0.08] bg-[#FCF9F4] p-7 shadow-[0_10px_28px_rgba(34,50,58,.04)]">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.17em] text-[#B38846]">{product.cards}</p>
-                      <h3 className="mt-2 font-serif text-[30px] leading-[1.03]">{product.name}</h3>
-                    </div>
-                    <div className="font-serif text-[34px] text-[#B38846]">{product.price}</div>
-                  </div>
-                  <p className="mt-6 text-[14px] leading-[1.65] text-[#22323A]/66">{page.productFit[index]}</p>
-                  <div className="mt-auto pt-8">
-                    <Link href="/#shop" className="inline-flex w-full items-center justify-center rounded-lg bg-[#22323A] px-5 py-3.5 text-[11px] font-medium text-white transition-colors hover:bg-[#34464F]">
-                      Create with {product.cards} →
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-14 sm:py-20">
-          <div className="mx-auto w-full max-w-[960px] px-5 sm:px-8">
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">QUESTIONS</p>
-              <h2 className="mt-3 font-serif text-[39px] leading-[1.02] sm:text-[47px]">Questions specific to {page.primaryKeyword}.</h2>
-            </div>
-            <div className="mt-9 divide-y divide-[#22323A]/[0.08] border-y border-[#22323A]/[0.08]">
+            <div className="mt-8 divide-y divide-[#22323A]/[0.08] border-y border-[#22323A]/[0.08]">
               {page.faqs.map((faq) => (
                 <details key={faq.question} className="group py-1">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[15px] font-medium text-[#22323A]">
-                    {faq.question}
-                    <span className="text-[#B38846] transition-transform group-open:rotate-45">+</span>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[15px] font-medium">
+                    {faq.question}<span className="text-[#B38846] transition-transform group-open:rotate-45">+</span>
                   </summary>
-                  <p className="max-w-[760px] pb-6 pr-12 text-[14px] leading-[1.7] text-[#22323A]/65">{faq.answer}</p>
+                  <p className="max-w-[760px] pb-6 pr-10 text-[14px] leading-[1.7] text-[#22323A]/64">{faq.answer}</p>
                 </details>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="border-t border-[#22323A]/[0.06] bg-[#F7F0E8] py-12 sm:py-14">
-          <div className="mx-auto w-full max-w-[1080px] px-5 text-center sm:px-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B38846]">EXPLORE RELATED GIFT IDEAS</p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <section className="px-5 py-12 text-center sm:px-8 sm:py-14">
+          <div className="mx-auto max-w-[880px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#B38846]">Explore related ideas</p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
               {page.related.map((slug) => {
                 const related = acquisitionPages[slug];
-                return (
-                  <Link key={slug} href={`/${slug}`} className="rounded-full border border-[#22323A]/[0.10] bg-[#FCF9F4] px-5 py-2.5 text-[12px] text-[#22323A]/70 transition-colors hover:border-[#B38846]/50 hover:text-[#B38846]">
-                    {related.primaryKeyword}
-                  </Link>
-                );
+                return related ? <Link key={slug} href={`/${slug}`} className="rounded-full border border-[#22323A]/[0.10] bg-white/55 px-4 py-2 text-[11px] text-[#22323A]/65 transition hover:border-[#B38846]/40 hover:text-[#B38846]">{related.primaryKeyword}</Link> : null;
               })}
             </div>
-            <div className="mt-8">
-              <Link href="/" className="text-[12px] font-medium text-[#22323A]/65 underline decoration-[#B38846]/40 underline-offset-4 transition-colors hover:text-[#B38846]">
-                Return to the main UNIKMO product page
-              </Link>
-            </div>
+            <h2 className="mx-auto mt-10 max-w-[680px] font-serif text-[32px] leading-[1.05] sm:text-[40px]">Give the feeling. Let the card carry it.</h2>
+            <p className="mx-auto mt-4 max-w-[620px] text-[14px] leading-[1.7] text-[#22323A]/62">Choose the number of UNIKMO cards that fits the moment you want to give.</p>
+            <Link href="/#shop" className="mt-7 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-8 text-[11px] font-medium text-white transition-colors hover:bg-[#9F783D]">Choose Your Card</Link>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-[#22323A]/[0.08] bg-[#FCF9F4] py-8">
-        <div className="mx-auto flex w-full max-w-[1080px] flex-col items-center justify-center gap-4 px-5 text-center text-[10px] uppercase tracking-[0.18em] text-[#22323A]/48 sm:px-8">
-          <span>UNIKMO © {new Date().getFullYear()}</span>
-          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+      <footer className="border-t border-[#22323A]/[0.08] bg-[#F7F0E8] py-8">
+        <div className="mx-auto flex max-w-[1080px] flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-8 sm:text-left">
+          <Image src="/unikmo-logo-header.png" alt="UNIKMO" width={729} height={220} className="h-8 w-auto" />
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.14em] text-[#22323A]/48">
             <Link href="/faq" className="hover:text-[#22323A]">FAQ</Link>
-            <Link href="/" className="hover:text-[#22323A]">Main Product Page</Link>
-            <Link href="/#shop" className="hover:text-[#22323A]">Create Your Moment</Link>
+            <Link href="/" className="hover:text-[#22323A]">UNIKMO</Link>
+            <Link href="/#shop" className="hover:text-[#22323A]">Choose Your Card</Link>
           </div>
         </div>
       </footer>
