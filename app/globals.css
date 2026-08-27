@@ -25,3 +25,17 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* UNIKMO conversion page: keep social proof to the two verified testimonial cards. */
+#stories .mt-10.grid > article:last-child {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  #stories .mt-10.grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
