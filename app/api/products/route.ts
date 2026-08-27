@@ -5,8 +5,46 @@ import { getEffectiveShopifyTestMode } from '@/lib/shopify-test-mode';
 
 export const dynamic = 'force-dynamic';
 
+const fallbackProducts = [
+  {
+    id: 'single-fallback',
+    title: 'Single Memory Card',
+    handle: 'single-memory-card',
+    image: '/cardfrontunikmo.jpg',
+    imageAlt: 'UNIKMO single memory card',
+    variantId: null,
+    price: '24',
+    currencyCode: 'USD',
+    variants: [],
+  },
+  {
+    id: 'four-fallback',
+    title: '4 Memory Cards',
+    handle: '4-memory-cards',
+    image: '/cardfrontsite4.png',
+    imageAlt: 'Four UNIKMO memory cards',
+    variantId: null,
+    price: '64',
+    currencyCode: 'USD',
+    variants: [],
+  },
+  {
+    id: 'seven-fallback',
+    title: '7 Memory Cards',
+    handle: '7-memory-cards',
+    image: '/cardfrontsite7.png',
+    imageAlt: 'Seven UNIKMO memory cards',
+    variantId: null,
+    price: '72',
+    currencyCode: 'USD',
+    variants: [],
+  },
+];
+
 /**
- * GET - Fetch products from Shopify and store domain for checkout links
+ * GET - Fetch products from Shopify and store domain for checkout links.
+ * If Shopify is unavailable in a preview, retain the same real UNIKMO
+ * product photography already used by the homepage.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -104,12 +142,9 @@ export async function GET(request: NextRequest) {
         };
       }) || [];
 
-    return NextResponse.json({ products, storeDomain });
+    return NextResponse.json({ products: products.length ? products : fallbackProducts, storeDomain });
   } catch (error: any) {
     console.error('Error fetching products:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch products', message: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ products: fallbackProducts, storeDomain: '' });
   }
 }
