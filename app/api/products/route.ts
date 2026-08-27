@@ -19,7 +19,7 @@ const fallbackProducts = [
   },
   {
     id: 'four-fallback',
-    title: '4 Memory Cards',
+    title: '4-Key Bundle',
     handle: '4-memory-cards',
     image: '/cardfrontsite4.png',
     imageAlt: 'Four UNIKMO memory cards',
@@ -30,7 +30,7 @@ const fallbackProducts = [
   },
   {
     id: 'seven-fallback',
-    title: '7 Memory Cards',
+    title: '7-Key Bundle',
     handle: '7-memory-cards',
     image: '/cardfrontsite7.png',
     imageAlt: 'Seven UNIKMO memory cards',
@@ -128,13 +128,14 @@ export async function GET(request: NextRequest) {
         const defaultVariant = variants[0] || null;
         const variantId = defaultVariant?.id || null;
         const price = defaultVariant?.price || null;
+        const normalizedTitle = String(node.title || '').replace(/7-Key Vault/gi, '7-Key Bundle');
 
         return {
           id: node.id,
-          title: node.title,
+          title: normalizedTitle,
           handle: node.handle,
           image: image?.url || null,
-          imageAlt: image?.altText || node.title,
+          imageAlt: image?.altText || normalizedTitle,
           variantId,
           price,
           currencyCode: shopCurrency,
