@@ -6,17 +6,11 @@ import { useEffect, useMemo, useState } from 'react';
 type Product = {
   id: string;
   title: string;
-  image?: string | null;
-  imageAlt?: string | null;
   price?: string | null;
   currencyCode?: string | null;
 };
 
 type ProductsResponse = { products?: Product[] };
-
-const GOLD = '#B38846';
-const NAVY = '#22323A';
-const CREAM = '#FCF9F4';
 
 const slides = [
   { image: '/story/matt-writes.png', caption: 'A thought becomes something worth keeping.', position: 'object-[50%_25%]' },
@@ -26,11 +20,13 @@ const slides = [
   { image: '/story/she-watches.png', caption: 'And the feeling can be revisited.', position: 'object-[42%_20%]' },
 ];
 
+// Use only UNIKMO-owned story imagery here. The previous occasion images
+// showed unrelated cards, which undermined product trust.
 const occasions = [
-  { title: 'Birthday', image: '/occasions/birthday.png' },
-  { title: 'Anniversary', image: '/occasions/anniversary.png' },
-  { title: 'Long-distance love', image: '/occasions/long-distance-love.png' },
-  { title: 'Just because', image: '/occasions/just-because.png' },
+  { title: 'Birthday', image: '/story/she-opens.png', position: 'object-[32%_20%]' },
+  { title: 'Anniversary', image: '/story/she-watches.png', position: 'object-[44%_20%]' },
+  { title: 'Long-distance love', image: '/story/she-scans.png', position: 'object-[38%_20%]' },
+  { title: 'Just because', image: '/story/matt-writes.png', position: 'object-[50%_24%]' },
 ];
 
 function formatCurrency(price?: string | null, currency?: string | null) {
@@ -38,6 +34,13 @@ function formatCurrency(price?: string | null, currency?: string | null) {
   const code = currency?.toUpperCase();
   const symbol = code === 'EUR' ? '€' : code === 'USD' ? '$' : code || '';
   return `${symbol}${Number(price).toFixed(2)}`;
+}
+
+function productVisual(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes('7') || t.includes('seven')) return '/cardfrontsite7-removebg-preview.png';
+  if (t.includes('4') || t.includes('four')) return '/cardfrontsite4-removebg-preview.png';
+  return '/cardfrontunikmo-removebg-preview.png';
 }
 
 function HeroCarousel() {
@@ -133,6 +136,12 @@ export default function TestPage() {
     return [...products].sort((a, b) => rank(a.title) - rank(b.title)).slice(0, 3);
   }, [products]);
 
+  const displayedProducts = orderedProducts.length ? orderedProducts : [
+    { id: 'single', title: 'Single Key', price: '24', currencyCode: 'USD' },
+    { id: 'four', title: '4-Key Bundle', price: '64', currencyCode: 'USD' },
+    { id: 'seven', title: '7-Key Vault', price: '72', currencyCode: 'USD' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#FCF9F4] text-[#22323A]">
       <Header />
@@ -147,7 +156,7 @@ export default function TestPage() {
           </div>
 
           <p className="mx-auto mt-7 max-w-[610px] text-[14px] leading-[1.7] text-[#22323A]/68 sm:text-[16px]">
-            A private video, voice note, photo or message — unlocked through a real UNIKMO A6 card they can hold and revisit.
+            A private video, voice note, photo or message — unlocked through a real UNIKMO card they can hold and revisit.
           </p>
           <a href="#shop" className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">
             Choose Your Card
@@ -160,20 +169,20 @@ export default function TestPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">One card. Two sides.</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">The card is the key. The memory is the gift.</h2>
               <p className="mx-auto mt-3 max-w-[560px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">
-                These are the actual UNIKMO A6 card designs — not recreated mockups.
+                The real UNIKMO card — front and back.
               </p>
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               <figure>
                 <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#EFE4D9] shadow-[0_18px_45px_rgba(34,50,58,.08)]">
-                  <Image src="/card-front.png" alt="Actual front of the UNIKMO A6 card" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
+                  <Image src="/card-front.png" alt="Front of the UNIKMO card" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
                 </div>
                 <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Front</figcaption>
               </figure>
               <figure>
                 <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#F3EBE2] shadow-[0_18px_45px_rgba(34,50,58,.08)]">
-                  <Image src="/card-back.png" alt="Actual back of the UNIKMO A6 card with QR code and private key" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
+                  <Image src="/card-back.png" alt="Back of the UNIKMO card with QR code and private key" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
                 </div>
                 <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Back</figcaption>
               </figure>
@@ -207,7 +216,7 @@ export default function TestPage() {
             <div className="mt-9 grid grid-cols-2 gap-4 lg:grid-cols-4">
               {occasions.map((occasion) => (
                 <article key={occasion.title} className="group relative aspect-[4/3] overflow-hidden rounded-[18px]">
-                  <Image src={occasion.image} alt={occasion.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" sizes="(max-width:1024px) 50vw, 25vw" />
+                  <Image src={occasion.image} alt={occasion.title} fill className={`object-cover transition-transform duration-500 group-hover:scale-[1.03] ${occasion.position}`} sizes="(max-width:1024px) 50vw, 25vw" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/60 via-transparent to-transparent" />
                   <h3 className="absolute bottom-4 left-4 right-4 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-white">{occasion.title}</h3>
                 </article>
@@ -238,7 +247,16 @@ export default function TestPage() {
               ))}
 
               <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
-                <div className="relative aspect-[4/3]"><Image src="/testimonials/customer-phone.jpg" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
+                <div className="relative aspect-[4/3] bg-[#EFE8DF]">
+                  <Image
+                    src="/testimonials/customer-phone.jpg"
+                    alt="A real UNIKMO recipient smiling while viewing a private moment on her phone"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width:768px) 100vw, 33vw"
+                  />
+                </div>
                 <div className="p-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B38846]">Real recipient moment</p>
                   <p className="mt-3 font-serif text-[20px] leading-[1.4]">The product disappears. What remains is the reaction.</p>
@@ -249,24 +267,26 @@ export default function TestPage() {
         </section>
 
         <section id="shop" className="bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
-          <div className="mx-auto max-w-[1240px]">
+          <div className="mx-auto max-w-[1320px]">
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Choose your card</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">Pick the way you want to give it.</h2>
             </div>
 
             <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {(orderedProducts.length ? orderedProducts : [
-                { id: 'single', title: 'Single Card', image: '/card-front.png' },
-                { id: 'four', title: '4-Card Set', image: '/card-front.png' },
-                { id: 'seven', title: '7-Card Set', image: '/card-front.png' },
-              ]).map((product) => (
-                <article key={product.id} className="rounded-[20px] border border-[#22323A]/[0.07] bg-white/55 p-6 text-center">
-                  <div className="relative mx-auto aspect-[3/2] w-full max-w-[360px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
-                    {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-4" sizes="360px" /> : null}
+              {displayedProducts.map((product) => (
+                <article key={product.id} className="rounded-[20px] border border-[#22323A]/[0.07] bg-white/55 px-5 pb-7 pt-4 text-center sm:px-6">
+                  <div className="relative mx-auto aspect-[1.48/1] w-full max-w-[430px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
+                    <Image
+                      src={productVisual(product.title)}
+                      alt={product.title}
+                      fill
+                      className="object-contain scale-[1.18]"
+                      sizes="(max-width:768px) 92vw, 420px"
+                    />
                   </div>
-                  <h3 className="mt-5 font-serif text-[24px]">{product.title}</h3>
-                  {'price' in product && product.price ? <p className="mt-2 text-[14px] font-medium">{formatCurrency(product.price, product.currencyCode)}</p> : null}
+                  <h3 className="mt-4 font-serif text-[25px]">{product.title}</h3>
+                  {product.price ? <p className="mt-2 text-[14px] font-medium">{formatCurrency(product.price, product.currencyCode)}</p> : null}
                   <a href="/#shop" className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white">Choose This</a>
                 </article>
               ))}
