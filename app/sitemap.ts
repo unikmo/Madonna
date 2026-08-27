@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: `${base}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${base}/how-unikmo-works`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     ...acquisitionPages.map((slug) => ({
       url: `${base}/${slug}`,
       lastModified: now,
