@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from 'react';
 type Product = {
   id: string;
   title: string;
+  image?: string | null;
+  imageAlt?: string | null;
   price?: string | null;
   currencyCode?: string | null;
 };
@@ -20,13 +22,11 @@ const slides = [
   { image: '/story/she-watches.png', caption: 'And the feeling can be revisited.', position: 'object-[42%_20%]' },
 ];
 
-// Use only UNIKMO-owned story imagery here. The previous occasion images
-// showed unrelated cards, which undermined product trust.
 const occasions = [
-  { title: 'Birthday', image: '/story/she-opens.png', position: 'object-[32%_20%]' },
-  { title: 'Anniversary', image: '/story/she-watches.png', position: 'object-[44%_20%]' },
-  { title: 'Long-distance love', image: '/story/she-scans.png', position: 'object-[38%_20%]' },
-  { title: 'Just because', image: '/story/matt-writes.png', position: 'object-[50%_24%]' },
+  { title: 'Birthday', image: '/occasions/birthday.png', position: 'object-[50%_8%]' },
+  { title: 'Anniversary', image: '/occasions/anniversary.png', position: 'object-[50%_8%]' },
+  { title: 'Long-distance love', image: '/occasions/long-distance-love.png', position: 'object-[50%_10%]' },
+  { title: 'Just because', image: '/occasions/just-because.png', position: 'object-[50%_8%]' },
 ];
 
 function formatCurrency(price?: string | null, currency?: string | null) {
@@ -34,13 +34,6 @@ function formatCurrency(price?: string | null, currency?: string | null) {
   const code = currency?.toUpperCase();
   const symbol = code === 'EUR' ? '€' : code === 'USD' ? '$' : code || '';
   return `${symbol}${Number(price).toFixed(2)}`;
-}
-
-function productVisual(title: string) {
-  const t = title.toLowerCase();
-  if (t.includes('7') || t.includes('seven')) return '/cardfrontsite7-removebg-preview.png';
-  if (t.includes('4') || t.includes('four')) return '/cardfrontsite4-removebg-preview.png';
-  return '/cardfrontunikmo-removebg-preview.png';
 }
 
 function HeroCarousel() {
@@ -54,36 +47,16 @@ function HeroCarousel() {
   return (
     <div className="relative mx-auto aspect-[16/9] w-full max-w-[980px] overflow-hidden rounded-[22px] bg-[#E9E0D5] shadow-[0_24px_70px_rgba(34,50,58,.12)]">
       {slides.map((slide, i) => (
-        <div
-          key={slide.image}
-          className={`absolute inset-0 transition-opacity duration-700 ${i === index ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-          aria-hidden={i !== index}
-        >
-          <Image
-            src={slide.image}
-            alt={slide.caption}
-            fill
-            priority={i === 0}
-            sizes="(max-width: 1100px) 94vw, 980px"
-            className={`object-cover ${slide.position}`}
-          />
+        <div key={slide.image} className={`absolute inset-0 transition-opacity duration-700 ${i === index ? 'opacity-100' : 'pointer-events-none opacity-0'}`} aria-hidden={i !== index}>
+          <Image src={slide.image} alt={slide.caption} fill priority={i === 0} sizes="(max-width: 1100px) 94vw, 980px" className={`object-cover ${slide.position}`} />
         </div>
       ))}
-
       <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#17232A]/35 to-transparent" />
       <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4 sm:bottom-6 sm:left-7 sm:right-7">
-        <p className="max-w-[70%] text-left text-[11px] leading-relaxed text-white/95 sm:text-[13px]">
-          {slides[index].caption}
-        </p>
+        <p className="max-w-[70%] text-left text-[11px] leading-relaxed text-white/95 sm:text-[13px]">{slides[index].caption}</p>
         <div className="flex gap-2" aria-label="Hero story slides">
           {slides.map((slide, i) => (
-            <button
-              key={slide.image}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`Show story image ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
-            />
+            <button key={slide.image} type="button" onClick={() => setIndex(i)} aria-label={`Show story image ${i + 1}`} className={`h-1.5 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`} />
           ))}
         </div>
       </div>
@@ -95,9 +68,7 @@ function Header() {
   return (
     <header className="border-b border-[#22323A]/[0.06] bg-[#FCF9F4]/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center px-5 sm:px-8 lg:px-12">
-        <a href="#top" aria-label="UNIKMO home">
-          <Image src="/unikmo-logo-header.png" alt="UNIKMO — The Key to Your Memory" width={729} height={220} priority className="h-8 w-auto sm:h-9" />
-        </a>
+        <a href="#top" aria-label="UNIKMO home"><Image src="/unikmo-logo-header.png" alt="UNIKMO — The Key to Your Memory" width={729} height={220} priority className="h-8 w-auto sm:h-9" /></a>
         <nav className="ml-auto hidden items-center gap-8 text-[11px] text-[#22323A]/70 md:flex">
           <a href="#how" className="hover:text-[#B38846]">How it works</a>
           <a href="#moments" className="hover:text-[#B38846]">Occasions</a>
@@ -136,31 +107,15 @@ export default function TestPage() {
     return [...products].sort((a, b) => rank(a.title) - rank(b.title)).slice(0, 3);
   }, [products]);
 
-  const displayedProducts = orderedProducts.length ? orderedProducts : [
-    { id: 'single', title: 'Single Key', price: '24', currencyCode: 'USD' },
-    { id: 'four', title: '4-Key Bundle', price: '64', currencyCode: 'USD' },
-    { id: 'seven', title: '7-Key Vault', price: '72', currencyCode: 'USD' },
-  ];
-
   return (
     <div className="min-h-screen bg-[#FCF9F4] text-[#22323A]">
       <Header />
       <main>
         <section id="top" className="px-5 pb-14 pt-12 text-center sm:px-8 sm:pb-18 sm:pt-16 lg:pt-20">
-          <h1 className="mx-auto max-w-[760px] font-serif text-[30px] leading-[1.08] tracking-[-0.025em] sm:text-[38px] lg:text-[46px]">
-            Give a moment. They’ll keep it forever.
-          </h1>
-
-          <div className="mt-8 sm:mt-10">
-            <HeroCarousel />
-          </div>
-
-          <p className="mx-auto mt-7 max-w-[610px] text-[14px] leading-[1.7] text-[#22323A]/68 sm:text-[16px]">
-            A private video, voice note, photo or message — unlocked through a real UNIKMO card they can hold and revisit.
-          </p>
-          <a href="#shop" className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">
-            Choose Your Card
-          </a>
+          <h1 className="mx-auto max-w-[760px] font-serif text-[30px] leading-[1.08] tracking-[-0.025em] sm:text-[38px] lg:text-[46px]">Give a moment. They’ll keep it forever.</h1>
+          <div className="mt-8 sm:mt-10"><HeroCarousel /></div>
+          <p className="mx-auto mt-7 max-w-[610px] text-[14px] leading-[1.7] text-[#22323A]/68 sm:text-[16px]">A private video, voice note, photo or message — unlocked through a real UNIKMO card they can hold and revisit.</p>
+          <a href="#shop" className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Choose Your Card</a>
         </section>
 
         <section className="border-y border-[#22323A]/[0.06] bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
@@ -168,22 +123,15 @@ export default function TestPage() {
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">One card. Two sides.</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">The card is the key. The memory is the gift.</h2>
-              <p className="mx-auto mt-3 max-w-[560px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">
-                The real UNIKMO card — front and back.
-              </p>
+              <p className="mx-auto mt-3 max-w-[560px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">The real UNIKMO card — front and back.</p>
             </div>
-
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               <figure>
-                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#EFE4D9] shadow-[0_18px_45px_rgba(34,50,58,.08)]">
-                  <Image src="/card-front.png" alt="Front of the UNIKMO card" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
-                </div>
+                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#EFE4D9] shadow-[0_18px_45px_rgba(34,50,58,.08)]"><Image src="/card-front.png" alt="Front of the UNIKMO card" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" /></div>
                 <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Front</figcaption>
               </figure>
               <figure>
-                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#F3EBE2] shadow-[0_18px_45px_rgba(34,50,58,.08)]">
-                  <Image src="/card-back.png" alt="Back of the UNIKMO card with QR code and private key" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" />
-                </div>
+                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#F3EBE2] shadow-[0_18px_45px_rgba(34,50,58,.08)]"><Image src="/card-back.png" alt="Back of the UNIKMO card with QR code and private key" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" /></div>
                 <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Back</figcaption>
               </figure>
             </div>
@@ -216,7 +164,7 @@ export default function TestPage() {
             <div className="mt-9 grid grid-cols-2 gap-4 lg:grid-cols-4">
               {occasions.map((occasion) => (
                 <article key={occasion.title} className="group relative aspect-[4/3] overflow-hidden rounded-[18px]">
-                  <Image src={occasion.image} alt={occasion.title} fill className={`object-cover transition-transform duration-500 group-hover:scale-[1.03] ${occasion.position}`} sizes="(max-width:1024px) 50vw, 25vw" />
+                  <Image src={occasion.image} alt={occasion.title} fill className={`object-cover scale-[1.55] transition-transform duration-500 group-hover:scale-[1.60] ${occasion.position}`} sizes="(max-width:1024px) 50vw, 25vw" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/60 via-transparent to-transparent" />
                   <h3 className="absolute bottom-4 left-4 right-4 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-white">{occasion.title}</h3>
                 </article>
@@ -231,7 +179,6 @@ export default function TestPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Trust comes from people</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">The feeling is the proof.</h2>
             </div>
-
             <div className="mt-10 grid gap-5 md:grid-cols-3">
               {[
                 { image: '/testimonials/customer-london.jpg', quote: 'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.', name: 'Matt L., London' },
@@ -245,18 +192,8 @@ export default function TestPage() {
                   </div>
                 </article>
               ))}
-
               <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
-                <div className="relative aspect-[4/3] bg-[#EFE8DF]">
-                  <Image
-                    src="/testimonials/customer-phone.jpg"
-                    alt="A real UNIKMO recipient smiling while viewing a private moment on her phone"
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    sizes="(max-width:768px) 100vw, 33vw"
-                  />
-                </div>
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#EFE8DF]"><img src="/test/trust-image" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" className="absolute inset-0 h-full w-full object-cover" /></div>
                 <div className="p-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B38846]">Real recipient moment</p>
                   <p className="mt-3 font-serif text-[20px] leading-[1.4]">The product disappears. What remains is the reaction.</p>
@@ -267,25 +204,22 @@ export default function TestPage() {
         </section>
 
         <section id="shop" className="bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
-          <div className="mx-auto max-w-[1320px]">
+          <div className="mx-auto max-w-[1240px]">
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Choose your card</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">Pick the way you want to give it.</h2>
             </div>
-
             <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {displayedProducts.map((product) => (
-                <article key={product.id} className="rounded-[20px] border border-[#22323A]/[0.07] bg-white/55 px-5 pb-7 pt-4 text-center sm:px-6">
-                  <div className="relative mx-auto aspect-[1.48/1] w-full max-w-[430px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
-                    <Image
-                      src={productVisual(product.title)}
-                      alt={product.title}
-                      fill
-                      className="object-contain scale-[1.18]"
-                      sizes="(max-width:768px) 92vw, 420px"
-                    />
+              {(orderedProducts.length ? orderedProducts : [
+                { id: 'single', title: 'Single Card', image: '/card-front.png' },
+                { id: 'four', title: '4-Card Set', image: '/card-front.png' },
+                { id: 'seven', title: '7-Card Set', image: '/card-front.png' },
+              ]).map((product) => (
+                <article key={product.id} className="rounded-[20px] border border-[#22323A]/[0.07] bg-white/55 p-6 text-center">
+                  <div className="relative mx-auto aspect-[3/2] w-full max-w-[360px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
+                    {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-4" sizes="360px" /> : null}
                   </div>
-                  <h3 className="mt-4 font-serif text-[25px]">{product.title}</h3>
+                  <h3 className="mt-5 font-serif text-[24px]">{product.title}</h3>
                   {product.price ? <p className="mt-2 text-[14px] font-medium">{formatCurrency(product.price, product.currencyCode)}</p> : null}
                   <a href="/#shop" className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white">Choose This</a>
                 </article>
@@ -310,7 +244,6 @@ export default function TestPage() {
           </div>
         </section>
       </main>
-
       <footer className="border-t border-[#22323A]/[0.07] bg-[#F8F2EB] px-5 py-10 sm:px-8">
         <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-5 text-center sm:flex-row sm:text-left">
           <Image src="/unikmo-logo-header.png" alt="UNIKMO" width={729} height={220} className="h-8 w-auto" />
