@@ -27,7 +27,6 @@ const occasions = [
     title: 'Birthday',
     image: '/occasions/birthday.png',
     position: 'object-[50%_8%]',
-    eyebrow: 'Birthday',
     headline: 'Say the part a birthday card cannot hold.',
     copy: 'Record the message you would normally try to squeeze into a few lines, then give them a card they can scan and return to later.',
   },
@@ -35,7 +34,6 @@ const occasions = [
     title: 'Anniversary',
     image: '/occasions/anniversary.png',
     position: 'object-[50%_8%]',
-    eyebrow: 'Anniversary',
     headline: 'Give your shared story somewhere to live.',
     copy: 'Turn a voice note, video, photo or written memory into something physical they can keep with the date and the feeling attached.',
   },
@@ -43,7 +41,6 @@ const occasions = [
     title: 'Long-distance love',
     image: '/occasions/long-distance-love.png',
     position: 'object-[50%_10%]',
-    eyebrow: 'Long-distance love',
     headline: 'Keep something personal close when you cannot be.',
     copy: 'Send a private moment they can unlock on the hard days, the good days, or whenever hearing from you matters most.',
   },
@@ -51,7 +48,6 @@ const occasions = [
     title: 'Just because',
     image: '/occasions/just-because.png',
     position: 'object-[50%_8%]',
-    eyebrow: 'Just because',
     headline: 'Some gifts matter because no occasion required them.',
     copy: 'Create a small surprise around a memory, thank-you, apology or message that deserves more weight than another text.',
   },
@@ -68,24 +64,27 @@ function getProductDetails(title: string) {
   const t = title.toLowerCase();
   if (t.includes('7') || t.includes('seven')) {
     return {
-      count: '7 private memories',
-      explanation: 'A fuller memory journey told over time.',
+      count: '7 cards · 7 private memories',
+      explanation: 'Seven individual UNIKMO cards, each unlocking its own private moment.',
       use: 'Best for a sequence of meaningful moments',
+      button: 'Choose 7 Cards',
       bestValue: true,
     };
   }
   if (t.includes('4') || t.includes('four')) {
     return {
-      count: '4 private memories',
-      explanation: 'Four moments for a birthday, anniversary or open-when story.',
+      count: '4 cards · 4 private memories',
+      explanation: 'Four individual UNIKMO cards, each unlocking its own private moment.',
       use: 'Best for a multi-part gift',
+      button: 'Choose 4 Cards',
       bestValue: false,
     };
   }
   return {
-    count: '1 private memory',
-    explanation: 'One meaningful moment, connected to one UNIKMO key.',
+    count: '1 card · 1 private memory',
+    explanation: 'One UNIKMO card unlocking one private video, voice note, photo or message.',
     use: 'Best for one person, one occasion',
+    button: 'Choose Single',
     bestValue: false,
   };
 }
@@ -150,6 +149,27 @@ function CheckLine({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ProductStage({ side }: { side: 'front' | 'back' }) {
+  const isFront = side === 'front';
+  return (
+    <figure>
+      <div className="relative aspect-[1.48/1] overflow-hidden rounded-[22px] border border-[#22323A]/[0.07] bg-[radial-gradient(circle_at_50%_38%,#FFFDF9_0%,#F3EAE0_58%,#E8DDD1_100%)] shadow-[0_18px_45px_rgba(34,50,58,.08)]">
+        <div className="absolute left-[14%] right-[14%] bottom-[10%] h-[8%] rounded-full bg-[#846F5B]/15 blur-xl" />
+        <div className="absolute inset-[9%] overflow-hidden rounded-[8px] border border-white/55 bg-[#F8F2EA] shadow-[0_24px_45px_rgba(40,30,20,.18),0_4px_14px_rgba(40,30,20,.10)]">
+          <Image
+            src={isFront ? '/card-front.png' : '/card-back.png'}
+            alt={isFront ? 'Front of the UNIKMO card' : 'Back of the UNIKMO card with QR code and private key'}
+            fill
+            className="object-cover"
+            sizes="(min-width:768px) 42vw, 86vw"
+          />
+        </div>
+      </div>
+      <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">{isFront ? 'Front' : 'Back'}</figcaption>
+    </figure>
+  );
+}
+
 export default function TestPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeOccasion, setActiveOccasion] = useState(0);
@@ -179,12 +199,17 @@ export default function TestPage() {
       <main>
         <section id="top" className="px-5 pb-14 pt-12 text-center sm:px-8 sm:pb-18 sm:pt-16 lg:pt-20">
           <h1 className="mx-auto max-w-[760px] font-serif text-[30px] leading-[1.08] tracking-[-0.025em] sm:text-[38px] lg:text-[46px]">Give a moment. They’ll keep it forever.</h1>
-          <p className="mx-auto mt-5 max-w-[720px] text-[15px] leading-[1.65] text-[#22323A]/68 sm:text-[17px]">Turn a private video, voice note, photo or message into a beautifully made UNIKMO card they can scan, unlock and keep.</p>
+          <p className="mx-auto mt-5 max-w-[760px] text-[15px] leading-[1.62] text-[#22323A]/72 sm:text-[17px]">
+            <strong className="font-semibold text-[#22323A]">Turn a video, voice note, photo or message into a beautiful physical card.</strong> They scan it to unlock your private moment.
+          </p>
           <div className="mt-7 sm:mt-9"><HeroCarousel /></div>
           <div className="mx-auto mt-6 flex max-w-[620px] flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-[#22323A]/55 sm:text-[12px]">
             <span>No app required</span><span aria-hidden="true">•</span><span>Private by design</span><span aria-hidden="true">•</span><span>Made to revisit</span>
           </div>
-          <a href="#shop" className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Choose Your Card</a>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <a href="#shop" className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Choose Your Card</a>
+            <a href="#how" className="inline-flex min-h-[44px] items-center text-[11px] font-medium text-[#22323A]/70 underline decoration-[#B38846]/50 underline-offset-4 transition hover:text-[#22323A]">See how it works</a>
+          </div>
         </section>
 
         <section className="border-y border-[#22323A]/[0.06] bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
@@ -195,14 +220,8 @@ export default function TestPage() {
               <p className="mx-auto mt-3 max-w-[560px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">The real UNIKMO card — front and back.</p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-2">
-              <figure>
-                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#EFE4D9] shadow-[0_18px_45px_rgba(34,50,58,.08)]"><Image src="/card-front.png" alt="Front of the UNIKMO card" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" /></div>
-                <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Front</figcaption>
-              </figure>
-              <figure>
-                <div className="relative aspect-[1.48/1] overflow-hidden rounded-[18px] border border-[#22323A]/[0.07] bg-[#F3EBE2] shadow-[0_18px_45px_rgba(34,50,58,.08)]"><Image src="/card-back.png" alt="Back of the UNIKMO card with QR code and private key" fill className="object-cover" sizes="(min-width:768px) 48vw, 94vw" /></div>
-                <figcaption className="mt-3 text-center text-[11px] uppercase tracking-[0.18em] text-[#22323A]/55">Back</figcaption>
-              </figure>
+              <ProductStage side="front" />
+              <ProductStage side="back" />
             </div>
           </div>
         </section>
@@ -258,7 +277,7 @@ export default function TestPage() {
                 </div>
                 <div className="flex items-center p-7 text-left sm:p-10 lg:p-12">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#B38846]">{active.eyebrow}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#B38846]">{active.title}</p>
                     <h3 className="mt-4 max-w-[390px] font-serif text-[28px] leading-[1.15] sm:text-[34px]">{active.headline}</h3>
                     <p className="mt-5 max-w-[410px] text-[13px] leading-[1.75] text-[#22323A]/62 sm:text-[14px]">{active.copy}</p>
                     <a href="#shop" className="mt-7 inline-flex items-center gap-2 text-[11px] font-medium text-[#22323A] underline decoration-[#B38846]/55 underline-offset-4">Choose a card <span aria-hidden="true">→</span></a>
@@ -293,7 +312,7 @@ export default function TestPage() {
               </article>
 
               <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#EFE8DF]"><Image src="/testimonials/customer-phone-hq.webp" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" fill unoptimized className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#EFE8DF]"><img src="/test/trust-image?v=3" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" className="absolute inset-0 h-full w-full object-cover" /></div>
                 <div className="p-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B38846]">Real recipient moment</p>
                   <p className="mt-3 font-serif text-[20px] leading-[1.42]">The product disappears. <strong className="font-semibold text-[#17232A]">What remains is the reaction.</strong></p>
@@ -308,7 +327,7 @@ export default function TestPage() {
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Choose your card</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">Pick the way you want to give it.</h2>
-              <p className="mx-auto mt-3 max-w-[610px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">The difference is simple: how many separate private memories you want to give.</p>
+              <p className="mx-auto mt-3 max-w-[610px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">Same UNIKMO experience. Choose how many separate cards — and private memories — you want to give.</p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {(orderedProducts.length ? orderedProducts : [
@@ -320,18 +339,18 @@ export default function TestPage() {
                 return (
                   <article key={product.id} className="relative rounded-[20px] border border-[#22323A]/[0.07] bg-white/60 p-6 text-center shadow-[0_14px_40px_rgba(34,50,58,.04)]">
                     {details.bestValue ? <span className="absolute right-4 top-4 z-10 rounded-full bg-[#22323A] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white">Best value</span> : null}
-                    <div className="relative mx-auto aspect-[3/2] w-full max-w-[360px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
-                      {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-3" sizes="360px" /> : null}
+                    <div className="relative mx-auto aspect-[3/2] w-full max-w-[390px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
+                      {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-2" sizes="390px" /> : null}
                     </div>
                     <h3 className="mt-5 font-serif text-[24px]">{product.title}</h3>
                     <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#B38846]">{details.count}</p>
                     {product.price ? <p className="mt-3 text-[18px] font-medium text-[#22323A]">{formatCurrency(product.price, product.currencyCode)}</p> : null}
-                    <ul className="mx-auto mt-5 max-w-[290px] space-y-3 border-t border-[#22323A]/[0.07] pt-5">
+                    <ul className="mx-auto mt-5 max-w-[300px] space-y-3 border-t border-[#22323A]/[0.07] pt-5">
                       <CheckLine>{details.explanation}</CheckLine>
-                      <CheckLine>QR code + private access code</CheckLine>
+                      <CheckLine>QR code + private access code on every card</CheckLine>
                       <CheckLine>{details.use}</CheckLine>
                     </ul>
-                    <a href="/#shop" className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white transition hover:bg-[#17232A]">Choose This</a>
+                    <a href="/#shop" className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white transition hover:bg-[#17232A]">{details.button}</a>
                   </article>
                 );
               })}
