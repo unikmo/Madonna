@@ -20,11 +20,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: privateRoutes,
       },
-      {
-        userAgent: 'ClaudeBot',
-        allow: '/',
-        disallow: privateRoutes,
-      },
     ],
     sitemap: 'https://www.unikmo.com/sitemap.xml',
   };
