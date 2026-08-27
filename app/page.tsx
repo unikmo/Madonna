@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import HashAlias from '@/components/HashAlias';
 import TestPage from './test/page';
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="production-home">
+      <HashAlias />
       <TestPage />
       <style>{`.production-home footer { display: none; }`}</style>
     </div>
