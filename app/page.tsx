@@ -8,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <TestPage />;
+  return (
+    <div className="production-home">
+      <TestPage />
+      <style>{`.production-home footer { display: none; }`}</style>
+    </div>
+  );
 }
