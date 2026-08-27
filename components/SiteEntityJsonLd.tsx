@@ -36,6 +36,19 @@ export default function SiteEntityJsonLd() {
           'Official website for UNIKMO physical memory cards and private digital moments.',
         publisher: { '@id': 'https://www.unikmo.com/#organization' },
         inLanguage: 'en',
+        hasPart: [
+          {
+            '@type': 'WebPage',
+            '@id': 'https://www.unikmo.com/how-unikmo-works#webpage',
+            url: 'https://www.unikmo.com/how-unikmo-works',
+            name: 'How UNIKMO Works',
+          },
+          {
+            '@type': 'WebPage',
+            url: 'https://www.unikmo.com/faq',
+            name: 'UNIKMO FAQ',
+          },
+        ],
       },
     ],
   };
