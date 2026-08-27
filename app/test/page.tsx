@@ -23,10 +23,38 @@ const slides = [
 ];
 
 const occasions = [
-  { title: 'Birthday', image: '/occasions/birthday.png', position: 'object-[50%_8%]' },
-  { title: 'Anniversary', image: '/occasions/anniversary.png', position: 'object-[50%_8%]' },
-  { title: 'Long-distance love', image: '/occasions/long-distance-love.png', position: 'object-[50%_10%]' },
-  { title: 'Just because', image: '/occasions/just-because.png', position: 'object-[50%_8%]' },
+  {
+    title: 'Birthday',
+    image: '/occasions/birthday.png',
+    position: 'object-[50%_8%]',
+    eyebrow: 'Birthday',
+    headline: 'Say the part a birthday card cannot hold.',
+    copy: 'Record the message you would normally try to squeeze into a few lines, then give them a card they can scan and return to later.',
+  },
+  {
+    title: 'Anniversary',
+    image: '/occasions/anniversary.png',
+    position: 'object-[50%_8%]',
+    eyebrow: 'Anniversary',
+    headline: 'Give your shared story somewhere to live.',
+    copy: 'Turn a voice note, video, photo or written memory into something physical they can keep with the date and the feeling attached.',
+  },
+  {
+    title: 'Long-distance love',
+    image: '/occasions/long-distance-love.png',
+    position: 'object-[50%_10%]',
+    eyebrow: 'Long-distance love',
+    headline: 'Keep something personal close when you cannot be.',
+    copy: 'Send a private moment they can unlock on the hard days, the good days, or whenever hearing from you matters most.',
+  },
+  {
+    title: 'Just because',
+    image: '/occasions/just-because.png',
+    position: 'object-[50%_8%]',
+    eyebrow: 'Just because',
+    headline: 'Some gifts matter because no occasion required them.',
+    copy: 'Create a small surprise around a memory, thank-you, apology or message that deserves more weight than another text.',
+  },
 ];
 
 function formatCurrency(price?: string | null, currency?: string | null) {
@@ -34,6 +62,32 @@ function formatCurrency(price?: string | null, currency?: string | null) {
   const code = currency?.toUpperCase();
   const symbol = code === 'EUR' ? '€' : code === 'USD' ? '$' : code || '';
   return `${symbol}${Number(price).toFixed(2)}`;
+}
+
+function getProductDetails(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes('7') || t.includes('seven')) {
+    return {
+      count: '7 private memories',
+      explanation: 'A fuller memory journey told over time.',
+      use: 'Best for a sequence of meaningful moments',
+      bestValue: true,
+    };
+  }
+  if (t.includes('4') || t.includes('four')) {
+    return {
+      count: '4 private memories',
+      explanation: 'Four moments for a birthday, anniversary or open-when story.',
+      use: 'Best for a multi-part gift',
+      bestValue: false,
+    };
+  }
+  return {
+    count: '1 private memory',
+    explanation: 'One meaningful moment, connected to one UNIKMO key.',
+    use: 'Best for one person, one occasion',
+    bestValue: false,
+  };
 }
 
 function HeroCarousel() {
@@ -87,8 +141,18 @@ function TrustIcon({ kind }: { kind: 'lock' | 'phone' | 'leaf' | 'quality' }) {
   return <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>;
 }
 
+function CheckLine({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3 text-left text-[12px] leading-[1.55] text-[#22323A]/68">
+      <span className="mt-[2px] flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full border border-[#B38846]/45 text-[10px] font-semibold text-[#B38846]">✓</span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
 export default function TestPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [activeOccasion, setActiveOccasion] = useState(0);
 
   useEffect(() => {
     fetch('/api/products')
@@ -107,14 +171,19 @@ export default function TestPage() {
     return [...products].sort((a, b) => rank(a.title) - rank(b.title)).slice(0, 3);
   }, [products]);
 
+  const active = occasions[activeOccasion];
+
   return (
     <div className="min-h-screen bg-[#FCF9F4] text-[#22323A]">
       <Header />
       <main>
         <section id="top" className="px-5 pb-14 pt-12 text-center sm:px-8 sm:pb-18 sm:pt-16 lg:pt-20">
           <h1 className="mx-auto max-w-[760px] font-serif text-[30px] leading-[1.08] tracking-[-0.025em] sm:text-[38px] lg:text-[46px]">Give a moment. They’ll keep it forever.</h1>
-          <div className="mt-8 sm:mt-10"><HeroCarousel /></div>
-          <p className="mx-auto mt-7 max-w-[610px] text-[14px] leading-[1.7] text-[#22323A]/68 sm:text-[16px]">A private video, voice note, photo or message — unlocked through a real UNIKMO card they can hold and revisit.</p>
+          <p className="mx-auto mt-5 max-w-[720px] text-[15px] leading-[1.65] text-[#22323A]/68 sm:text-[17px]">Turn a private video, voice note, photo or message into a beautifully made UNIKMO card they can scan, unlock and keep.</p>
+          <div className="mt-7 sm:mt-9"><HeroCarousel /></div>
+          <div className="mx-auto mt-6 flex max-w-[620px] flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-[#22323A]/55 sm:text-[12px]">
+            <span>No app required</span><span aria-hidden="true">•</span><span>Private by design</span><span aria-hidden="true">•</span><span>Made to revisit</span>
+          </div>
           <a href="#shop" className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Choose Your Card</a>
         </section>
 
@@ -159,16 +228,43 @@ export default function TestPage() {
         </section>
 
         <section id="moments" className="bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
-          <div className="mx-auto max-w-[1180px]">
-            <h2 className="text-center font-serif text-[31px] sm:text-[40px]">For life’s meaningful moments.</h2>
-            <div className="mt-9 grid grid-cols-2 gap-4 lg:grid-cols-4">
-              {occasions.map((occasion) => (
-                <article key={occasion.title} className="group relative aspect-[4/3] overflow-hidden rounded-[18px]">
-                  <Image src={occasion.image} alt={occasion.title} fill className={`object-cover scale-[1.55] transition-transform duration-500 group-hover:scale-[1.60] ${occasion.position}`} sizes="(max-width:1024px) 50vw, 25vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/60 via-transparent to-transparent" />
-                  <h3 className="absolute bottom-4 left-4 right-4 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-white">{occasion.title}</h3>
-                </article>
-              ))}
+          <div className="mx-auto max-w-[1160px]">
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Picture who it is for</p>
+              <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">For life’s meaningful moments.</h2>
+            </div>
+
+            <div className="mx-auto mt-8 grid max-w-[860px] grid-cols-2 gap-2 rounded-[16px] border border-[#22323A]/[0.07] bg-[#FCF9F4]/70 p-2 sm:grid-cols-4">
+              {occasions.map((occasion, index) => {
+                const selected = activeOccasion === index;
+                return (
+                  <button
+                    key={occasion.title}
+                    type="button"
+                    onClick={() => setActiveOccasion(index)}
+                    aria-pressed={selected}
+                    className={`min-h-[48px] rounded-[11px] px-3 py-2 text-[10px] font-medium uppercase tracking-[0.12em] transition ${selected ? 'bg-[#22323A] text-white shadow-sm' : 'text-[#22323A]/58 hover:bg-white hover:text-[#22323A]'}`}
+                  >
+                    {occasion.title}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-[22px] border border-[#22323A]/[0.07] bg-[#FCF9F4] shadow-[0_18px_55px_rgba(34,50,58,.07)]">
+              <div className="grid lg:grid-cols-[1.35fr_.85fr]">
+                <div className="relative aspect-[16/10] min-h-[300px] overflow-hidden lg:aspect-auto lg:min-h-[480px]">
+                  <Image key={active.image} src={active.image} alt={`${active.title} gifting moment`} fill className={`object-cover scale-[1.18] ${active.position}`} sizes="(max-width:1024px) 100vw, 62vw" />
+                </div>
+                <div className="flex items-center p-7 text-left sm:p-10 lg:p-12">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#B38846]">{active.eyebrow}</p>
+                    <h3 className="mt-4 max-w-[390px] font-serif text-[28px] leading-[1.15] sm:text-[34px]">{active.headline}</h3>
+                    <p className="mt-5 max-w-[410px] text-[13px] leading-[1.75] text-[#22323A]/62 sm:text-[14px]">{active.copy}</p>
+                    <a href="#shop" className="mt-7 inline-flex items-center gap-2 text-[11px] font-medium text-[#22323A] underline decoration-[#B38846]/55 underline-offset-4">Choose a card <span aria-hidden="true">→</span></a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -180,23 +276,27 @@ export default function TestPage() {
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">The feeling is the proof.</h2>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-3">
-              {[
-                { image: '/testimonials/customer-london.jpg', quote: 'I gave it to my partner for her birthday. She cried within seconds. It felt deeply personal — not just another gift.', name: 'Matt L., London' },
-                { image: '/testimonials/customer-newyork.jpg', quote: 'Such a simple idea, but incredibly powerful. The moment we unlocked the message together, it became something we’ll remember.', name: 'Sophie M., New York' },
-              ].map((item) => (
-                <article key={item.name} className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
-                  <div className="relative aspect-[4/3]"><Image src={item.image} alt={item.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
-                  <div className="p-6">
-                    <blockquote className="font-serif text-[20px] leading-[1.4]">“{item.quote}”</blockquote>
-                    <p className="mt-4 text-[11px] text-[#22323A]/55">— {item.name}</p>
-                  </div>
-                </article>
-              ))}
               <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#EFE8DF]"><img src="/test/trust-image" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" className="absolute inset-0 h-full w-full object-cover" /></div>
+                <div className="relative aspect-[4/3]"><Image src="/testimonials/customer-london.jpg" alt="Matt L., London" fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
+                <div className="p-6">
+                  <blockquote className="font-serif text-[20px] leading-[1.42]">“I gave it to my partner for her birthday. <strong className="font-semibold text-[#17232A]">She cried within seconds.</strong> It felt deeply personal — not just another gift.”</blockquote>
+                  <p className="mt-4 text-[11px] text-[#22323A]/55">— Matt L., London</p>
+                </div>
+              </article>
+
+              <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
+                <div className="relative aspect-[4/3]"><Image src="/testimonials/customer-newyork.jpg" alt="Sophie M., New York" fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
+                <div className="p-6">
+                  <blockquote className="font-serif text-[20px] leading-[1.42]">“Such a simple idea, but <strong className="font-semibold text-[#17232A]">incredibly powerful.</strong> The moment we unlocked the message together, it became something we’ll remember.”</blockquote>
+                  <p className="mt-4 text-[11px] text-[#22323A]/55">— Sophie M., New York</p>
+                </div>
+              </article>
+
+              <article className="overflow-hidden rounded-[20px] border border-[#22323A]/[0.07] bg-white/45">
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#EFE8DF]"><Image src="/testimonials/customer-phone-hq.webp" alt="A real UNIKMO recipient smiling while viewing a private moment on her phone" fill unoptimized className="object-cover" sizes="(max-width:768px) 100vw, 33vw" /></div>
                 <div className="p-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B38846]">Real recipient moment</p>
-                  <p className="mt-3 font-serif text-[20px] leading-[1.4]">The product disappears. What remains is the reaction.</p>
+                  <p className="mt-3 font-serif text-[20px] leading-[1.42]">The product disappears. <strong className="font-semibold text-[#17232A]">What remains is the reaction.</strong></p>
                 </div>
               </article>
             </div>
@@ -208,22 +308,33 @@ export default function TestPage() {
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Choose your card</p>
               <h2 className="mt-3 font-serif text-[31px] sm:text-[40px]">Pick the way you want to give it.</h2>
+              <p className="mx-auto mt-3 max-w-[610px] text-[13px] leading-relaxed text-[#22323A]/60 sm:text-[14px]">The difference is simple: how many separate private memories you want to give.</p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {(orderedProducts.length ? orderedProducts : [
-                { id: 'single', title: 'Single Card', image: '/card-front.png' },
-                { id: 'four', title: '4-Card Set', image: '/card-front.png' },
-                { id: 'seven', title: '7-Card Set', image: '/card-front.png' },
-              ]).map((product) => (
-                <article key={product.id} className="rounded-[20px] border border-[#22323A]/[0.07] bg-white/55 p-6 text-center">
-                  <div className="relative mx-auto aspect-[3/2] w-full max-w-[360px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
-                    {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-4" sizes="360px" /> : null}
-                  </div>
-                  <h3 className="mt-5 font-serif text-[24px]">{product.title}</h3>
-                  {product.price ? <p className="mt-2 text-[14px] font-medium">{formatCurrency(product.price, product.currencyCode)}</p> : null}
-                  <a href="/#shop" className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white">Choose This</a>
-                </article>
-              ))}
+                { id: 'single', title: 'Single Key', image: '/cardfrontunikmo.jpg', price: '24', currencyCode: 'USD' },
+                { id: 'four', title: '4-Key Bundle', image: '/cardfrontsite4.png', price: '64', currencyCode: 'USD' },
+                { id: 'seven', title: '7-Key Vault', image: '/cardfrontsite7.png', price: '72', currencyCode: 'USD' },
+              ]).map((product) => {
+                const details = getProductDetails(product.title);
+                return (
+                  <article key={product.id} className="relative rounded-[20px] border border-[#22323A]/[0.07] bg-white/60 p-6 text-center shadow-[0_14px_40px_rgba(34,50,58,.04)]">
+                    {details.bestValue ? <span className="absolute right-4 top-4 z-10 rounded-full bg-[#22323A] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white">Best value</span> : null}
+                    <div className="relative mx-auto aspect-[3/2] w-full max-w-[360px] overflow-hidden rounded-[16px] bg-[#FAF6F1]">
+                      {product.image ? <Image src={product.image} alt={product.imageAlt || product.title} fill unoptimized={product.image.startsWith('http')} className="object-contain p-3" sizes="360px" /> : null}
+                    </div>
+                    <h3 className="mt-5 font-serif text-[24px]">{product.title}</h3>
+                    <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#B38846]">{details.count}</p>
+                    {product.price ? <p className="mt-3 text-[18px] font-medium text-[#22323A]">{formatCurrency(product.price, product.currencyCode)}</p> : null}
+                    <ul className="mx-auto mt-5 max-w-[290px] space-y-3 border-t border-[#22323A]/[0.07] pt-5">
+                      <CheckLine>{details.explanation}</CheckLine>
+                      <CheckLine>QR code + private access code</CheckLine>
+                      <CheckLine>{details.use}</CheckLine>
+                    </ul>
+                    <a href="/#shop" className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#22323A] px-6 text-[11px] font-medium text-white transition hover:bg-[#17232A]">Choose This</a>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
