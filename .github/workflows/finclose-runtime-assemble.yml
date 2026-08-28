@@ -22,6 +22,15 @@ jobs:
           ref: finclose-v020-runtime
           fetch-depth: 0
 
+      - name: Restore coherent payload 00 baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            'https://raw.githubusercontent.com/unikmo/Unikmo/e0b3b69423d145ba821486d3693545aea1c5c3be/finclose_runtime/v0.20.0/payload_00.txt' \
+            --output finclose_runtime/v0.20.0/payload_00.txt
+          test "$(git hash-object finclose_runtime/v0.20.0/payload_00.txt)" = '807a23f9a4f703afefc085df14f89e0e54022d40'
+
       - name: Diagnose, assemble and unpack runtime
         shell: bash
         run: |
@@ -43,9 +52,6 @@ jobs:
           if not parts:
               raise SystemExit('No FinClose payload chunks found')
 
-          # Decode each staged Base64 chunk independently. All non-final chunks were
-          # intentionally written on 4-character boundaries, so this also tells us
-          # exactly which staged part first corrupts the XZ stream.
           compressed_parts: list[bytes] = []
           for p in parts:
               raw = p.read_text(encoding='utf-8').strip().encode('ascii')
@@ -81,8 +87,6 @@ jobs:
 
           compressed = b''.join(compressed_parts)
           decompressed = b''.join(output_parts)
-
-          # Cross-check the streaming result against a one-shot decode before writing files.
           verified = lzma.decompress(compressed)
           if verified != decompressed:
               raise SystemExit('XZ_VERIFY_MISMATCH streaming and one-shot outputs differ')
@@ -133,6 +137,8 @@ jobs:
           manifest = {
               'payload_chunks': [p.name for p in parts],
               'payload_count': len(parts),
+              'payload_00_blob': '807a23f9a4f703afefc085df14f89e0e54022d40',
+              'payload_baseline_commit': 'e0b3b69423d145ba821486d3693545aea1c5c3be',
               'encoded_bytes': sum(len(p.read_text(encoding='utf-8').strip()) for p in parts),
               'compressed_bytes': len(compressed),
               'compressed_sha256': hashlib.sha256(compressed).hexdigest(),
@@ -145,16 +151,19 @@ jobs:
           print(json.dumps(manifest, indent=2))
           PY
 
-      - name: Commit assembled runtime
+      - name: Commit repaired payload and assembled runtime
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add finclose_runtime/v0.20.0/assembled finclose_runtime/v0.20.0/assembly-manifest.json
+          git add \
+            finclose_runtime/v0.20.0/payload_00.txt \
+            finclose_runtime/v0.20.0/assembled \
+            finclose_runtime/v0.20.0/assembly-manifest.json
           if git diff --cached --quiet; then
             echo 'No assembly changes to commit.'
             exit 0
           fi
-          git commit -m 'FinClose v0.20: materialize verified Vercel runtime package'
+          git commit -m 'FinClose v0.20: repair payload and materialize verified runtime'
           git push origin HEAD:finclose-v020-runtime
