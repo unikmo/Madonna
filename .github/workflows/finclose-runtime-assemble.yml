@@ -1,0 +1,120 @@
+name: Assemble FinClose v0.20 runtime
+
+on:
+  push:
+    branches:
+      - finclose-v020-runtime
+    paths:
+      - 'finclose_runtime/v0.20.0/payload_*.txt'
+      - '.github/workflows/finclose-runtime-assemble.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: finclose-v020-runtime
+          fetch-depth: 0
+
+      - name: Assemble and unpack runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+          import base64
+          import hashlib
+          import io
+          import json
+          import lzma
+          import shutil
+          import tarfile
+          import zipfile
+          from pathlib import Path
+
+          root = Path('finclose_runtime/v0.20.0')
+          parts = sorted(root.glob('payload_*.txt'))
+          if not parts:
+              raise SystemExit('No FinClose payload chunks found')
+
+          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts).encode('ascii')
+          compressed = base64.b64decode(encoded, validate=True)
+          decompressed = lzma.decompress(compressed)
+
+          out = root / 'assembled'
+          if out.exists():
+              shutil.rmtree(out)
+          out.mkdir(parents=True)
+
+          def safe_target(base: Path, member: str) -> Path:
+              target = (base / member).resolve()
+              base_resolved = base.resolve()
+              if target != base_resolved and base_resolved not in target.parents:
+                  raise RuntimeError(f'Unsafe archive member: {member}')
+              return target
+
+          archive_type = 'binary'
+          if zipfile.is_zipfile(io.BytesIO(decompressed)):
+              archive_type = 'zip'
+              with zipfile.ZipFile(io.BytesIO(decompressed)) as zf:
+                  for info in zf.infolist():
+                      safe_target(out, info.filename)
+                  zf.extractall(out)
+          else:
+              tmp = root / '.runtime-decoded.tmp'
+              tmp.write_bytes(decompressed)
+              try:
+                  if tarfile.is_tarfile(tmp):
+                      archive_type = 'tar'
+                      with tarfile.open(tmp) as tf:
+                          for member in tf.getmembers():
+                              safe_target(out, member.name)
+                          tf.extractall(out)
+                  else:
+                      (out / 'runtime.bin').write_bytes(decompressed)
+              finally:
+                  tmp.unlink(missing_ok=True)
+
+          files = []
+          for p in sorted(x for x in out.rglob('*') if x.is_file()):
+              data = p.read_bytes()
+              files.append({
+                  'path': p.relative_to(out).as_posix(),
+                  'bytes': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest(),
+              })
+
+          manifest = {
+              'payload_chunks': [p.name for p in parts],
+              'payload_count': len(parts),
+              'encoded_bytes': len(encoded),
+              'encoded_sha256': hashlib.sha256(encoded).hexdigest(),
+              'compressed_bytes': len(compressed),
+              'compressed_sha256': hashlib.sha256(compressed).hexdigest(),
+              'decompressed_bytes': len(decompressed),
+              'decompressed_sha256': hashlib.sha256(decompressed).hexdigest(),
+              'archive_type': archive_type,
+              'files': files,
+          }
+          (root / 'assembly-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(manifest, indent=2))
+          PY
+
+      - name: Commit assembled runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add finclose_runtime/v0.20.0/assembled finclose_runtime/v0.20.0/assembly-manifest.json
+          if git diff --cached --quiet; then
+            echo 'No assembly changes to commit.'
+            exit 0
+          fi
+          git commit -m 'FinClose v0.20: materialize Vercel runtime package'
+          git push origin HEAD:finclose-v020-runtime
