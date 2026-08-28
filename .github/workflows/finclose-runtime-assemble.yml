@@ -7,6 +7,7 @@ on:
     paths:
       - 'finclose_runtime/v0.20.0/payload_*.txt'
       - '.github/workflows/finclose-runtime-assemble.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,7 +22,7 @@ jobs:
           ref: finclose-v020-runtime
           fetch-depth: 0
 
-      - name: Assemble and unpack runtime
+      - name: Diagnose, assemble and unpack runtime
         shell: bash
         run: |
           set -euo pipefail
@@ -42,9 +43,49 @@ jobs:
           if not parts:
               raise SystemExit('No FinClose payload chunks found')
 
-          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts).encode('ascii')
-          compressed = base64.b64decode(encoded, validate=True)
-          decompressed = lzma.decompress(compressed)
+          # Decode each staged Base64 chunk independently. All non-final chunks were
+          # intentionally written on 4-character boundaries, so this also tells us
+          # exactly which staged part first corrupts the XZ stream.
+          compressed_parts: list[bytes] = []
+          for p in parts:
+              raw = p.read_text(encoding='utf-8').strip().encode('ascii')
+              try:
+                  decoded = base64.b64decode(raw, validate=True)
+              except Exception as exc:
+                  raise SystemExit(f'BASE64_CORRUPTION part={p.name} chars={len(raw)} error={exc}') from exc
+              compressed_parts.append(decoded)
+              print(f'PART {p.name}: encoded={len(raw)} decoded={len(decoded)} sha256={hashlib.sha256(decoded).hexdigest()}')
+
+          decompressor = lzma.LZMADecompressor(format=lzma.FORMAT_AUTO)
+          output_parts: list[bytes] = []
+          for index, (p, chunk) in enumerate(zip(parts, compressed_parts)):
+              try:
+                  produced = decompressor.decompress(chunk)
+                  output_parts.append(produced)
+                  print(
+                      f'XZ FEED {p.name}: compressed={len(chunk)} produced={len(produced)} '
+                      f'eof={decompressor.eof} unused={len(decompressor.unused_data)}'
+                  )
+              except lzma.LZMAError as exc:
+                  previous = parts[index - 1].name if index else 'none'
+                  raise SystemExit(
+                      f'XZ_CORRUPTION first_detected_in={p.name} previous_part={previous} '
+                      f'compressed_offset={sum(len(x) for x in compressed_parts[:index])} error={exc}'
+                  ) from exc
+
+          if not decompressor.eof:
+              raise SystemExit(
+                  f'XZ_TRUNCATED after={parts[-1].name} compressed_bytes={sum(map(len, compressed_parts))}; '
+                  'the staged payload is missing tail bytes or its final chunk is incomplete'
+              )
+
+          compressed = b''.join(compressed_parts)
+          decompressed = b''.join(output_parts)
+
+          # Cross-check the streaming result against a one-shot decode before writing files.
+          verified = lzma.decompress(compressed)
+          if verified != decompressed:
+              raise SystemExit('XZ_VERIFY_MISMATCH streaming and one-shot outputs differ')
 
           out = root / 'assembled'
           if out.exists():
@@ -92,8 +133,7 @@ jobs:
           manifest = {
               'payload_chunks': [p.name for p in parts],
               'payload_count': len(parts),
-              'encoded_bytes': len(encoded),
-              'encoded_sha256': hashlib.sha256(encoded).hexdigest(),
+              'encoded_bytes': sum(len(p.read_text(encoding='utf-8').strip()) for p in parts),
               'compressed_bytes': len(compressed),
               'compressed_sha256': hashlib.sha256(compressed).hexdigest(),
               'decompressed_bytes': len(decompressed),
@@ -116,5 +156,5 @@ jobs:
             echo 'No assembly changes to commit.'
             exit 0
           fi
-          git commit -m 'FinClose v0.20: materialize Vercel runtime package'
+          git commit -m 'FinClose v0.20: materialize verified Vercel runtime package'
           git push origin HEAD:finclose-v020-runtime
