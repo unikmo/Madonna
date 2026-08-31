@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import HashAlias from '@/components/HashAlias';
+import CuratedUnikmoTeaser from '@/components/CuratedUnikmoTeaser';
 import TestPage from './test/page';
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function HomePage() {
     <div className="production-home">
       <HashAlias />
       <TestPage />
+      <CuratedUnikmoTeaser />
       <style>{`.production-home footer { display: none; }`}</style>
     </div>
   );
