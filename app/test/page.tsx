@@ -263,7 +263,7 @@ export default function TestPage() {
         <section id="curated" className="border-t border-[#B38846]/20 bg-[#FCF9F4] px-5 py-14 sm:px-8 lg:py-20">
           <div className="mx-auto grid max-w-[1240px] overflow-hidden rounded-[24px] border border-[#B38846]/35 bg-[#F8F2EB] shadow-[0_22px_65px_rgba(34,50,58,.07)] lg:grid-cols-[1.05fr_1fr]">
             <div className="relative min-h-[360px] overflow-hidden sm:min-h-[460px] lg:min-h-[600px]">
-              <Image src="/curated-anniversary-billboard.png" alt="An anniversary memory displayed on a Times Square billboard" fill className="object-cover" sizes="(max-width:1024px) 100vw, 52vw" />
+              <Image src="/curated-anniversary-billboard.webp" alt="An anniversary memory displayed on a Times Square billboard" fill className="object-cover" sizes="(max-width:1024px) 100vw, 52vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/18 via-transparent to-transparent" />
             </div>
             <div className="flex items-center p-7 sm:p-10 lg:p-12">
