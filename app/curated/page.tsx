@@ -26,8 +26,8 @@ const choices = [
     number: '01',
     label: 'KEEP IT',
     title: 'Keep It — Curated',
-    image: '/story/she-watches.png',
-    imageAlt: 'Someone revisiting a private UNIKMO memory on their phone beside the card',
+    image: '/occasions/anniversary.png',
+    imageAlt: 'A couple revisiting their finished UNIKMO memory',
     price: `$${CURATED_PRODUCTS.KEEP_IT.price}`,
     priceNote: 'Physical or digital delivery',
     href: curatedBuyUrl(CURATED_PRODUCTS.KEEP_IT.variants.physical.id),
@@ -46,8 +46,8 @@ const choices = [
     label: 'SHOW IT',
     title: 'Show It + Keep It',
     subtitle: 'Times Square Edition',
-    image: '/curated-anniversary-billboard.webp',
-    imageAlt: 'A curated UNIKMO memory shown on a Times Square billboard',
+    image: '/occasions/long-distance-love.png',
+    imageAlt: 'Someone watching their curated UNIKMO memory',
     price: `$${CURATED_PRODUCTS.SHOW_IT.price}`,
     priceNote: 'Everything in Keep It, plus Times Square',
     href: curatedBuyUrl(CURATED_PRODUCTS.SHOW_IT.variants.physical.id),
@@ -274,16 +274,7 @@ export default function CuratedPage() {
               </p>
             </div>
 
-            <div className="mt-10 grid gap-5 sm:grid-cols-2">
-              <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
-                <Image src="/curated-anniversary-billboard.webp" alt="A curated memory on a Times Square billboard" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
-              </div>
-              <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
-                <Image src="/occasions/anniversary.png" alt="A couple revisiting their curated UNIKMO memory" fill className="object-cover object-top" sizes="(max-width:640px) 100vw, 480px" />
-              </div>
-            </div>
-
-            <div className="mt-6 grid overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#22323A] text-white md:grid-cols-3">
+            <div className="mt-10 grid overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#22323A] text-white md:grid-cols-3">
               {[
                 ['POP', 'Capture the celebration in your own way.'],
                 ['TIMES SQUARE', 'Take the finished moment public.'],
