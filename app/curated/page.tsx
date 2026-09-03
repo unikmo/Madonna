@@ -186,8 +186,8 @@ export default function CuratedPage() {
           <div className="mx-auto mt-9 grid max-w-[1180px] gap-5 lg:grid-cols-2">
             <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
               <Image
-                src="/curated-anniversary-billboard.webp"
-                alt="A curated UNIKMO memory on a Times Square billboard as friends watch"
+                src="/story/she-watches.png"
+                alt="Someone revisiting their finished UNIKMO memory"
                 fill
                 priority
                 className="object-cover"

@@ -54,8 +54,8 @@ export default function CuratedUnikmoTeaser() {
       <div className="mx-auto grid max-w-[1240px] overflow-hidden rounded-[24px] border border-[#B38846]/35 bg-[#F8F2EB] shadow-[0_22px_65px_rgba(34,50,58,.07)] lg:grid-cols-[1.05fr_1fr]">
         <div className="relative min-h-[360px] overflow-hidden sm:min-h-[460px] lg:min-h-[600px]">
           <Image
-            src="/curated-anniversary-billboard.webp"
-            alt="A curated UNIKMO memory shown on a Times Square billboard"
+            src="/story/matt-writes.png"
+            alt="Choosing the moments to send for a curated UNIKMO memory"
             fill
             className="object-cover"
             sizes="(max-width:1024px) 100vw, 52vw"
