@@ -1,0 +1,31 @@
+name: FinClose Firebase CI
+
+on:
+  push:
+    branches:
+      - finclose-firebase
+    paths:
+      - 'finclose_firebase/**'
+      - '.github/workflows/finclose-firebase-ci.yml'
+  pull_request:
+    paths:
+      - 'finclose_firebase/**'
+      - '.github/workflows/finclose-firebase-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: finclose_firebase
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build static Firebase artifact
+        run: npm run build
+      - name: Verify Firebase output
+        run: test -f out/index.html
