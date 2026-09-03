@@ -104,7 +104,7 @@ export default function CuratedUnikmoTeaser() {
 
             <div className="mt-7 flex flex-wrap items-center gap-5">
               <Link
-                href="/curated#brief"
+                href="/curated#order"
                 className="inline-flex min-h-[46px] items-center justify-center rounded-lg bg-[#B38846] px-6 text-[11px] font-medium text-white transition hover:bg-[#9D773D]"
               >
                 Have Us Create It <span className="ml-2" aria-hidden="true">&rarr;</span>

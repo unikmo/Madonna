@@ -1,121 +1,91 @@
 /**
- * Curated UNIKMO Shopify Product Configuration
- * Product IDs and pricing for the curated service offerings
+ * Curated UNIKMO — Shopify product configuration.
  *
- * IMPORTANT: Update these IDs after creating products in Shopify
+ * These are live products in the Unikmo Shopify store (created 2026-09).
+ * Numeric variant IDs are used to build Shopify cart permalinks
+ * (https://<domain>/cart/<variantId>:<qty>,...), which drop the buyer
+ * straight into Shopify checkout.
  */
 
-export interface CuratedProduct {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  basePrice: number;
-  variants: Array<{
-    title: string;
-    variantId: string;
-    price: number;
-  }>;
-}
+export const SHOPIFY_STORE_DOMAIN =
+  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace(/^https?:\/\//, '').replace(/\/$/, '') ||
+  'unikmo.myshopify.com';
 
-// TODO: Replace these IDs with real Shopify product IDs after creation
-// Format: gid://shopify/Product/XXXXXXXXXX
+export type CuratedExperienceKey = 'KEEP_IT' | 'SHOW_IT';
+export type CuratedDeliveryKey = 'physical' | 'digital';
 
 export const CURATED_PRODUCTS = {
-  // Keep It - Curated
   KEEP_IT: {
-    title: 'Curated UNIKMO - Keep It',
-    slug: 'curated-keep-it',
-    description: 'Professional curation and editing of your selected moments into one finished UNIKMO memory.',
-    testModeId: 'gid://shopify/Product/KEEP_IT_TEST_ID', // TODO: Update
-    productionId: 'gid://shopify/Product/KEEP_IT_PROD_ID', // TODO: Update
+    key: 'KEEP_IT',
+    label: 'Keep It — Curated',
+    productId: '16567461937497',
+    price: 199,
     variants: {
-      physical: {
-        title: 'Physical UNIKMO Card',
-        testModeVariantId: 'gid://shopify/ProductVariant/KEEP_IT_PHYSICAL_TEST', // TODO: Update
-        productionVariantId: 'gid://shopify/ProductVariant/KEEP_IT_PHYSICAL_PROD', // TODO: Update
-        basePrice: 0, // TODO: Set pricing
-      },
-      digital: {
-        title: 'Digital Delivery',
-        testModeVariantId: 'gid://shopify/ProductVariant/KEEP_IT_DIGITAL_TEST', // TODO: Update
-        productionVariantId: 'gid://shopify/ProductVariant/KEEP_IT_DIGITAL_PROD', // TODO: Update
-        basePrice: 0, // TODO: Set pricing (usually lower than physical)
-      },
+      physical: { id: '59289396805977', label: 'Physical UNIKMO card' },
+      digital: { id: '59289396838745', label: 'Digital delivery' },
     },
   },
-
-  // Show It - Times Square Edition
   SHOW_IT: {
-    title: 'Curated UNIKMO - Times Square Edition',
-    slug: 'curated-show-it-times-square',
-    description: 'Professional curation with a Times Square appearance. The public moment is captured and incorporated into your finished UNIKMO memory.',
-    testModeId: 'gid://shopify/Product/SHOW_IT_TEST_ID', // TODO: Update
-    productionId: 'gid://shopify/Product/SHOW_IT_PROD_ID', // TODO: Update
+    key: 'SHOW_IT',
+    label: 'Show It — Times Square Edition',
+    productId: '16567462461785',
+    price: 399,
     variants: {
-      physical: {
-        title: 'Physical UNIKMO Card',
-        testModeVariantId: 'gid://shopify/ProductVariant/SHOW_IT_PHYSICAL_TEST', // TODO: Update
-        productionVariantId: 'gid://shopify/ProductVariant/SHOW_IT_PHYSICAL_PROD', // TODO: Update
-        basePrice: 0, // TODO: Set pricing (premium)
-      },
-      digital: {
-        title: 'Digital Delivery',
-        testModeVariantId: 'gid://shopify/ProductVariant/SHOW_IT_DIGITAL_TEST', // TODO: Update
-        productionVariantId: 'gid://shopify/ProductVariant/SHOW_IT_DIGITAL_PROD', // TODO: Update
-        basePrice: 0, // TODO: Set pricing
-      },
+      physical: { id: '59289397395801', label: 'Physical UNIKMO card' },
+      digital: { id: '59289397428569', label: 'Digital delivery' },
     },
   },
-
-  // Extra Keepsakes
   EXTRA_KEEPSAKES: {
-    title: 'Curated UNIKMO - Extra Keepsake Card',
-    slug: 'curated-extra-keepsakes',
-    description: 'Additional physical UNIKMO cards with the same finished curated memory.',
-    testModeId: 'gid://shopify/Product/EXTRAS_TEST_ID', // TODO: Update
-    productionId: 'gid://shopify/Product/EXTRAS_PROD_ID', // TODO: Update
+    key: 'EXTRA_KEEPSAKES',
+    label: 'Extra Keepsake Card',
+    productId: '16567463117145',
+    pricePerCard: 12,
     variants: {
-      standard: {
-        title: '1 Extra Card',
-        testModeVariantId: 'gid://shopify/ProductVariant/EXTRAS_TEST', // TODO: Update
-        productionVariantId: 'gid://shopify/ProductVariant/EXTRAS_PROD', // TODO: Update
-        pricePerCard: 12, // Fixed price per card
-      },
+      standard: { id: '59289398477145', label: 'Extra keepsake card' },
     },
   },
-};
+} as const;
 
-export function getCuratedProductId(productKey: keyof typeof CURATED_PRODUCTS, isTestMode: boolean): string {
-  const product = CURATED_PRODUCTS[productKey];
-  return isTestMode ? product.testModeId : product.productionId;
+export interface CuratedCartItem {
+  id: string;
+  quantity: number;
 }
 
-export function getCuratedVariantId(
-  productKey: keyof typeof CURATED_PRODUCTS,
-  variantKey: string,
-  isTestMode: boolean
-): string {
-  const product = CURATED_PRODUCTS[productKey];
-  const variant = (product.variants as any)[variantKey];
+/** Builds a Shopify cart permalink that lands the buyer in checkout. */
+export function curatedCartUrl(items: CuratedCartItem[]): string {
+  const cart = items
+    .filter((item) => item.id && item.quantity > 0)
+    .map((item) => `${item.id}:${item.quantity}`)
+    .join(',');
+  return `https://${SHOPIFY_STORE_DOMAIN}/cart/${cart}`;
+}
 
-  if (!variant) {
-    throw new Error(`Variant ${variantKey} not found for product ${productKey}`);
+/** Resolves the experience + delivery + extras selection to Shopify cart items. */
+export function curatedCartItems(options: {
+  experience: CuratedExperienceKey;
+  delivery: CuratedDeliveryKey;
+  extraKeepsakes?: number;
+}): CuratedCartItem[] {
+  const product = CURATED_PRODUCTS[options.experience];
+  const variant = product.variants[options.delivery];
+  const items: CuratedCartItem[] = [{ id: variant.id, quantity: 1 }];
+
+  const extras = Math.max(0, Math.min(50, Math.floor(options.extraKeepsakes ?? 0)));
+  if (extras > 0) {
+    items.push({ id: CURATED_PRODUCTS.EXTRA_KEEPSAKES.variants.standard.id, quantity: extras });
   }
-
-  return isTestMode ? variant.testModeVariantId : variant.productionVariantId;
+  return items;
 }
 
-export function calculateCuratedPrice(
-  baseServicePrice: number,
-  extraKeepsakesCount: number
-): { basePrice: number; extrasPrice: number; totalPrice: number } {
-  const extrasPrice = extraKeepsakesCount * CURATED_PRODUCTS.EXTRA_KEEPSAKES.variants.standard.pricePerCard;
-  const totalPrice = baseServicePrice + extrasPrice;
+export function curatedCheckoutUrl(options: {
+  experience: CuratedExperienceKey;
+  delivery: CuratedDeliveryKey;
+  extraKeepsakes?: number;
+}): string {
+  return curatedCartUrl(curatedCartItems(options));
+}
 
-  return {
-    basePrice: baseServicePrice,
-    extrasPrice,
-    totalPrice,
-  };
+/** Direct "buy now" link for a single curated line item. */
+export function curatedBuyUrl(variantId: string, quantity = 1): string {
+  return curatedCartUrl([{ id: variantId, quantity }]);
 }

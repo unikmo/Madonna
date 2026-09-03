@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import CuratedInquiryForm from '@/components/CuratedInquiryForm';
+import CuratedCheckout from '@/components/CuratedCheckout';
+import { CURATED_PRODUCTS, curatedBuyUrl } from '@/lib/curated-products';
 
 export const metadata: Metadata = {
   title: 'Curated UNIKMO | Keep It, Show It, Share It',
@@ -25,6 +26,12 @@ const choices = [
     number: '01',
     label: 'KEEP IT',
     title: 'Keep It — Curated',
+    image: '/curated/keep-it-card.webp',
+    imageAlt: 'A finished UNIKMO keepsake card beside printed photos',
+    price: `$${CURATED_PRODUCTS.KEEP_IT.price}`,
+    priceNote: 'Physical or digital delivery',
+    href: curatedBuyUrl(CURATED_PRODUCTS.KEEP_IT.variants.physical.id),
+    cta: 'Buy Keep It',
     description:
       'You send the photos, videos and messages you want us to work with. We select, sequence and edit them into one finished memory worth keeping.',
     points: [
@@ -39,10 +46,16 @@ const choices = [
     label: 'SHOW IT',
     title: 'Show It + Keep It',
     subtitle: 'Times Square Edition',
+    image: '/curated/show-it-card.webp',
+    imageAlt: 'A UNIKMO card held up in front of a Times Square billboard',
+    price: `$${CURATED_PRODUCTS.SHOW_IT.price}`,
+    priceNote: 'Everything in Keep It, plus Times Square',
+    href: curatedBuyUrl(CURATED_PRODUCTS.SHOW_IT.variants.physical.id),
+    cta: 'Buy Show It',
     description:
       'Take the finished moment public. We prepare the Times Square creative, coordinate the appearance, capture it, and incorporate that public moment into the finished UNIKMO memory.',
     points: [
-      'Everything in Curated',
+      'Everything in Keep It — Curated',
       'Times Square creative preparation',
       'Times Square appearance, subject to availability',
       'Display capture incorporated into the finished memory',
@@ -52,13 +65,19 @@ const choices = [
     number: '03',
     label: 'SHARE IT',
     title: 'Extra Keepsakes',
+    image: '/curated/share-keepsakes.webp',
+    imageAlt: 'Four hands holding matching UNIKMO keepsake cards',
+    price: `$${CURATED_PRODUCTS.EXTRA_KEEPSAKES.pricePerCard} each`,
+    priceNote: 'Add any quantity at checkout',
+    href: curatedBuyUrl(CURATED_PRODUCTS.EXTRA_KEEPSAKES.variants.standard.id),
+    cta: 'Buy an extra card',
     description:
       'Give the same finished curated memory to family, friends, colleagues or employees who were part of it.',
     points: [
       '$12 per additional physical UNIKMO card',
-      '3 additional cards = $36',
       'Same finished curated memory',
-      'Larger quantities can be requested in the brief',
+      'Add several during checkout',
+      'Larger quantities can be requested after ordering',
     ],
   },
 ] as const;
@@ -70,6 +89,11 @@ const faqs = [
       'Curated UNIKMO is an optional concierge service. You intentionally send UNIKMO the photos, videos and messages you want professionally assembled into one finished memory.',
   },
   {
+    question: 'How much does Curated UNIKMO cost?',
+    answer:
+      'Keep It — Curated is $199. Show It — Times Square Edition is $399 and includes everything in Keep It plus the Times Square appearance and its capture. Additional physical keepsake cards are $12 each and can be added at checkout. Prices are in USD.',
+  },
+  {
     question: 'What is the Times Square Edition?',
     answer:
       'Times Square Edition adds a public Times Square appearance to the curated service. The appearance is captured and incorporated into the finished UNIKMO memory, subject to scheduling and availability.',
@@ -77,7 +101,7 @@ const faqs = [
   {
     question: 'Can Curated UNIKMO be delivered digitally?',
     answer:
-      'Yes. The curated experience can be requested with digital delivery or with a personalized physical UNIKMO card.',
+      'Yes. Choose digital delivery or a personalized physical UNIKMO card at checkout — the price is the same either way.',
   },
   {
     question: 'How much are extra Curated UNIKMO cards?',
@@ -115,6 +139,11 @@ export default function CuratedPage() {
     url: 'https://www.unikmo.com/curated',
     description:
       'Customers intentionally submit selected photos, videos and messages for professional curation into a finished UNIKMO memory, with an optional Times Square Edition and additional physical keepsakes.',
+    offers: [
+      { '@type': 'Offer', name: 'Keep It — Curated', price: String(CURATED_PRODUCTS.KEEP_IT.price), priceCurrency: 'USD' },
+      { '@type': 'Offer', name: 'Show It — Times Square Edition', price: String(CURATED_PRODUCTS.SHOW_IT.price), priceCurrency: 'USD' },
+      { '@type': 'Offer', name: 'Extra Keepsake Card', price: String(CURATED_PRODUCTS.EXTRA_KEEPSAKES.pricePerCard), priceCurrency: 'USD' },
+    ],
   };
 
   const faqSchema = {
@@ -143,44 +172,51 @@ export default function CuratedPage() {
             <Link href="/how-unikmo-works" className="hover:text-[#B38846]">How it works</Link>
             <Link href="/faq" className="hover:text-[#B38846]">FAQ</Link>
           </nav>
-          <a href="#brief" className="ml-auto rounded-lg bg-[#B38846] px-5 py-3 text-[11px] font-medium text-white transition hover:bg-[#9D773D] md:ml-8">Start Curated</a>
+          <a href="#order" className="ml-auto rounded-lg bg-[#B38846] px-5 py-3 text-[11px] font-medium text-white transition hover:bg-[#9D773D] md:ml-8">Start Curated</a>
         </div>
       </header>
 
       <main>
-        <section className="px-5 pb-14 pt-14 sm:px-8 sm:pb-16 sm:pt-18 lg:pt-20">
-          <div className="mx-auto grid max-w-[1120px] items-center gap-10 lg:grid-cols-[1fr_.9fr] lg:gap-14">
-            <div className="text-center lg:text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Curated UNIKMO</p>
-              <h1 className="mt-4 font-serif text-[39px] leading-[1.04] tracking-[-0.025em] sm:text-[50px] lg:text-[58px]">You bring the moments. We make the memory.</h1>
-              <p className="mt-5 max-w-[670px] text-[15px] leading-[1.75] text-[#22323A]/68 sm:text-[17px]">
-                Send us the photos, videos and messages you choose. We professionally assemble them into one finished UNIKMO memory — then you decide whether to keep it private, show it in Times Square, or share extra keepsakes.
-              </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 lg:justify-start">
-                <a href="#brief" className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Start Curated</a>
-                <a href="#choices" className="inline-flex min-h-[44px] items-center text-[11px] font-medium text-[#22323A]/70 underline decoration-[#B38846]/50 underline-offset-4">See the three choices</a>
-              </div>
-              <p className="mt-5 text-[11px] leading-[1.6] text-[#22323A]/45">Curated is optional. Standard UNIKMO remains self-created and private by design.</p>
-            </div>
+        <section className="px-5 pb-14 pt-12 text-center sm:px-8 sm:pb-16 sm:pt-16 lg:pt-20">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Curated UNIKMO</p>
+          <h1 className="mx-auto mt-4 max-w-[980px] font-serif text-[39px] leading-[1.03] tracking-[-0.025em] sm:text-[52px] lg:text-[62px]">
+            You bring the moments. We make the memory.
+          </h1>
 
-            <div className="rounded-[24px] border border-[#22323A]/[0.07] bg-[radial-gradient(circle_at_50%_30%,#FFFDF9_0%,#F3EAE0_58%,#E6D9CC_100%)] p-6 shadow-[0_22px_60px_rgba(34,50,58,.09)] sm:p-8">
-              <div className="relative aspect-[1.48/1] overflow-hidden rounded-[12px] border border-white/60 bg-[#F8F2EA] shadow-[0_24px_48px_rgba(40,30,20,.16)]">
-                <Image src="/card-front.png" alt="UNIKMO physical keepsake card" fill className="object-cover" sizes="(max-width:1024px) 86vw, 480px" />
-              </div>
-              <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-                {[
-                  ['KEEP', 'Curate'],
-                  ['SHOW', 'Times Square'],
-                  ['SHARE', '$12 each'],
-                ].map(([label, text]) => (
-                  <div key={label} className="rounded-[12px] border border-[#22323A]/[0.07] bg-[#FCF9F4]/75 px-2 py-4">
-                    <p className="text-[9px] font-semibold tracking-[0.18em] text-[#B38846]">{label}</p>
-                    <p className="mt-1 text-[11px] text-[#22323A]/62">{text}</p>
-                  </div>
-                ))}
+          <div className="mx-auto mt-9 grid max-w-[1180px] gap-5 lg:grid-cols-2">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
+              <Image
+                src="/curated/times-square-night.webp"
+                alt="A curated UNIKMO memory on a Times Square billboard as friends watch"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width:1024px) 100vw, 50vw"
+              />
+            </div>
+            <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#B38846]/20 bg-[radial-gradient(circle_at_50%_35%,#FFFDF9_0%,#F3EAE0_60%,#E7DBCE_100%)]">
+              <div className="absolute inset-[9%] overflow-hidden rounded-[16px] border border-white/60 shadow-[0_24px_55px_rgba(40,30,20,.16)]">
+                <Image
+                  src="/curated/keep-it-card.webp"
+                  alt="A finished UNIKMO keepsake card beside printed photos"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:1024px) 82vw, 42vw"
+                />
               </div>
             </div>
           </div>
+
+          <p className="mx-auto mt-7 max-w-[820px] text-[15px] leading-[1.75] text-[#22323A]/68 sm:text-[17px]">
+            Send us the photos, videos and messages you choose. We professionally assemble them into one finished
+            UNIKMO memory — then you decide whether to keep it private, show it in Times Square, or share extra
+            keepsakes.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <a href="#order" className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[#B38846] px-7 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">Start Curated</a>
+            <a href="#choices" className="inline-flex min-h-[44px] items-center text-[11px] font-medium text-[#22323A]/70 underline decoration-[#B38846]/50 underline-offset-4">See the three choices</a>
+          </div>
+          <p className="mt-5 text-[11px] leading-[1.6] text-[#22323A]/45">Curated is optional. Standard UNIKMO remains self-created and private by design.</p>
         </section>
 
         <section id="choices" className="border-y border-[#22323A]/[0.06] bg-[#F8F2EB] px-5 py-16 sm:px-8 lg:py-20">
@@ -192,25 +228,41 @@ export default function CuratedPage() {
 
             <div className="mt-10 grid gap-6 lg:grid-cols-3">
               {choices.map((choice) => (
-                <article key={choice.number} className="rounded-[20px] border border-[#22323A]/[0.08] bg-[#FCF9F4] p-7 shadow-[0_14px_38px_rgba(34,50,58,.04)]">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#B38846]/40 text-[10px] font-semibold text-[#B38846]">{choice.number}</span>
-                    <span className="text-[9px] font-semibold tracking-[0.2em] text-[#B38846]">{choice.label}</span>
+                <article key={choice.number} className="flex flex-col overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#FCF9F4] shadow-[0_14px_38px_rgba(34,50,58,.04)]">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-[#EDE4D8]">
+                    <Image src={choice.image} alt={choice.imageAlt} fill className="object-cover" sizes="(max-width:1024px) 100vw, 360px" />
                   </div>
-                  <h3 className="mt-5 font-serif text-[27px] leading-[1.12]">{choice.title}</h3>
-                  {'subtitle' in choice && choice.subtitle ? <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#B38846]">{choice.subtitle}</p> : null}
-                  <p className="mt-4 text-[13px] leading-[1.7] text-[#22323A]/62">{choice.description}</p>
-                  <ul className="mt-6 space-y-3 border-t border-[#22323A]/[0.07] pt-5">
-                    {choice.points.map((point) => (
-                      <li key={point} className="flex items-start gap-3 text-[12px] leading-[1.55] text-[#22323A]/65">
-                        <span className="mt-[2px] flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full border border-[#B38846]/45 text-[10px] font-semibold text-[#B38846]">✓</span>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="flex flex-1 flex-col p-7">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#B38846]/40 text-[10px] font-semibold text-[#B38846]">{choice.number}</span>
+                      <span className="text-[9px] font-semibold tracking-[0.2em] text-[#B38846]">{choice.label}</span>
+                    </div>
+                    <h3 className="mt-5 font-serif text-[27px] leading-[1.12]">{choice.title}</h3>
+                    {'subtitle' in choice && choice.subtitle ? <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#B38846]">{choice.subtitle}</p> : null}
+                    <div className="mt-4 flex items-baseline gap-2">
+                      <span className="font-serif text-[26px] leading-none">{choice.price}</span>
+                      <span className="text-[11px] text-[#22323A]/50">{choice.priceNote}</span>
+                    </div>
+                    <p className="mt-4 text-[13px] leading-[1.7] text-[#22323A]/62">{choice.description}</p>
+                    <ul className="mt-6 space-y-3 border-t border-[#22323A]/[0.07] pt-5">
+                      {choice.points.map((point) => (
+                        <li key={point} className="flex items-start gap-3 text-[12px] leading-[1.55] text-[#22323A]/65">
+                          <span className="mt-[2px] flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full border border-[#B38846]/45 text-[10px] font-semibold text-[#B38846]">✓</span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-6 flex flex-1 flex-col justify-end gap-3 pt-1">
+                      <a href={choice.href} className="inline-flex min-h-[46px] items-center justify-center rounded-lg bg-[#B38846] px-6 text-[11px] font-medium text-white transition hover:bg-[#9D773D]">{choice.cta}</a>
+                      <a href="#order" className="text-center text-[11px] font-medium text-[#22323A]/60 underline decoration-[#B38846]/45 underline-offset-4">Configure delivery &amp; extras</a>
+                    </div>
+                  </div>
                 </article>
               ))}
             </div>
+            <p className="mx-auto mt-8 max-w-[640px] text-center text-[11px] leading-[1.6] text-[#22323A]/45">
+              Prices are in USD. Checkout is handled securely by Shopify. Digital delivery is available for the same price at checkout.
+            </p>
           </div>
         </section>
 
@@ -224,7 +276,16 @@ export default function CuratedPage() {
               </p>
             </div>
 
-            <div className="mt-10 grid overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#22323A] text-white md:grid-cols-3">
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
+                <Image src="/curated/times-square-proposal.webp" alt="A proposal moment on a Times Square billboard" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
+              </div>
+              <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
+                <Image src="/curated/times-square-day.webp" alt="A wedding memory on a Times Square billboard in daylight" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
+              </div>
+            </div>
+
+            <div className="mt-6 grid overflow-hidden rounded-[20px] border border-[#22323A]/[0.08] bg-[#22323A] text-white md:grid-cols-3">
               {[
                 ['POP', 'Capture the celebration in your own way.'],
                 ['TIMES SQUARE', 'Take the finished moment public.'],
@@ -236,7 +297,7 @@ export default function CuratedPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-center text-[10px] leading-[1.6] text-[#22323A]/45">Times Square scheduling and capture are confirmed during the concierge brief before files are submitted.</p>
+            <p className="mt-4 text-center text-[10px] leading-[1.6] text-[#22323A]/45">After checkout we confirm Times Square scheduling and capture with you before any files are submitted.</p>
           </div>
         </section>
 
@@ -261,14 +322,14 @@ export default function CuratedPage() {
           </div>
         </section>
 
-        <section id="brief" className="px-5 py-16 sm:px-8 lg:py-20">
+        <section id="order" className="px-5 py-16 sm:px-8 lg:py-20">
           <div className="mx-auto max-w-[900px]">
             <div className="mx-auto max-w-[680px] text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Start with a short brief</p>
-              <h2 className="mt-3 font-serif text-[32px] sm:text-[42px]">Tell us how far you want to take it.</h2>
-              <p className="mx-auto mt-4 max-w-[620px] text-[13px] leading-[1.7] text-[#22323A]/60 sm:text-[14px]">No files and no payment yet. Choose the experience and delivery you have in mind. We confirm scope, timing and price first.</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B38846]">Order your curated memory</p>
+              <h2 className="mt-3 font-serif text-[32px] sm:text-[42px]">Choose it, then check out.</h2>
+              <p className="mx-auto mt-4 max-w-[620px] text-[13px] leading-[1.7] text-[#22323A]/60 sm:text-[14px]">Pick your experience, delivery and any extra keepsake cards. Payment is handled securely by Shopify. Right after checkout we email you to collect your photos, videos and messages.</p>
             </div>
-            <div className="mt-9"><CuratedInquiryForm /></div>
+            <div className="mt-9"><CuratedCheckout /></div>
           </div>
         </section>
 
