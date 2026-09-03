@@ -15,7 +15,6 @@ export default function HomePage() {
       <HashAlias />
       <TestPage />
       <CuratedUnikmoTeaser />
-      <style>{`.production-home footer { display: none; }`}</style>
     </div>
   );
 }
