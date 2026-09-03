@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import CuratedUnikmoTeaser from '@/components/CuratedUnikmoTeaser';
 
 type Product = {
   id: string;
@@ -259,6 +260,8 @@ export default function TestPage() {
             })}</div>
           </div>
         </section>
+
+        <CuratedUnikmoTeaser />
 
         <section className="border-t border-[#22323A]/[0.06] bg-[#FCF9F4] px-5 py-8 sm:px-8"><div className="mx-auto grid max-w-[1180px] gap-5 sm:grid-cols-2 lg:grid-cols-4">{[
           ['lock', 'Private & secure', 'Your moments stay private.'],
