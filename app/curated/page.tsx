@@ -26,8 +26,8 @@ const choices = [
     number: '01',
     label: 'KEEP IT',
     title: 'Keep It — Curated',
-    image: '/curated/keep-it-card.webp',
-    imageAlt: 'A finished UNIKMO keepsake card beside printed photos',
+    image: '/story/she-watches.png',
+    imageAlt: 'Someone revisiting a private UNIKMO memory on their phone beside the card',
     price: `$${CURATED_PRODUCTS.KEEP_IT.price}`,
     priceNote: 'Physical or digital delivery',
     href: curatedBuyUrl(CURATED_PRODUCTS.KEEP_IT.variants.physical.id),
@@ -46,8 +46,8 @@ const choices = [
     label: 'SHOW IT',
     title: 'Show It + Keep It',
     subtitle: 'Times Square Edition',
-    image: '/curated/show-it-card.webp',
-    imageAlt: 'A UNIKMO card held up in front of a Times Square billboard',
+    image: '/curated-anniversary-billboard.webp',
+    imageAlt: 'A curated UNIKMO memory shown on a Times Square billboard',
     price: `$${CURATED_PRODUCTS.SHOW_IT.price}`,
     priceNote: 'Everything in Keep It, plus Times Square',
     href: curatedBuyUrl(CURATED_PRODUCTS.SHOW_IT.variants.physical.id),
@@ -65,8 +65,8 @@ const choices = [
     number: '03',
     label: 'SHARE IT',
     title: 'Extra Keepsakes',
-    image: '/curated/share-keepsakes.webp',
-    imageAlt: 'Four hands holding matching UNIKMO keepsake cards',
+    image: '/email-product-triptych.png',
+    imageAlt: 'Several matching UNIKMO keepsake cards',
     price: `$${CURATED_PRODUCTS.EXTRA_KEEPSAKES.pricePerCard} each`,
     priceNote: 'Add any quantity at checkout',
     href: curatedBuyUrl(CURATED_PRODUCTS.EXTRA_KEEPSAKES.variants.standard.id),
@@ -186,7 +186,7 @@ export default function CuratedPage() {
           <div className="mx-auto mt-9 grid max-w-[1180px] gap-5 lg:grid-cols-2">
             <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
               <Image
-                src="/curated/times-square-night.webp"
+                src="/curated-anniversary-billboard.webp"
                 alt="A curated UNIKMO memory on a Times Square billboard as friends watch"
                 fill
                 priority
@@ -194,16 +194,14 @@ export default function CuratedPage() {
                 sizes="(max-width:1024px) 100vw, 50vw"
               />
             </div>
-            <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#B38846]/20 bg-[radial-gradient(circle_at_50%_35%,#FFFDF9_0%,#F3EAE0_60%,#E7DBCE_100%)]">
-              <div className="absolute inset-[9%] overflow-hidden rounded-[16px] border border-white/60 shadow-[0_24px_55px_rgba(40,30,20,.16)]">
-                <Image
-                  src="/curated/keep-it-card.webp"
-                  alt="A finished UNIKMO keepsake card beside printed photos"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:1024px) 82vw, 42vw"
-                />
-              </div>
+            <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
+              <Image
+                src="/story/she-opens.png"
+                alt="Someone opening a finished UNIKMO keepsake"
+                fill
+                className="object-cover"
+                sizes="(max-width:1024px) 100vw, 50vw"
+              />
             </div>
           </div>
 
@@ -278,10 +276,10 @@ export default function CuratedPage() {
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2">
               <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
-                <Image src="/curated/times-square-proposal.webp" alt="A proposal moment on a Times Square billboard" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
+                <Image src="/curated-anniversary-billboard.webp" alt="A curated memory on a Times Square billboard" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
               </div>
               <div className="relative aspect-[3/2] overflow-hidden rounded-[20px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
-                <Image src="/curated/times-square-day.webp" alt="A wedding memory on a Times Square billboard in daylight" fill className="object-cover" sizes="(max-width:640px) 100vw, 480px" />
+                <Image src="/occasions/anniversary.png" alt="A couple revisiting their curated UNIKMO memory" fill className="object-cover object-top" sizes="(max-width:640px) 100vw, 480px" />
               </div>
             </div>
 
