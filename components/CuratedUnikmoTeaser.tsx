@@ -1,21 +1,24 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import TimesSquareRotator from './TimesSquareRotator';
 
 const offerings = [
   {
     eyebrow: 'Keep It',
     title: 'Curated Memory',
+    price: '$199',
     copy: 'We professionally assemble the photos, videos and messages you choose into one finished UNIKMO.',
   },
   {
     eyebrow: 'Show It',
     title: 'Times Square Edition',
+    price: '$399',
     copy: 'We curate it, show it in Times Square, capture the moment and preserve the experience inside your UNIKMO.',
   },
   {
     eyebrow: 'Share It',
     title: 'Extra Keepsakes',
-    copy: 'Give the same finished memory to family, friends and everyone who was part of it. $12 per extra card.',
+    price: '$12 each',
+    copy: 'Give the same finished memory to everyone who was part of it — added at checkout.',
   },
 ] as const;
 
@@ -52,16 +55,7 @@ export default function CuratedUnikmoTeaser() {
       className="border-t border-[#B38846]/20 bg-[#FCF9F4] px-5 py-14 sm:px-8 lg:py-20"
     >
       <div className="mx-auto grid max-w-[1240px] overflow-hidden rounded-[24px] border border-[#B38846]/35 bg-[#F8F2EB] shadow-[0_22px_65px_rgba(34,50,58,.07)] lg:grid-cols-[1.05fr_1fr]">
-        <div className="relative min-h-[360px] overflow-hidden sm:min-h-[460px] lg:min-h-[600px]">
-          <Image
-            src="/story/matt-writes.png"
-            alt="Choosing the moments to send for a curated UNIKMO memory"
-            fill
-            className="object-cover"
-            sizes="(max-width:1024px) 100vw, 52vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#17232A]/20 via-transparent to-transparent" />
-        </div>
+        <TimesSquareRotator className="min-h-[360px] overflow-hidden sm:min-h-[460px] lg:min-h-[600px]" />
 
         <div className="flex items-center p-7 sm:p-10 lg:p-12">
           <div className="w-full">
@@ -97,7 +91,8 @@ export default function CuratedUnikmoTeaser() {
                     {offering.eyebrow}
                   </p>
                   <h3 className="mt-1 font-serif text-[18px]">{offering.title}</h3>
-                  <p className="mt-3 text-[11px] leading-[1.6] text-[#22323A]/58">{offering.copy}</p>
+                  <p className="mt-2 font-serif text-[17px] text-[#22323A]">{offering.price}</p>
+                  <p className="mt-2 text-[11px] leading-[1.6] text-[#22323A]/58">{offering.copy}</p>
                 </article>
               ))}
             </div>

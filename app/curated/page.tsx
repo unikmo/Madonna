@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import CuratedCheckout from '@/components/CuratedCheckout';
+import TimesSquareRotator from '@/components/TimesSquareRotator';
 import { CURATED_PRODUCTS, curatedBuyUrl } from '@/lib/curated-products';
 
 export const metadata: Metadata = {
@@ -26,8 +27,8 @@ const choices = [
     number: '01',
     label: 'KEEP IT',
     title: 'Keep It — Curated',
-    image: '/occasions/anniversary.png',
-    imageAlt: 'A couple revisiting their finished UNIKMO memory',
+    image: '/curated/curated-card.webp',
+    imageAlt: 'A finished UNIKMO keepsake card beside printed photos',
     price: `$${CURATED_PRODUCTS.KEEP_IT.price}`,
     priceNote: 'Physical or digital delivery',
     href: curatedBuyUrl(CURATED_PRODUCTS.KEEP_IT.variants.physical.id),
@@ -46,8 +47,8 @@ const choices = [
     label: 'SHOW IT',
     title: 'Show It + Keep It',
     subtitle: 'Times Square Edition',
-    image: '/occasions/long-distance-love.png',
-    imageAlt: 'Someone watching their curated UNIKMO memory',
+    image: '/curated/ts-ny.webp',
+    imageAlt: 'A UNIKMO card held up in front of a Times Square billboard',
     price: `$${CURATED_PRODUCTS.SHOW_IT.price}`,
     priceNote: 'Everything in Keep It, plus Times Square',
     href: curatedBuyUrl(CURATED_PRODUCTS.SHOW_IT.variants.physical.id),
@@ -65,8 +66,8 @@ const choices = [
     number: '03',
     label: 'SHARE IT',
     title: 'Extra Keepsakes',
-    image: '/email-product-triptych.png',
-    imageAlt: 'Several matching UNIKMO keepsake cards',
+    image: '/curated/curated-manycards.webp',
+    imageAlt: 'Four people holding matching UNIKMO keepsake cards',
     price: `$${CURATED_PRODUCTS.EXTRA_KEEPSAKES.pricePerCard} each`,
     priceNote: 'Add any quantity at checkout',
     href: curatedBuyUrl(CURATED_PRODUCTS.EXTRA_KEEPSAKES.variants.standard.id),
@@ -184,21 +185,13 @@ export default function CuratedPage() {
           </h1>
 
           <div className="mx-auto mt-9 grid max-w-[1180px] gap-5 lg:grid-cols-2">
+            <TimesSquareRotator className="aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]" />
             <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
               <Image
-                src="/story/she-watches.png"
-                alt="Someone revisiting their finished UNIKMO memory"
+                src="/curated/curated-card.webp"
+                alt="A finished UNIKMO keepsake card beside printed photos"
                 fill
                 priority
-                className="object-cover"
-                sizes="(max-width:1024px) 100vw, 50vw"
-              />
-            </div>
-            <div className="relative aspect-[3/2] overflow-hidden rounded-[24px] border border-[#22323A]/[0.06] bg-[#EDE4D8]">
-              <Image
-                src="/story/she-opens.png"
-                alt="Someone opening a finished UNIKMO keepsake"
-                fill
                 className="object-cover"
                 sizes="(max-width:1024px) 100vw, 50vw"
               />
