@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { COMPANY } from '@/lib/company';
 
 const nav = [
   { label: 'How it works', href: '/how-unikmo-works' },
@@ -10,8 +11,9 @@ const nav = [
 
 const legal = [
   { label: 'Privacy', href: '/privacy' },
+  { label: 'Cookies', href: '/cookies' },
   { label: 'Terms', href: '/terms' },
-  { label: 'Imprint', href: '/imprint' },
+  { label: 'Legal Notice', href: '/imprint' },
 ];
 
 export default function SiteFooter() {
@@ -43,7 +45,7 @@ export default function SiteFooter() {
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>UNIKMO &copy; {year}</span>
             <span aria-hidden="true" className="text-[#22323A]/20">|</span>
-            <span>PlanetHike O&Uuml;, Tallinn, Estonia</span>
+            <span>{COMPANY.legalName}, Wyoming, USA</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
@@ -53,20 +55,10 @@ export default function SiteFooter() {
               </Link>
             ))}
             <span aria-hidden="true" className="text-[#22323A]/20">|</span>
-            <a
-              href="https://www.instagram.com/unikmo_first"
-              target="_blank"
-              rel="noreferrer"
-              className="transition hover:text-[#B38846]"
-            >
+            <a href={COMPANY.social.instagram} target="_blank" rel="noreferrer" className="transition hover:text-[#B38846]">
               Instagram
             </a>
-            <a
-              href="https://www.tiktok.com/@myunikmo"
-              target="_blank"
-              rel="noreferrer"
-              className="transition hover:text-[#B38846]"
-            >
+            <a href={COMPANY.social.tiktok} target="_blank" rel="noreferrer" className="transition hover:text-[#B38846]">
               TikTok
             </a>
           </div>

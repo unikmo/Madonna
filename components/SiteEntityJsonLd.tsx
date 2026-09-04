@@ -6,17 +6,18 @@ export default function SiteEntityJsonLd() {
         '@type': 'Organization',
         '@id': 'https://www.unikmo.com/#organization',
         name: 'UNIKMO',
-        legalName: 'PlanetHike OÜ',
+        legalName: 'TSquare Ventures LLC',
         url: 'https://www.unikmo.com/',
         description:
           'UNIKMO creates physical keepsake cards that unlock a private digital memory such as a video, voice note, photo, or written message.',
         email: 'hello@planethike.org',
         address: {
           '@type': 'PostalAddress',
-          streetAddress: 'Järvevana tee 9',
-          addressLocality: 'Tallinn',
-          postalCode: '11314',
-          addressCountry: 'EE',
+          streetAddress: '30 N Gould St, Ste R',
+          addressLocality: 'Sheridan',
+          addressRegion: 'WY',
+          postalCode: '82801',
+          addressCountry: 'US',
         },
         contactPoint: {
           '@type': 'ContactPoint',

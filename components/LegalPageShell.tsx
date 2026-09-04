@@ -55,8 +55,9 @@ export default function LegalPageShell({
 
           <div className="mt-14 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#22323A]/[0.08] pt-6 text-[11px] font-medium text-[#22323A]/60">
             <Link href="/privacy" className="hover:text-[#B38846]">Privacy</Link>
+            <Link href="/cookies" className="hover:text-[#B38846]">Cookies</Link>
             <Link href="/terms" className="hover:text-[#B38846]">Terms</Link>
-            <Link href="/imprint" className="hover:text-[#B38846]">Imprint</Link>
+            <Link href="/imprint" className="hover:text-[#B38846]">Legal Notice</Link>
             <Link href="/contact" className="hover:text-[#B38846]">Contact</Link>
           </div>
         </div>
