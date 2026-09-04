@@ -10,7 +10,7 @@ export default function SiteEntityJsonLd() {
         url: 'https://www.unikmo.com/',
         description:
           'UNIKMO creates physical keepsake cards that unlock a private digital memory such as a video, voice note, photo, or written message.',
-        email: 'hello@planethike.org',
+        email: 'hello@unikmo.com',
         address: {
           '@type': 'PostalAddress',
           streetAddress: '30 N Gould St, Ste R',
@@ -21,7 +21,7 @@ export default function SiteEntityJsonLd() {
         },
         contactPoint: {
           '@type': 'ContactPoint',
-          email: 'hello@planethike.org',
+          email: 'hello@unikmo.com',
           contactType: 'customer support',
           url: 'https://www.unikmo.com/contact',
           availableLanguage: 'en',

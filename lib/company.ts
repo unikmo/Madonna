@@ -18,7 +18,7 @@ export const COMPANY = {
   },
   addressOneLine: '30 N Gould St, Ste R, Sheridan, WY 82801, United States',
   registeredAgent: 'Registered Agents Inc, 30 N Gould St, Ste R, Sheridan, WY 82801',
-  email: 'hello@planethike.org',
+  email: 'hello@unikmo.com',
   governingLaw: 'the State of Wyoming, United States',
   social: {
     instagram: 'https://www.instagram.com/unikmo_first',

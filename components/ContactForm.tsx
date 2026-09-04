@@ -31,7 +31,7 @@ export default function ContactForm() {
       setEmail('');
       setMessage('');
     } catch {
-      setError('Failed to send. Please email hello@planethike.org instead.');
+      setError('Failed to send. Please email hello@unikmo.com instead.');
       setStatus('error');
     }
   }
