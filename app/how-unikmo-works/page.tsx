@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How UNIKMO Works | Physical Memory Cards for Private Messages',
@@ -315,16 +316,7 @@ export default function HowUnikmoWorksPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[#22323A]/[0.08] bg-[#F7F0E8] py-8">
-        <div className="mx-auto flex max-w-[1080px] flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-8 sm:text-left">
-          <Image src="/unikmo-logo-header.png" alt="UNIKMO" width={729} height={220} className="h-8 w-auto" />
-          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.14em] text-[#22323A]/48">
-            <Link href="/">UNIKMO</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/#shop">Choose Your Card</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

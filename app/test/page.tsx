@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import CuratedUnikmoTeaser from '@/components/CuratedUnikmoTeaser';
+import SiteFooter from '@/components/SiteFooter';
 
 type Product = {
   id: string;
@@ -270,7 +271,7 @@ export default function TestPage() {
           ['quality', 'Premium quality', 'Made to be kept.'],
         ].map(([kind, title, body]) => <div key={title} className="flex items-center gap-4"><div className="text-[#B38846]"><TrustIcon kind={kind as 'lock' | 'phone' | 'leaf' | 'quality'} /></div><div><p className="text-[12px] font-medium">{title}</p><p className="mt-1 text-[11px] text-[#22323A]/55">{body}</p></div></div>)}</div></section>
       </main>
-      <footer className="border-t border-[#22323A]/[0.07] bg-[#F8F2EB] px-5 py-10 sm:px-8"><div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-5 text-center sm:flex-row sm:text-left"><Image src="/unikmo-logo-header.png" alt="UNIKMO" width={729} height={220} className="h-8 w-auto" /><p className="text-[11px] text-[#22323A]/50">Test page only — production unchanged.</p></div></footer>
+      <SiteFooter />
     </div>
   );
 }

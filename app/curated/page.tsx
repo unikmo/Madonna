@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import CuratedCheckout from '@/components/CuratedCheckout';
 import TimesSquareRotator from '@/components/TimesSquareRotator';
+import SiteFooter from '@/components/SiteFooter';
 import { CURATED_PRODUCTS, curatedBuyUrl } from '@/lib/curated-products';
 
 export const metadata: Metadata = {
@@ -147,6 +148,15 @@ export default function CuratedPage() {
     ],
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'UNIKMO', item: 'https://www.unikmo.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Curated UNIKMO', item: 'https://www.unikmo.com/curated' },
+    ],
+  };
+
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -162,6 +172,7 @@ export default function CuratedPage() {
     <div className="min-h-screen bg-[#FCF9F4] text-[#22323A]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <header className="sticky top-0 z-40 border-b border-[#22323A]/[0.07] bg-[#FCF9F4]/95 backdrop-blur-xl">
@@ -339,16 +350,7 @@ export default function CuratedPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[#22323A]/[0.08] bg-[#FCF9F4] py-8">
-        <div className="mx-auto flex max-w-[1080px] flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-8 sm:text-left">
-          <Image src="/unikmo-logo-header.png" alt="UNIKMO" width={729} height={220} className="h-8 w-auto" />
-          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.14em] text-[#22323A]/48">
-            <Link href="/">UNIKMO</Link>
-            <Link href="/how-unikmo-works">How it works</Link>
-            <Link href="/faq">FAQ</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

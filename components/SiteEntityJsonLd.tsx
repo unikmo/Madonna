@@ -6,9 +6,29 @@ export default function SiteEntityJsonLd() {
         '@type': 'Organization',
         '@id': 'https://www.unikmo.com/#organization',
         name: 'UNIKMO',
+        legalName: 'PlanetHike OÜ',
         url: 'https://www.unikmo.com/',
         description:
           'UNIKMO creates physical keepsake cards that unlock a private digital memory such as a video, voice note, photo, or written message.',
+        email: 'hello@planethike.org',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Järvevana tee 9',
+          addressLocality: 'Tallinn',
+          postalCode: '11314',
+          addressCountry: 'EE',
+        },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          email: 'hello@planethike.org',
+          contactType: 'customer support',
+          url: 'https://www.unikmo.com/contact',
+          availableLanguage: 'en',
+        },
+        sameAs: [
+          'https://www.instagram.com/unikmo_first',
+          'https://www.tiktok.com/@myunikmo',
+        ],
         logo: {
           '@type': 'ImageObject',
           '@id': 'https://www.unikmo.com/#logo',
@@ -53,6 +73,11 @@ export default function SiteEntityJsonLd() {
             '@type': 'WebPage',
             url: 'https://www.unikmo.com/faq',
             name: 'UNIKMO FAQ',
+          },
+          {
+            '@type': 'WebPage',
+            url: 'https://www.unikmo.com/contact',
+            name: 'Contact UNIKMO',
           },
         ],
       },
