@@ -25,8 +25,8 @@ const categories: Array<{ name: string; consent: string; copy: string }> = [
   },
   {
     name: 'Analytics',
-    consent: 'Consent required',
-    copy: 'Would measure how the site is used so we can improve it. Not currently used.',
+    consent: 'No consent required (cookieless)',
+    copy: 'We use Vercel Web Analytics to count page views and see which sites send us traffic. It sets no cookies and stores no identifier on your device, so it does not require consent. No other analytics tools are used.',
   },
   {
     name: 'Marketing',
@@ -52,10 +52,18 @@ export default function CookiePolicyPage() {
 
       <LegalSection heading="2. What we currently use">
         <p>
-          UNIKMO currently uses <span className="font-medium text-[#22323A]">only strictly necessary cookies and
-          equivalent local storage</span>. These keep the site running and let you complete a purchase. We do{' '}
-          <span className="font-medium text-[#22323A]">not</span> currently use analytics, advertising or tracking
-          cookies, and there is no cross-site tracking.
+          On unikmo.com itself we use <span className="font-medium text-[#22323A]">only strictly necessary cookies and
+          equivalent local storage</span>. These keep the site running and let you complete a purchase.
+        </p>
+        <p>
+          For traffic measurement we use <span className="font-medium text-[#22323A]">Vercel Web Analytics</span>, a
+          privacy-friendly, <span className="font-medium text-[#22323A]">cookieless</span> tool. It records aggregate page
+          views and referring sites. It does not set cookies, does not store any identifier on your device, does not track
+          you across other websites, and is not used for advertising. Because it does not store or read information on your
+          device, it does not require a consent banner.
+        </p>
+        <p>
+          We do <span className="font-medium text-[#22323A]">not</span> use advertising, retargeting or marketing cookies.
         </p>
         <p>
           Checkout and payment take place on Shopify. When you proceed to checkout, Shopify sets its own strictly
@@ -94,15 +102,21 @@ export default function CookiePolicyPage() {
             requirement under the EU ePrivacy rules because they are essential to provide a service you have requested.
           </li>
           <li>
-            <span className="font-medium text-[#22323A]">All other categories</span> (preferences, analytics, marketing)
-            would only be set with your prior consent (GDPR Art. 6(1)(a) and the ePrivacy Directive as implemented in your
-            country). Because we do not currently use them, no consent banner is shown.
+            <span className="font-medium text-[#22323A]">Cookieless analytics</span> (Vercel Web Analytics) does not store
+            or access information on your device, so the ePrivacy consent requirement does not apply. The limited
+            aggregate data it produces is processed on the basis of our legitimate interest in understanding and
+            improving the site (GDPR Art. 6(1)(f)); you can object at any time by contacting us.
+          </li>
+          <li>
+            <span className="font-medium text-[#22323A]">Preferences and marketing cookies</span> would only be set with
+            your prior consent (GDPR Art. 6(1)(a) and the ePrivacy Directive as implemented in your country). Because we
+            do not use them, no consent banner is shown.
           </li>
         </ul>
         <p>
-          If we introduce non-essential cookies, we will first present a consent banner that lets you accept or reject
-          each category before any such cookie is set, and update this policy with the specific cookies, providers and
-          durations.
+          If we introduce cookies or similar technologies that are not strictly necessary, we will first present a consent
+          banner that lets you accept or reject each category before any such technology is used, and update this policy
+          with the specific cookies, providers and durations.
         </p>
       </LegalSection>
 

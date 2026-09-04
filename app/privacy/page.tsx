@@ -38,7 +38,11 @@ export default function PrivacyPage() {
           </li>
           <li>
             Basic technical data — standard server logs and strictly necessary cookies needed to run the site and
-            checkout (see our <a href="/cookies" className={link}>Cookie Policy</a>).
+            checkout.
+          </li>
+          <li>
+            Aggregate analytics — cookieless page-view and traffic-source data from Vercel Web Analytics. It does not
+            identify you and is not linked to your order (see our <a href="/cookies" className={link}>Cookie Policy</a>).
           </li>
         </ul>
         <p>No accounts are required, and we do not build advertising or tracking profiles.</p>
@@ -141,10 +145,11 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="12. Cookies">
+      <LegalSection heading="12. Cookies &amp; analytics">
         <p>
-          We use only strictly necessary cookies to run the site and checkout. If we add analytics or marketing cookies
-          in future, we will ask for your consent first. Details are in our{' '}
+          We use only strictly necessary cookies to run the site and checkout, plus Vercel Web Analytics — a cookieless
+          tool that measures aggregate traffic without storing anything on your device or identifying you. We do not use
+          advertising or marketing cookies. If that changes, we will ask for your consent first. Details are in our{' '}
           <a href="/cookies" className={link}>Cookie Policy</a>.
         </p>
       </LegalSection>
