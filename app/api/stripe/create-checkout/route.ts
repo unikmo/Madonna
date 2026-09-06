@@ -7,15 +7,21 @@ export const dynamic = 'force-dynamic';
 const SHIPPING_COUNTRIES = ['DE', 'AT', 'CH', 'NL', 'BE', 'FR', 'IT', 'ES', 'PT', 'IE', 'GB', 'US', 'CA', 'AU'];
 
 function getBaseUrl(request: NextRequest): string {
-  const configured = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL;
-  if (configured) return configured.replace(/\/$/, '');
-
+  // For the parallel test flow, always return to the environment that initiated Checkout.
+  // This keeps preview testing isolated from production even when BASE_URL points to unikmo.com.
   const origin = request.headers.get('origin');
   if (origin) return origin.replace(/\/$/, '');
 
   const host = request.headers.get('host');
-  const protocol = host?.includes('localhost') ? 'http' : 'https';
-  return host ? `${protocol}://${host}` : 'http://localhost:3000';
+  if (host) {
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    return `${protocol}://${host}`;
+  }
+
+  const configured = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL;
+  if (configured) return configured.replace(/\/$/, '');
+
+  return 'http://localhost:3000';
 }
 
 export async function POST(request: NextRequest) {
