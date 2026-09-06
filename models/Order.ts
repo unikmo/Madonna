@@ -2,23 +2,37 @@ import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
 export interface ILineItem {
   productId: string;
-  variantId: string;
+  variantId?: string;
   quantity: number;
   metafields?: Record<string, any>;
 }
 
+export interface IShippingAddress {
+  name?: string;
+  line1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface IOrder extends Document {
-  shopifyOrderId: string;
+  paymentProvider: 'shopify' | 'stripe';
+  paymentReference?: string;
+  shopifyOrderId?: string;
   shopifyOrderName?: string;
-  shopifyProductId: string;
+  shopifyProductId?: string;
+  productCode?: string;
   orderQuantity: number;
   user: Types.ObjectId;
   email: string;
   customerName?: string;
+  shippingAddress?: IShippingAddress;
   totalPrice: number;
   currency: string;
   paymentStatus: 'paid';
-  source: 'webhook' | 'admin';
+  source: 'webhook' | 'admin' | 'stripe';
   tags: string[];
   lineItems: ILineItem[];
   createdAt: Date;
@@ -27,19 +41,39 @@ export interface IOrder extends Document {
 
 const OrderSchema: Schema = new Schema(
   {
+    paymentProvider: {
+      type: String,
+      enum: ['shopify', 'stripe'],
+      default: 'shopify',
+      required: true,
+      index: true,
+    },
+    paymentReference: {
+      type: String,
+      required: false,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
     shopifyOrderId: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
+      sparse: true,
       index: true,
     },
     shopifyProductId: {
       type: String,
-      required: true,
+      required: false,
     },
     shopifyOrderName: {
       type: String,
       required: false,
+    },
+    productCode: {
+      type: String,
+      required: false,
+      index: true,
     },
     orderQuantity: {
       type: Number,
@@ -62,6 +96,15 @@ const OrderSchema: Schema = new Schema(
       trim: true,
       default: '',
     },
+    shippingAddress: {
+      name: String,
+      line1: String,
+      line2: String,
+      city: String,
+      state: String,
+      postalCode: String,
+      country: String,
+    },
     totalPrice: {
       type: Number,
       required: true,
@@ -79,7 +122,7 @@ const OrderSchema: Schema = new Schema(
     },
     source: {
       type: String,
-      enum: ['webhook', 'admin'],
+      enum: ['webhook', 'admin', 'stripe'],
       default: 'webhook',
       required: true,
       index: true,
