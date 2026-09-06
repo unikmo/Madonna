@@ -33,8 +33,71 @@ export interface ProcessOrderInput {
   customerName?: string;
 }
 
+export interface StripePaidOrderInput {
+  checkoutSessionId: string;
+  paymentIntentId?: string;
+  email: string;
+  totalPrice: number;
+  currency: string;
+  productCode: 'single' | 'four' | 'seven';
+  quantity: Quantity;
+  customerName?: string;
+  shippingAddress?: {
+    name?: string;
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+}
+
 function normalizeShopifyId(id: string | number | undefined): string {
   return id != null ? String(id) : '';
+}
+
+async function generateCodesForOrder({
+  userId,
+  orderId,
+  quantity,
+  deliveryType,
+}: {
+  userId: any;
+  orderId: any;
+  quantity: Quantity;
+  deliveryType: DeliveryType;
+}): Promise<string[]> {
+  const generatedCodes: string[] = [];
+
+  for (let i = 0; i < quantity; i++) {
+    try {
+      let code = '';
+      let attempts = 0;
+      const maxAttempts = 10;
+      do {
+        code = generateMomentCode(quantity, deliveryType);
+        attempts += 1;
+        if (attempts >= maxAttempts) {
+          throw new Error('Failed to generate unique code after multiple attempts');
+        }
+      } while (await MomentCode.findOne({ code }));
+
+      await MomentCode.create({
+        code,
+        user: userId,
+        order: orderId,
+        quantity,
+        deliveryType,
+        status: 'new',
+      });
+      generatedCodes.push(code);
+    } catch (error) {
+      console.error('Error generating code:', error);
+    }
+  }
+
+  return generatedCodes;
 }
 
 /**
@@ -169,6 +232,8 @@ export async function processPaidOrderAndGenerateCodes(input: ProcessOrderInput)
   const firstProductId = normalizeShopifyId(input.lineItems[0]?.product_id);
 
   const orderRecord = await Order.create({
+    paymentProvider: 'shopify',
+    paymentReference: `shopify:${input.shopifyOrderId}`,
     shopifyOrderId: input.shopifyOrderId,
     shopifyOrderName: input.shopifyOrderName || input.shopifyOrderNumber,
     shopifyProductId: firstProductId,
@@ -190,32 +255,13 @@ export async function processPaidOrderAndGenerateCodes(input: ProcessOrderInput)
 
   const generatedCodes: string[] = [];
   for (const item of input.codesToGenerate) {
-    for (let i = 0; i < item.quantity; i++) {
-      try {
-        let code = '';
-        let attempts = 0;
-        const maxAttempts = 10;
-        do {
-          code = generateMomentCode(item.quantity, item.deliveryType);
-          attempts += 1;
-          if (attempts >= maxAttempts) {
-            throw new Error('Failed to generate unique code after multiple attempts');
-          }
-        } while (await MomentCode.findOne({ code }));
-
-        await MomentCode.create({
-          code,
-          user: user._id,
-          order: orderRecord._id,
-          quantity: item.quantity,
-          deliveryType: item.deliveryType,
-          status: 'new',
-        });
-        generatedCodes.push(code);
-      } catch (error) {
-        console.error('Error generating code:', error);
-      }
-    }
+    const codes = await generateCodesForOrder({
+      userId: user._id,
+      orderId: orderRecord._id,
+      quantity: item.quantity,
+      deliveryType: item.deliveryType,
+    });
+    generatedCodes.push(...codes);
   }
 
   if (generatedCodes.length > 0) {
@@ -233,3 +279,71 @@ export async function processPaidOrderAndGenerateCodes(input: ProcessOrderInput)
   };
 }
 
+export async function processStripePaidOrder(input: StripePaidOrderInput): Promise<{
+  created: boolean;
+  orderId: string;
+  generatedCodes: string[];
+}> {
+  const normalizedEmail = input.email.toLowerCase().trim();
+  const paymentReference = `stripe:${input.checkoutSessionId}`;
+  const existingOrder = await Order.findOne({ paymentReference });
+  if (existingOrder) {
+    return {
+      created: false,
+      orderId: existingOrder._id.toString(),
+      generatedCodes: [],
+    };
+  }
+
+  let user = await User.findOne({ email: normalizedEmail });
+  if (!user) {
+    user = await User.create({
+      email: normalizedEmail,
+      roles: ['buyer'],
+    });
+  }
+
+  const orderRecord = await Order.create({
+    paymentProvider: 'stripe',
+    paymentReference,
+    productCode: input.productCode,
+    orderQuantity: input.quantity,
+    user: user._id,
+    email: normalizedEmail,
+    customerName: input.customerName || input.shippingAddress?.name || '',
+    shippingAddress: input.shippingAddress || undefined,
+    totalPrice: input.totalPrice,
+    currency: input.currency || 'USD',
+    paymentStatus: 'paid',
+    source: 'stripe',
+    tags: ['stripe-test'],
+    lineItems: [
+      {
+        productId: input.productCode,
+        variantId: input.paymentIntentId || input.checkoutSessionId,
+        quantity: input.quantity,
+      },
+    ],
+  });
+
+  const generatedCodes = await generateCodesForOrder({
+    userId: user._id,
+    orderId: orderRecord._id,
+    quantity: input.quantity,
+    deliveryType: 'physical',
+  });
+
+  if (generatedCodes.length > 0) {
+    try {
+      await sendMomentCodesEmail(normalizedEmail, generatedCodes, input.checkoutSessionId);
+    } catch (emailError) {
+      console.error('Failed to send Stripe order email:', emailError);
+    }
+  }
+
+  return {
+    created: true,
+    orderId: orderRecord._id.toString(),
+    generatedCodes,
+  };
+}
